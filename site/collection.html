@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypurr Terminal — The Collection</title>
+<meta name="description" content="Browse all 4,600 Hypurrs by trait and rarity, each wired to its owner's live Hyperliquid book. Direction and size only, never PnL.">
+<meta name="theme-color" content="#0E0B08">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/base.css">
+<script src="/assets/app.js"></script>
+<style>
+  .hero{padding:8px 0 6px}
+  .hero h1{margin:8px 0 0;font-family:'Bricolage Grotesque';font-size:clamp(38px,6vw,64px);line-height:.98;font-weight:700;letter-spacing:-.03em}
+  .hero h1 .hl{background:linear-gradient(120deg,var(--mint),var(--grape));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin:16px 0 0;color:var(--dim);font-size:clamp(15px,1.7vw,18px);font-weight:500;max-width:640px;line-height:1.5}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 6px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 20px}
+  .stat b{font-family:'Bricolage Grotesque';font-size:24px;font-weight:700;display:block;line-height:1}
+  .stat span{font-size:12px;color:var(--dim);font-weight:600;margin-top:5px;display:block}
+  .stat.live b{color:var(--mint)}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:22px 0 8px;position:sticky;top:62px;z-index:20;padding:12px;border-radius:16px;background:rgba(23,18,12,.82);border:1px solid var(--line);backdrop-filter:blur(10px)}
+  .field{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:8px 12px;font-weight:600;color:var(--dim);font-size:13px}
+  .field input,.field select{border:0;outline:0;background:transparent;font-family:'Inter';font-weight:600;font-size:14px;color:var(--ink)}
+  .field input{width:120px}
+  .field select{cursor:pointer} .field select option{background:#1a140d;color:var(--ink)}
+  .btn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:11px;padding:9px 15px;font-weight:600;font-size:13.5px;color:var(--ink);transition:.25s var(--ease)}
+  .btn:hover{border-color:var(--faint)}
+  .btn.p{background:var(--ink);color:#12100b;border-color:var(--ink)}
+  .btn.live{color:var(--mint);border-color:rgba(84,224,203,.35)}
+  .btn.live.on{background:var(--mint);color:#0b0906;border-color:var(--mint)}
+  .count{margin-left:auto;font-weight:700;color:var(--faint);font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin:16px 0 20px}
+  .cat{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s;position:relative}
+  .cat:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.5);border-color:var(--line2)}
+  .thumb{aspect-ratio:1;background:var(--panel2);position:relative}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .rank{position:absolute;top:8px;left:8px;font-family:'Bricolage Grotesque';font-weight:700;font-size:11px;background:rgba(0,0,0,.66);color:var(--ink);padding:3px 9px;border-radius:999px;border:1px solid var(--line2);backdrop-filter:blur(4px)}
+  .trading{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:5px;background:rgba(14,11,8,.85);border:1px solid var(--mint);color:var(--mint);font-weight:600;font-size:11px;padding:3px 9px 3px 8px;border-radius:999px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);position:relative}
+  .dot.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--mint);animation:pulse 1.8s var(--ease) infinite}
+  @keyframes pulse{0%{transform:scale(.6);opacity:.8}100%{transform:scale(1.9);opacity:0}}
+  .cat .meta{padding:11px 13px 13px}
+  .cat .meta .nm{font-family:'Bricolage Grotesque';font-weight:600;font-size:15px}
+  .pos-mini{margin-top:7px;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px;color:var(--dim)}
+  .pos-mini .side{font-weight:700;padding:1px 8px;border-radius:999px;font-size:11.5px}
+  .side.long{background:var(--long-soft);color:var(--long)}
+  .side.short{background:var(--short-soft);color:var(--short)}
+  .flat{margin-top:7px;font-weight:600;font-size:12px;color:var(--faint)}
+  #sentinel{height:1px}
+  .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.66);backdrop-filter:blur(5px)}
+  .modal.open{display:flex}
+  .sheet{background:var(--panel);border-radius:24px;max-width:760px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6);border:1px solid var(--line2)}
+  .sheet .top{display:grid;grid-template-columns:250px 1fr;gap:0}
+  .sheet .art{background:var(--panel2)}
+  .sheet .art img{width:100%;display:block}
+  .sheet .side-pad{padding:22px 24px}
+  .sheet h2{margin:0;font-family:'Bricolage Grotesque';font-size:26px;font-weight:700}
+  .owner{margin:5px 0 16px;font-weight:500;color:var(--dim);font-size:13.5px}
+  .owner b{color:var(--ink)}
+  .owner code{background:var(--panel2);padding:2px 8px;border-radius:8px;font-size:12.5px;border:1px solid var(--line)}
+  .panel{background:linear-gradient(135deg,rgba(84,224,203,.06),rgba(237,190,114,.05));border:1px solid var(--line2);border-radius:16px;padding:14px 16px;margin-bottom:16px}
+  .panel h3{margin:0 0 10px;font-family:'Bricolage Grotesque';font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .prow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px dashed var(--line);font-weight:600}
+  .prow:first-of-type{border-top:0}
+  .prow .coin{font-family:'Bricolage Grotesque';font-weight:600;min-width:56px}
+  .prow .lev{font-size:12px;color:var(--faint);font-weight:700}
+  .prow .ntl{margin-left:auto;font-family:'Bricolage Grotesque';font-weight:600}
+  .traits{padding:0 24px 24px}
+  .traits h3{font-size:11.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin:6px 0 12px}
+  .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .trait{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+  .trait .k{font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+  .trait .v{font-family:'Bricolage Grotesque';font-weight:600;font-size:14.5px;margin-top:3px}
+  .trait .rr{font-size:11.5px;font-weight:700;color:var(--mint);margin-top:4px}
+  .x{position:sticky;top:10px;float:right;margin:10px 10px 0 0;width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:rgba(14,11,8,.9);color:var(--ink);font-size:18px;cursor:pointer;z-index:2}
+  .tl-head{font-family:'Bricolage Grotesque';font-weight:600;font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.18em;margin:2px 24px 2px}
+  .tl{padding:6px 24px 20px}
+  .tl-stat{font-weight:500;font-size:13px;color:var(--dim);margin:4px 0 14px}
+  .tl-stat b{color:var(--ink)} .tl-stat code{background:var(--panel2);padding:1px 6px;border-radius:6px;border:1px solid var(--line)}
+  .tl-track{position:relative;height:28px;margin:2px 2px}
+  .tl-line{position:absolute;top:13px;left:0;right:0;height:3px;border-radius:2px;background:var(--line2)}
+  .tl-dot{position:absolute;top:6px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2.5px solid var(--panel);box-shadow:0 2px 6px rgba(0,0,0,.5);cursor:pointer}
+  .tl-dot.mint{background:var(--faint)} .tl-dot.airdrop{background:var(--mint)} .tl-dot.trade{background:var(--coral)}
+  .tl-axis{display:flex;justify-content:space-between;font-weight:700;font-size:11px;color:var(--faint);margin:2px 2px 0}
+  .tl-leg{display:flex;gap:14px;margin:10px 2px 2px;font-weight:600;font-size:11.5px;color:var(--dim)}
+  .tl-leg i{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  .tl-list{margin-top:10px;max-height:190px;overflow:auto;border-top:1px solid var(--line)}
+  .tl-row{display:grid;grid-template-columns:84px 120px 1fr;gap:8px;padding:8px 2px;border-bottom:1px dashed var(--line);font-weight:600;font-size:12.5px;align-items:center}
+  .tl-k{font-family:'Bricolage Grotesque';font-weight:600;text-transform:capitalize;padding:1px 9px;border-radius:999px;font-size:11px;justify-self:start}
+  .tl-k.mint{background:var(--panel2);color:var(--dim);border:1px solid var(--line2)} .tl-k.airdrop{background:var(--long-soft);color:var(--mint)} .tl-k.trade{background:var(--short-soft);color:var(--coral)}
+  .tl-d{color:var(--dim)} .tl-o{font-weight:700;color:var(--ink)}
+  .vc{padding:6px 24px 18px} .vc-none{padding:2px 24px 16px;font-weight:500;font-size:13px;color:var(--faint)}
+  .vc-stat{font-weight:500;font-size:13.5px;color:var(--dim);margin:2px 0 8px} .vc-stat b{color:var(--grape);font-family:'Bricolage Grotesque'}
+  .vc-svg{width:100%;height:120px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px}
+  .vc-axis{display:flex;justify-content:space-between;font-weight:700;font-size:11px;color:var(--faint);margin:4px 2px 0}
+  .pnote{margin-top:10px;font-weight:500;font-size:11.5px;color:var(--dim);border-top:1px dashed var(--line2);padding-top:8px}
+  @media(max-width:560px){.hero h1{font-size:32px}.sheet .top{grid-template-columns:1fr}.field input{width:90px}}
+</style></head>
+<body data-page="collection">
+<header class="site"><div class="bar">
+  <a class="brand" href="/"><span class="logo">🐾</span><span>HYPURR</span></a>
+  <nav class="top">
+    <a href="/collection" data-nav="collection">The Collection</a>
+    <a href="/positioning" data-nav="positioning">The Index</a>
+    <a href="/desk" data-nav="desk">Live Desk</a>
+    <a href="/pride" data-nav="pride">The Pride</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <div class="kicker">The Collection · 4,600 Hyperliquid OGs</div>
+  <div class="hero">
+    <h1>Every Hypurr, and <span class="hl">what they're trading.</span></h1>
+    <p>Browse the whole pride by trait and rarity. Each Hypurr is wired to its owner's live Hyperliquid book, so you can see who's on the tape right now.</p>
+    <div class="stats">
+      <div class="stat"><b id="s-supply">4,600</b><span>Hypurrs</span></div>
+      <div class="stat"><b id="s-holders">–</b><span>unique holders</span></div>
+      <div class="stat live"><b id="s-live">–</b><span>holding a live position</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="controls">
+    <label class="field">⌕ <input id="q" placeholder="Hypurr # id" inputmode="numeric"></label>
+    <label class="field">Trait <select id="cat"><option value="">any</option></select></label>
+    <label class="field"><select id="val"><option value="">any value</option></select></label>
+    <button class="btn live" id="onlyLive">only trading</button>
+    <button class="btn" id="sort">rarest first</button>
+    <button class="btn p" id="rand">random</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div id="board" class="loading"><div class="spin"></div>loading the pride…</div>
+  <div class="grid" id="grid"></div>
+  <div id="sentinel"></div>
+</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="tt" id="tt"></div>
+
+<footer class="site"><div class="foot">
+  <span id="note"></span>
+  <div class="lg"><a href="/privacy">Privacy</a><a href="/privacy">Cookies</a><span>· Hypurr Terminal, unofficial community tool</span></div>
+</div></footer>
+
+<script>
+(async function(){
+  const [TOK, FREQ, OWN, POS, PROVRAW, SALES] = await Promise.all([
+    HT.json('/data/tokens.json'), HT.json('/data/rarity.json'), HT.json('/data/owners.json'),
+    HT.json('/data/positions.json'), HT.json('/data/provenance.json'), HT.json('/data/sales.json')
+  ]);
+  const PROV = { nowTs: PROVRAW.nowTs, byId: PROVRAW.prov };
+  const positions = POS.wallets;
+  const esc=HT.esc, short=HT.short, money=HT.money, fmtD=HT.fmtD, img=HT.img;
+  // join: build TOKENS with owner + mapped positions
+  const TOKENS = TOK.tokens.map(t=>{
+    const owner = OWN[t.id] || null;
+    const w = owner ? positions[owner] : null;
+    const ps = (w && w.positions ? w.positions : []).slice()
+      .sort((a,b)=>b.notionalUsd-a.notionalUsd)
+      .map(p=>({coin:p.coin, dir:p.direction, lev:p.leverage&&p.leverage.value, notionalUsd:p.notionalUsd}));
+    return { id:t.id, name:"Hypurr #"+t.id, rarityRank:t.rr, traits:t.t, owner, positions:ps };
+  });
+  const rarityPct = (cat,val)=>{ const c=FREQ.freq&&FREQ.freq[cat]&&FREQ.freq[cat][val]; return c?((c/FREQ.total)*100):null; };
+  document.getElementById('board').style.display='none';
+
+  // stats
+  const holders = new Set(Object.values(OWN)).size;
+  const liveHolders = Object.values(positions).filter(w=>w.hasPosition).length;
+  document.getElementById('s-holders').textContent = HT.num(holders);
+  document.getElementById('s-live').textContent = HT.num(liveHolders);
+
+  let state={ onlyLive:false, sortRare:true, cat:"", val:"" };
+  const catSel=document.getElementById('cat'), valSel=document.getElementById('val');
+  (FREQ.categories||Object.keys(FREQ.freq||{})).forEach(c=>catSel.insertAdjacentHTML('beforeend',`<option>${esc(c)}</option>`));
+  catSel.onchange=()=>{ state.cat=catSel.value; state.val=""; fillVals(); render(); };
+  valSel.onchange=()=>{ state.val=valSel.value; render(); };
+  function fillVals(){ valSel.innerHTML='<option value="">any value</option>'; if(!state.cat)return;
+    Object.keys(FREQ.freq[state.cat]||{}).sort().forEach(v=>valSel.insertAdjacentHTML('beforeend',`<option>${esc(v)}</option>`)); }
+  document.getElementById('q').oninput=render;
+  document.getElementById('onlyLive').onclick=e=>{ state.onlyLive=!state.onlyLive; e.target.classList.toggle('on',state.onlyLive); render(); };
+  document.getElementById('sort').onclick=e=>{ state.sortRare=!state.sortRare; e.target.textContent=state.sortRare?"rarest first":"by id"; render(); };
+  document.getElementById('rand').onclick=()=>{ const t=TOKENS[Math.floor(Math.random()*TOKENS.length)]; openCat(t.id); };
+  const topPos=t=>t.positions&&t.positions.length?t.positions[0]:null;
+  function filtered(){
+    const q=document.getElementById('q').value.trim();
+    let list=TOKENS.slice();
+    if(q) list=list.filter(t=>String(t.id).includes(q));
+    if(state.onlyLive) list=list.filter(t=>t.positions&&t.positions.length);
+    if(state.cat&&state.val) list=list.filter(t=>t.traits[state.cat]===state.val);
+    list.sort((a,b)=> state.sortRare ? a.rarityRank-b.rarityRank : a.id-b.id);
+    return list;
+  }
+  function cardHTML(t){
+    const p=topPos(t);
+    const trading=p?`<div class="trading"><span class="dot pulse"></span>trading</div>`:"";
+    const posline=p?`<div class="pos-mini"><span class="side ${p.dir}">${p.lev?p.lev+"x ":""}${p.dir}</span> ${esc(p.coin)}</div>`:`<div class="flat">sitting flat</div>`;
+    return `<div class="cat" onclick="openCat(${t.id})">
+      <div class="thumb"><span class="rank">#${t.rarityRank}</span>${trading}
+        <img loading="lazy" src="${img(t.id)}" alt="${esc(t.name)}"></div>
+      <div class="meta"><div class="nm">${esc(t.name)}</div>${posline}</div></div>`;
+  }
+  // batched infinite-scroll render
+  const BATCH=400; let curList=[], shown=0;
+  const grid=document.getElementById('grid');
+  function render(){
+    curList=filtered(); shown=0; grid.innerHTML="";
+    document.getElementById('count').textContent=curList.length.toLocaleString()+" Hypurrs";
+    more();
+  }
+  function more(){
+    if(shown>=curList.length) return;
+    const next=curList.slice(shown, shown+BATCH);
+    grid.insertAdjacentHTML('beforeend', next.map(cardHTML).join(""));
+    shown+=next.length;
+  }
+  const io=new IntersectionObserver(es=>{ if(es[0].isIntersecting) more(); }, {rootMargin:"800px"});
+  io.observe(document.getElementById('sentinel'));
+
+  window.openCat=function(id){
+    const t=TOKENS.find(x=>x.id===id); if(!t)return;
+    const ps=t.positions||[];
+    const panel=ps.length?`
+      <div class="panel"><h3>What ${esc(t.name)}'s human is trading</h3>
+        ${ps.map(p=>`<div class="prow"><span class="coin">${esc(p.coin)}</span>
+          <span class="side ${p.dir}">${p.dir}</span><span class="lev">${p.lev?p.lev+"x":""}</span>
+          <span class="ntl">${money(p.notionalUsd)}</span></div>`).join("")}
+        <div class="pnote">Could be one leg of a hedge or delta-neutral book, not a directional call or a copy-trade signal.</div>
+      </div>`:`<div class="panel"><h3>Sitting flat</h3>
+        <div style="font-weight:500;color:var(--dim)">This Hypurr's human has no open positions right now.</div></div>`;
+    const traits=Object.entries(t.traits).map(([k,v])=>{ const pct=rarityPct(k,v);
+      return `<div class="trait"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>
+        ${pct!=null?`<div class="rr">${pct<1?pct.toFixed(1):Math.round(pct)}% have this</div>`:""}</div>`; }).join("");
+    document.getElementById('sheet').innerHTML=`
+      <button class="x" onclick="closeM()">×</button>
+      <div class="top">
+        <div class="art"><img src="${img(t.id)}" alt="${esc(t.name)}"></div>
+        <div class="side-pad">
+          <h2>${esc(t.name)}</h2>
+          <div class="owner">rarity rank <b>#${t.rarityRank}</b> · held by <code>${short(t.owner)}</code></div>
+          ${panel}
+        </div>
+      </div>
+      <div class="traits"><h3>traits</h3><div class="tgrid">${traits}</div></div>
+      <h3 class="tl-head">ownership history</h3>
+      ${timelineHTML(t.id)}
+      ${valueChartHTML(t.id)}`;
+    document.getElementById('modal').classList.add('open');
+  };
+  window.closeM=function(){ document.getElementById('modal').classList.remove('open'); };
+  document.getElementById('modal').onclick=e=>{ if(e.target.id==='modal') closeM(); };
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeM(); });
+  function timelineHTML(id){
+    const P=PROV.byId?PROV.byId[id]:null;
+    if(!P) return '<div class="tl-stat" style="padding:0 24px">No transfer history for this Hypurr.</div>';
+    const now=PROV.nowTs, start=P.chain[0].ts, span=Math.max(1, now-start);
+    const dots=P.chain.map(c=>{const x=Math.min(100,Math.max(0,((c.ts-start)/span)*100));return `<span class="tl-dot ${c.kind}" style="left:${x}%" data-t="${c.kind} · ${fmtD(c.ts)} · ${short(c.owner)}"></span>`;}).join('');
+    const list=[...P.chain].reverse().map(c=>`<div class="tl-row"><span class="tl-k ${c.kind}">${c.kind}</span><span class="tl-d">${fmtD(c.ts)}</span><span class="tl-o">${short(c.owner)}</span></div>`).join('');
+    return `<div class="tl"><div class="tl-stat">traded <b>${P.trades}</b> ${P.trades===1?'time':'times'} · airdropped ${fmtD(P.airdropTs||start)} · now <code>${short(P.currentOwner)}</code></div>
+      <div class="tl-track"><span class="tl-line"></span>${dots}</div>
+      <div class="tl-axis"><span>${fmtD(start)}</span><span>today</span></div>
+      <div class="tl-leg"><span><i style="background:var(--mint)"></i>airdrop</span><span><i style="background:var(--coral)"></i>trade</span></div>
+      <div class="tl-list">${list}</div></div>`;
+  }
+  function valueChartHTML(id){
+    const s=SALES&&SALES.byToken?SALES.byToken[id]:null;
+    if(!s||!s.length) return '<h3 class="tl-head">sale price (HYPE)</h3><div class="vc-none">No HYPE sales recorded on-chain for this Hypurr yet.</div>';
+    const prices=s.map(x=>x.price), last=s[s.length-1], hi=Math.max(...prices), lo=Math.min(...prices), avg=Math.round(prices.reduce((a,b)=>a+b,0)/prices.length);
+    const W=300,H=120,pad=10, t0=s[0].ts, t1=Math.max(s[s.length-1].ts,t0+1), tspan=t1-t0, pmin=lo, pspan=Math.max(1,hi-lo);
+    const pts=s.map(x=>[pad+((x.ts-t0)/tspan)*(W-2*pad), H-pad-((x.price-pmin)/pspan)*(H-2*pad), x]);
+    const poly=pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+    const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="var(--grape)" stroke="var(--panel)" stroke-width="1.5" data-t="${p[2].price} HYPE · ${fmtD(p[2].ts)}"/>`).join("");
+    return `<h3 class="tl-head">sale price (HYPE)</h3>
+      <div class="vc"><div class="vc-stat">last sale <b>${last.price} HYPE</b> · ${s.length} sale${s.length>1?'s':''} · high ${hi} · avg ${avg}</div>
+      <svg viewBox="0 0 ${W} ${H}" class="vc-svg" preserveAspectRatio="none"><polyline points="${poly}" fill="none" stroke="var(--grape)" stroke-width="2.5"/>${dots}</svg>
+      <div class="vc-axis"><span>${fmtD(t0)}</span><span>${fmtD(s[s.length-1].ts)}</span></div></div>`;
+  }
+  const tt=document.getElementById('tt');
+  document.addEventListener('mousemove',e=>{const el=e.target.closest('[data-t]');if(el){tt.textContent=el.getAttribute('data-t');tt.style.opacity=1;tt.style.left=Math.min(e.clientX+12,innerWidth-220)+'px';tt.style.top=(e.clientY+14)+'px';}else tt.style.opacity=0;});
+  document.getElementById('note').textContent="Live: all 4,600 Hypurrs with their owners' current Hyperliquid positions, refreshed on a rolling ~15 minute cycle. No PnL shown anywhere by design. Positions can be delta-neutral or hedged legs, not signals or financial advice.";
+  render();
+})().catch(e=>{document.getElementById('board').textContent='could not load data';console.error(e);});
+</script>
+</body></html>

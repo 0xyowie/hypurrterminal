@@ -1,0 +1,31 @@
+name: Refresh positions
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes (GitHub may delay under load)
+  workflow_dispatch: {}        # allow manual runs
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Sweep Hyperliquid positions -> site/data
+        run: node scripts/refresh-prod.mjs
+      - name: Commit refreshed data
+        run: |
+          git config user.name  "hypurr-refresh-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add site/data/positions.json site/data/index.json site/data/desk.json
+          if git diff --cached --quiet; then
+            echo "No change in positions this cycle."
+          else
+            git commit -m "data: refresh positions $(date -u +%FT%TZ)"
+            git push
+          fi

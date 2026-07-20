@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypurr Terminal — The Index</title>
+<meta name="description" content="What the Hypurr pride is positioned in right now — net long vs short across every holder's live Hyperliquid book. Direction and size only, never PnL.">
+<meta name="theme-color" content="#0E0B08">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/base.css">
+<script src="/assets/app.js"></script>
+<style>
+  .wrap{max-width:1080px}
+  .kicker{margin:34px 0 0}
+  .hero{padding:6px 0 6px}
+  .hero .big{font-family:'Bricolage Grotesque';font-size:clamp(60px,9vw,104px);line-height:.92;font-weight:700;letter-spacing:-.03em;margin:10px 0 0}
+  .hero .big .u{color:var(--mint)}
+  .hero h1{font-weight:500;font-size:clamp(20px,2.6vw,27px);margin:14px 0 0;max-width:640px;line-height:1.28;color:var(--ink)}
+  .hero .ts{color:var(--faint);font-weight:500;font-size:13px;margin-top:14px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);display:inline-block;margin-right:7px;position:relative;vertical-align:middle}
+  .dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--mint);animation:pl 2s var(--ease) infinite}
+  @keyframes pl{0%{transform:scale(.5);opacity:.9}100%{transform:scale(2);opacity:0}}
+  .explain{margin:22px 0 2px;background:linear-gradient(180deg,var(--panel),var(--bg));border:1px solid var(--line2);border-left:2px solid var(--gold);border-radius:14px;padding:15px 18px;font-weight:400;font-size:13.5px;color:var(--dim);line-height:1.62}
+  .explain b{color:var(--ink);font-weight:600;font-family:'Bricolage Grotesque'}
+  .explain .q{color:var(--gold);font-weight:600}
+  .legend{display:flex;gap:16px;margin:24px 0 8px;font-weight:600;font-size:12.5px;color:var(--dim)}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:4px;vertical-align:middle;margin-right:6px}
+  .cards{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:12px 0}
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg));border:1px solid var(--line);border-radius:20px;padding:22px 24px}
+  .card h3{font-family:'Bricolage Grotesque';margin:0 0 4px;font-size:18px;font-weight:600}
+  .card .sub{color:var(--dim);font-weight:500;font-size:13px;margin-bottom:18px}
+  .divbar{height:36px;border-radius:11px;display:flex;overflow:hidden;background:#241c12;gap:2px}
+  .divbar .seg{position:relative;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b0906;font-size:13.5px;min-width:2px;overflow:hidden}
+  .divbar .seg::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-120%);animation:sh 3.4s var(--ease) infinite}
+  @keyframes sh{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
+  .seg.long{background:var(--long)} .seg.short{background:var(--short)}
+  .barlbl{display:flex;justify-content:space-between;margin-top:10px;font-weight:700;font-size:13px}
+  .barlbl .l{color:var(--long)} .barlbl .s{color:var(--short)}
+  .mini{margin-top:16px}
+  .mini .mlab{display:flex;justify-content:space-between;font-weight:600;font-size:12px;color:var(--dim);margin-bottom:6px}
+  .mini .divbar{height:22px}
+  .read{margin-top:18px;background:rgba(237,190,114,.06);border:1px solid rgba(237,190,114,.22);border-radius:13px;padding:12px 15px;font-weight:500;font-size:13.5px;color:var(--ink);line-height:1.5}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:8px 0 4px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .tile b{font-family:'Bricolage Grotesque';font-weight:700;font-size:30px;display:block;line-height:1}
+  .tile span{font-weight:600;font-size:12px;color:var(--dim);margin-top:6px;display:block}
+  .tile.live b{color:var(--mint)}
+  .coins{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:8px 8px 14px;margin:20px 0 20px}
+  .coins h2{font-family:'Bricolage Grotesque';font-size:19px;margin:16px 16px 2px;font-weight:600}
+  .coins .csub{color:var(--dim);font-weight:500;font-size:12.5px;margin:0 16px 12px}
+  .crow{display:grid;grid-template-columns:74px 1fr 84px;gap:12px;align-items:center;padding:9px 16px;border-radius:12px;transition:.3s var(--ease)}
+  .crow:hover{background:rgba(255,255,255,.03)}
+  .crow .coin{font-family:'Bricolage Grotesque';font-weight:600;font-size:15px}
+  .crow .hold{text-align:right;font-weight:600;font-size:11.5px;color:var(--faint)}
+  .crow .hold b{font-family:'Bricolage Grotesque';color:var(--ink);font-size:15px;font-weight:600}
+  @media(max-width:640px){.cards{grid-template-columns:1fr}.tiles{grid-template-columns:1fr}.crow{grid-template-columns:56px 1fr 60px}}
+</style></head>
+<body data-page="positioning">
+<header class="site"><div class="bar">
+  <a class="brand" href="/"><span class="logo">🐾</span><span>HYPURR</span></a>
+  <nav class="top">
+    <a href="/collection" data-nav="collection">The Collection</a>
+    <a href="/positioning" data-nav="positioning">The Index</a>
+    <a href="/desk" data-nav="desk">Live Desk</a>
+    <a href="/pride" data-nav="pride">The Pride</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <div class="kicker">The Index · what the pride is positioned in</div>
+  <div class="hero">
+    <div class="big disp"><span id="h-net" class="u">–</span> net long</div>
+    <h1 id="h-sub">of Hypurr holders with an open position are leaning long right now.</h1>
+    <div class="ts"><span class="dot"></span><span id="h-ts">loading…</span> · refreshes about every 15 minutes</div>
+  </div>
+
+  <div class="explain">
+    <span class="q">How to read this.</span> The index counts open positions by <b>direction only</b>. A lot of Hypurr wallets aren't taking a bet at all — they run <b>delta-neutral</b>, hedged, or market-making books, so a "long" you see here is often just one leg against a short somewhere else (a funding-rate carry, a basis trade, an LP hedge). That's why holders can lean heavily long while the biggest dollars lean short. Read it as a live <b>positioning snapshot of the pride</b> — not crowd sentiment, and never a signal to copy.
+  </div>
+
+  <div class="legend"><span><span class="swatch" style="background:var(--long)"></span>long</span>
+    <span><span class="swatch" style="background:var(--short)"></span>short</span></div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>The mood</h3>
+      <div class="sub" id="mood-sub"></div>
+      <div class="divbar" id="mood-bar"></div>
+      <div class="barlbl"><span class="l" id="mood-l"></span><span class="s" id="mood-s"></span></div>
+    </div>
+    <div class="card">
+      <h3>Crowd vs whales</h3>
+      <div class="sub">the same book, counted two ways</div>
+      <div class="mini"><div class="mlab"><span>by wallet (one holder, one vote)</span><span id="w-long"></span></div>
+        <div class="divbar" id="w-bar"></div></div>
+      <div class="mini"><div class="mlab"><span>by size (dollars at risk)</span><span id="n-long"></span></div>
+        <div class="divbar" id="n-bar"></div></div>
+      <div class="read" id="read"></div>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><b id="t-holders">–</b><span>UNIQUE HOLDERS</span></div>
+    <div class="tile live"><b id="t-live">–</b><span>WITH A LIVE POSITION</span></div>
+    <div class="tile"><b id="t-part">–</b><span>PARTICIPATION</span></div>
+  </div>
+
+  <div class="coins">
+    <h2>What they're trading</h2>
+    <div class="csub">top markets by dollars at risk across the pride. bar splits holders long vs short. hover for size.</div>
+    <div id="coinrows"></div>
+  </div>
+</div>
+
+<footer class="site"><div class="foot">
+  <span id="note"></span>
+  <div class="lg"><a href="/privacy">Privacy</a><a href="/privacy">Cookies</a><span>· Hypurr Terminal, unofficial community tool</span></div>
+</div></footer>
+<div class="tt" id="tt"></div>
+
+<script>
+(async function(){
+  const IX = await HT.json('/data/index.json');
+  const pct = HT.pct, money = HT.money, num = HT.num;
+  const bw = IX.byWallet;
+  const netLongPct = bw.netLong/Math.max(1,bw.netLong+bw.netShort);
+  document.getElementById('h-net').textContent = pct(netLongPct)+"%";
+  document.getElementById('h-ts').textContent = "as of "+new Date(IX.generatedAt).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+  document.getElementById('mood-sub').textContent = num(IX.holdersWithPosition)+" holders have an open position";
+  document.getElementById('mood-bar').innerHTML = `<div class="seg long" style="flex:${bw.netLong}" data-t="${bw.netLong} holders net long"></div>
+    <div class="seg short" style="flex:${bw.netShort}" data-t="${bw.netShort} holders net short"></div>`;
+  document.getElementById('mood-l').textContent = "▲ "+num(bw.netLong)+" net long";
+  document.getElementById('mood-s').textContent = num(bw.netShort)+" net short ▼";
+  document.getElementById('w-long').textContent = pct(netLongPct)+"% long";
+  document.getElementById('w-bar').innerHTML = `<div class="seg long" style="flex:${bw.netLong}"></div><div class="seg short" style="flex:${bw.netShort}"></div>`;
+  const nlong = IX.byNotional.longPct;
+  document.getElementById('n-long').textContent = pct(nlong)+"% long";
+  document.getElementById('n-bar').innerHTML = `<div class="seg long" style="flex:${Math.round(nlong*1000)}"></div><div class="seg short" style="flex:${Math.round((1-nlong)*1000)}"></div>`;
+  document.getElementById('read').textContent = pct(netLongPct) >= 55 && nlong < 50
+    ? `Most holders are long, but the biggest positions lean short. The crowd is bullish; the whales are hedged or fading them.`
+    : `Holders and dollars are pointing the same way right now.`;
+  document.getElementById('t-holders').textContent = num(IX.holdersTotal);
+  document.getElementById('t-live').textContent = num(IX.holdersWithPosition);
+  document.getElementById('t-part').textContent = pct(IX.participationRate)+"%";
+  document.getElementById('coinrows').innerHTML = IX.topCoins.map(c=>{
+    const lw=c.longWallets, sw=c.shortWallets;
+    return `<div class="crow"><div class="coin">${HT.esc(c.coin)}</div>
+      <div class="divbar" style="height:26px">
+        <div class="seg long" style="flex:${lw}" data-t="${HT.esc(c.coin)}: ${lw} long · ${money(c.longNotional)}">${lw>sw?lw:""}</div>
+        <div class="seg short" style="flex:${sw}" data-t="${HT.esc(c.coin)}: ${sw} short · ${money(c.shortNotional)}">${sw>=lw?sw:""}</div>
+      </div>
+      <div class="hold"><b>${c.holders}</b><br>holders</div></div>`;
+  }).join("");
+  const tt=document.getElementById('tt');
+  document.addEventListener('mousemove',e=>{const el=e.target.closest('[data-t]');
+    if(el){tt.innerHTML=el.getAttribute('data-t');tt.style.opacity=1;tt.style.left=Math.min(e.clientX+12,innerWidth-250)+"px";tt.style.top=(e.clientY+14)+"px";}else tt.style.opacity=0;});
+  document.getElementById('note').textContent="Live read across all "+num(IX.holdersTotal)+" holders' Hyperliquid positions, refreshed on a rolling ~15 minute cycle. Direction and size only, never PnL. Many holders run delta-neutral or hedged books, so this is a read on the pride, not a signal or financial advice.";
+})().catch(e=>{document.getElementById('h-ts').textContent='could not load data';console.error(e);});
+</script>
+</body></html>

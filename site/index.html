@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypurr Terminal — the pride, and what they trade</title>
+<meta name="description" content="An unofficial community terminal for the 4,600 Hypurr NFTs — behind every Hypurr is a Hyperliquid wallet, and right now hundreds are live on the tape. Direction and size only, never PnL.">
+<meta name="theme-color" content="#0E0B08">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://hypurrterminal.xyz">
+<meta property="og:type" content="website"><meta property="og:url" content="https://hypurrterminal.xyz">
+<meta property="og:title" content="Hypurr Terminal"><meta property="og:description" content="Behind every Hypurr is a Hyperliquid wallet — see what the pride is trading, live.">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Hypurr Terminal">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/base.css">
+<script src="/assets/app.js"></script>
+<style>
+  :root{--violet:#9A8CE0}
+  html,body{height:100%;overflow-x:hidden}
+  body{background:
+    radial-gradient(1000px 700px at 82% 30%, rgba(84,224,203,.10), transparent 60%),
+    radial-gradient(820px 640px at 12% 78%, rgba(237,190,114,.09), transparent 58%),
+    var(--bg);}
+  a{color:inherit;text-decoration:none}
+  header.land{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:16px;padding:18px 34px 30px;background:linear-gradient(180deg,rgba(14,11,8,.94) 30%,rgba(14,11,8,0))}
+  header.land .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.02em;font-size:15px;color:var(--ink)}
+  .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:#1a140d;border:1px solid var(--line2)}
+  .navlinks{margin-left:auto;display:flex;gap:4px}
+  .navlinks a{font-size:13px;color:#d2c7b0;text-shadow:0 1px 12px rgba(0,0,0,.7);padding:8px 13px;border-radius:99px;transition:.35s var(--ease)}
+  .navlinks a:hover{color:var(--ink);background:rgba(255,255,255,.04)}
+  .hero{display:grid;grid-template-columns:1.02fr .98fr;min-height:90svh;position:relative}
+  .scrollcue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;color:var(--faint);font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+  .scrollcue .ch{font-size:17px;animation:bob 1.8s var(--ease) infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(6px);opacity:1}}
+  .htext{position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;padding:80px 3vw 80px 7vw;max-width:680px}
+  .eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--mint);margin-bottom:26px}
+  h1{font-family:'Bricolage Grotesque';font-weight:700;font-size:clamp(52px,7.6vw,104px);line-height:.9;letter-spacing:-.035em;margin:0}
+  h1 em{font-style:normal;color:var(--gold)}
+  .sub{margin:28px 0 0;color:var(--dim);font-size:18px;line-height:1.6;max-width:440px}
+  .row{display:flex;align-items:center;gap:18px;margin-top:38px;flex-wrap:wrap}
+  .btn{font-size:15px;font-weight:600;padding:15px 26px;border-radius:14px;background:var(--ink);color:#12100b;transition:.4s var(--ease);cursor:pointer}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(245,239,228,.14)}
+  .awake{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--dim);font-weight:500}
+  .awake .p{width:8px;height:8px;border-radius:50%;background:var(--mint);position:relative}
+  .awake .p::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--mint);animation:pl 2s var(--ease) infinite}
+  @keyframes pl{0%{transform:scale(.5);opacity:.9}100%{transform:scale(2);opacity:0}}
+  .awake b{color:var(--ink);font-weight:700}
+  .gwrap{position:relative;cursor:grab}
+  .gwrap:active{cursor:grabbing}
+  #globe{position:absolute;inset:0}
+  .hint{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);pointer-events:none;transition:opacity .6s var(--ease);z-index:3}
+  .hint.gone{opacity:0}
+  .strip{position:relative;z-index:3;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr)}
+  .strip a{padding:26px 30px;border-left:1px solid var(--line);transition:.4s var(--ease);display:block}
+  .strip a:first-child{border-left:0}
+  .strip a:hover{background:rgba(255,255,255,.03)}
+  .strip .n{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.14em}
+  .strip .t{font-family:'Bricolage Grotesque';font-weight:600;font-size:20px;margin-top:8px}
+  .strip .d{font-size:13px;color:var(--dim);margin-top:4px}
+  .strip a:hover .t{color:var(--gold)}
+  @media(max-width:860px){
+    header.land{padding:16px 18px}.navlinks{display:none}
+    .hero{grid-template-columns:1fr;min-height:auto}
+    .gwrap{height:52vh;order:-1;margin-top:56px}
+    .scrollcue{display:none}
+    .htext{padding:30px 20px 44px;max-width:none}
+    h1{font-size:clamp(44px,15vw,80px)}
+    .strip{grid-template-columns:1fr 1fr}
+    .strip a{border-left:0;border-top:1px solid var(--line)}
+  }
+</style></head>
+<body data-page="landing">
+<header class="land">
+  <a class="brand" href="/"><span class="mark">🐾</span>HYPURR</a>
+  <nav class="navlinks"><a href="/collection">Collection</a><a href="/positioning">Index</a><a href="/desk">Live Desk</a><a href="/pride">The Pride</a></nav>
+</header>
+
+<section class="hero">
+  <div class="htext">
+    <div class="eyebrow">4,600 Hypurrs · dealt in one night · awake on-chain</div>
+    <h1 class="disp">The pride<br>never <em>sleeps.</em></h1>
+    <p class="sub">Grab it and spin it. Behind every Hypurr is a Hyperliquid wallet, and right now hundreds of them are live on the tape.</p>
+    <div class="row">
+      <a class="btn" href="/collection">Enter the den →</a>
+      <span class="awake"><span class="p"></span><b id="awake">–</b>&nbsp;Hypurrs awake right now</span>
+    </div>
+  </div>
+  <div class="gwrap">
+    <div id="globe"></div>
+    <div class="hint" id="hint">drag to spin</div>
+  </div>
+  <div class="scrollcue"><span>explore the terminal</span><span class="ch">↓</span></div>
+</section>
+
+<nav class="strip">
+  <a href="/collection"><div class="n">01</div><div class="t">The Collection</div><div class="d">4,600 Hypurrs, by trait &amp; rarity</div></a>
+  <a href="/positioning"><div class="n">02</div><div class="t">The Index</div><div class="d">what the cohort is trading</div></a>
+  <a href="/desk"><div class="n">03</div><div class="t">Live Desk</div><div class="d">the biggest live books</div></a>
+  <a href="/pride"><div class="n">04</div><div class="t">The Pride</div><div class="d">diamond hands &amp; price history</div></a>
+</nav>
+
+<script src="/assets/three.min.js"></script>
+<script>
+(async function(){
+  const [GID, IX] = await Promise.all([HT.json('/data/globe.json'), HT.json('/data/index.json')]);
+  const G = { cats: GID.ids.map(id=>({id, img:HT.img(id)})), awake: IX.holdersWithPosition };
+  document.getElementById('awake').textContent = G.awake;
+  const mount=document.getElementById('globe');
+  let W=mount.clientWidth||600, H=mount.clientHeight||600;
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x0E0B08, 8, 17);
+  const camera=new THREE.PerspectiveCamera(46, W/H, 0.1, 100); camera.position.z=12.4;
+  const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1)); renderer.setSize(W,H);
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  mount.appendChild(renderer.domElement);
+  const group=new THREE.Group(); scene.add(group);
+  const R=5.4, N=G.cats.length;
+  function roundImg(img){
+    const s=136, r=30, cv=document.createElement('canvas'); cv.width=cv.height=s;
+    const g=cv.getContext('2d');
+    g.beginPath(); g.moveTo(r,0); g.arcTo(s,0,s,s,r); g.arcTo(s,s,0,s,r); g.arcTo(0,s,0,0,r); g.arcTo(0,0,s,0,r); g.closePath(); g.clip();
+    g.drawImage(img,0,0,s,s);
+    g.globalCompositeOperation='source-over'; g.lineWidth=3; g.strokeStyle='rgba(255,240,214,.12)';
+    g.beginPath(); g.moveTo(r,1.5); g.arcTo(s-1.5,1.5,s-1.5,s-1.5,r); g.arcTo(s-1.5,s-1.5,1.5,s-1.5,r); g.arcTo(1.5,s-1.5,1.5,1.5,r); g.arcTo(1.5,1.5,s-1.5,1.5,r); g.stroke();
+    return new THREE.CanvasTexture(cv);
+  }
+  G.cats.forEach((c,i)=>{
+    const y=1-(i/(N-1))*2, rr=Math.sqrt(Math.max(0,1-y*y)), th=i*2.399963229;
+    const pos=new THREE.Vector3(Math.cos(th)*rr*R, y*R, Math.sin(th)*rr*R);
+    const im=new Image();
+    im.onload=()=>{ const tex=roundImg(im); tex.encoding=THREE.sRGBEncoding;
+      const mat=new THREE.SpriteMaterial({map:tex, transparent:true, depthWrite:false});
+      const sp=new THREE.Sprite(mat); sp.position.copy(pos); sp.scale.set(1.0,1.0,1); group.add(sp); };
+    im.src=c.img;
+  });
+  let dragging=false, px=0, py=0, velY=0.0022, velX=0, tiltX=0, tiltY=0;
+  const el=renderer.domElement; el.style.touchAction='none';
+  el.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;el.setPointerCapture(e.pointerId);document.getElementById('hint').classList.add('gone');});
+  el.addEventListener('pointermove',e=>{
+    if(dragging){velY=(e.clientX-px)*0.0009; velX=(e.clientY-py)*0.0009; px=e.clientX; py=e.clientY;}
+    const rx=(e.clientX/W-0.5), ry=(e.clientY/H-0.5); tiltY=rx*0.4; tiltX=ry*0.3;
+  });
+  el.addEventListener('pointerup',()=>{dragging=false;});
+  el.addEventListener('pointerleave',()=>{dragging=false;});
+  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function loop(){
+    requestAnimationFrame(loop);
+    if(!dragging){ velY += ((reduce?0:0.0022)-velY)*0.03; velX*=0.9; }
+    group.rotation.y += velY;
+    group.rotation.x = Math.max(-0.7, Math.min(0.7, group.rotation.x + velX));
+    camera.position.x += (tiltY*1.4 - camera.position.x)*0.04;
+    camera.position.y += (-tiltX*1.4 - camera.position.y)*0.04;
+    camera.lookAt(0,0,0);
+    renderer.render(scene,camera);
+  }
+  loop();
+  function resize(){ W=mount.clientWidth||1; H=mount.clientHeight||1; camera.aspect=W/H;
+    const fov=camera.fov*Math.PI/180, need=R+1.5;
+    camera.position.z=Math.max(need/Math.tan(fov/2), need/(Math.tan(fov/2)*(W/H)));
+    scene.fog.near=camera.position.z - R*0.85; scene.fog.far=camera.position.z + R*0.98;
+    camera.updateProjectionMatrix(); renderer.setSize(W,H); }
+  window.addEventListener('resize',resize);
+  if(window.ResizeObserver){ new ResizeObserver(resize).observe(mount); }
+  resize();
+})().catch(e=>console.error(e));
+</script>
+</body></html>
