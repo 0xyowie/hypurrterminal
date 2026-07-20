@@ -71,7 +71,6 @@
 <body data-page="landing">
 <header class="land">
   <a class="brand" href="/"><span class="mark">🐾</span>HYPURR</a>
-  <nav class="navlinks"><a href="/collection">Collection</a><a href="/positioning">Index</a><a href="/desk">Live Desk</a><a href="/pride">The Pride</a></nav>
 </header>
 
 <section class="hero">
@@ -134,9 +133,10 @@
     im.src=c.img;
   });
   let dragging=false, px=0, py=0, velY=0.0022, velX=0, tiltX=0, tiltY=0;
-  const el=renderer.domElement; el.style.touchAction='none';
-  el.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;el.setPointerCapture(e.pointerId);document.getElementById('hint').classList.add('gone');});
+  const el=renderer.domElement; el.style.touchAction='pan-y';
+  el.addEventListener('pointerdown',e=>{document.getElementById('hint').classList.add('gone');if(e.pointerType==='touch')return;dragging=true;px=e.clientX;py=e.clientY;el.setPointerCapture(e.pointerId);});
   el.addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch')return; // let the page scroll on touch (touch-action: pan-y)
     if(dragging){velY=(e.clientX-px)*0.0009; velX=(e.clientY-py)*0.0009; px=e.clientX; py=e.clientY;}
     const rx=(e.clientX/W-0.5), ry=(e.clientY/H-0.5); tiltY=rx*0.4; tiltX=ry*0.3;
   });

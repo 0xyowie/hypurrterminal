@@ -50,7 +50,7 @@
   #sentinel{height:1px}
   .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.66);backdrop-filter:blur(5px)}
   .modal.open{display:flex}
-  .sheet{background:var(--panel);border-radius:24px;max-width:760px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6);border:1px solid var(--line2)}
+  .sheet{position:relative;background:var(--panel);border-radius:24px;max-width:760px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6);border:1px solid var(--line2)}
   .sheet .top{display:grid;grid-template-columns:250px 1fr;gap:0}
   .sheet .art{background:var(--panel2)}
   .sheet .art img{width:100%;display:block}
@@ -73,7 +73,7 @@
   .trait .k{font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.12em}
   .trait .v{font-family:'Bricolage Grotesque';font-weight:600;font-size:14.5px;margin-top:3px}
   .trait .rr{font-size:11.5px;font-weight:700;color:var(--mint);margin-top:4px}
-  .x{position:sticky;top:10px;float:right;margin:10px 10px 0 0;width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:rgba(14,11,8,.9);color:var(--ink);font-size:18px;cursor:pointer;z-index:2}
+  .x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:rgba(14,11,8,.72);backdrop-filter:blur(6px);color:var(--ink);font-size:18px;cursor:pointer;z-index:3;display:grid;place-items:center;line-height:1}
   .tl-head{font-family:'Bricolage Grotesque';font-weight:600;font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.18em;margin:2px 24px 2px}
   .tl{padding:6px 24px 20px}
   .tl-stat{font-weight:500;font-size:13px;color:var(--dim);margin:4px 0 14px}
@@ -95,7 +95,22 @@
   .vc-svg{width:100%;height:120px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px}
   .vc-axis{display:flex;justify-content:space-between;font-weight:700;font-size:11px;color:var(--faint);margin:4px 2px 0}
   .pnote{margin-top:10px;font-weight:500;font-size:11.5px;color:var(--dim);border-top:1px dashed var(--line2);padding-top:8px}
-  @media(max-width:560px){.hero h1{font-size:32px}.sheet .top{grid-template-columns:1fr}.field input{width:90px}}
+  @media(max-width:560px){
+    .hero h1{font-size:32px}
+    .sheet .top{grid-template-columns:1fr}
+    .grid{grid-template-columns:1fr 1fr;gap:12px}
+    .grid.large{grid-template-columns:1fr}
+    .cat .meta{padding:9px 11px 11px}
+    .cat .meta .nm{font-size:13.5px}
+    .pos-mini{font-size:11.5px;margin-top:5px}
+    .rank{font-size:10px;padding:2px 7px}
+    .trading{font-size:10px;padding:3px 7px}
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;top:59px}
+    .controls .field,.controls .btn{width:100%}
+    .controls .field input{width:100%}
+    .controls .qfield{grid-column:1 / -1}
+    .count{grid-column:1 / -1;margin-left:0;text-align:right}
+  }
 </style></head>
 <body data-page="collection">
 <header class="site"><div class="bar">
@@ -123,11 +138,12 @@
 
 <div class="wrap">
   <div class="controls">
-    <label class="field">⌕ <input id="q" placeholder="Hypurr # id" inputmode="numeric"></label>
+    <label class="field qfield">⌕ <input id="q" placeholder="Hypurr # id" inputmode="numeric"></label>
     <label class="field">Trait <select id="cat"><option value="">any</option></select></label>
     <label class="field"><select id="val"><option value="">any value</option></select></label>
     <button class="btn live" id="onlyLive">only trading</button>
     <button class="btn" id="sort">rarest first</button>
+    <button class="btn" id="dense">large view</button>
     <button class="btn p" id="rand">random</button>
     <span class="count" id="count"></span>
   </div>
@@ -182,6 +198,7 @@
   document.getElementById('onlyLive').onclick=e=>{ state.onlyLive=!state.onlyLive; e.target.classList.toggle('on',state.onlyLive); render(); };
   document.getElementById('sort').onclick=e=>{ state.sortRare=!state.sortRare; e.target.textContent=state.sortRare?"rarest first":"by id"; render(); };
   document.getElementById('rand').onclick=()=>{ const t=TOKENS[Math.floor(Math.random()*TOKENS.length)]; openCat(t.id); };
+  document.getElementById('dense').onclick=e=>{ const large=document.getElementById('grid').classList.toggle('large'); e.target.textContent=large?'compact view':'large view'; };
   const topPos=t=>t.positions&&t.positions.length?t.positions[0]:null;
   function filtered(){
     const q=document.getElementById('q').value.trim();
@@ -247,10 +264,13 @@
       ${timelineHTML(t.id)}
       ${valueChartHTML(t.id)}`;
     document.getElementById('modal').classList.add('open');
+    back.onOpen();
   };
-  window.closeM=function(){ document.getElementById('modal').classList.remove('open'); };
-  document.getElementById('modal').onclick=e=>{ if(e.target.id==='modal') closeM(); };
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeM(); });
+  const modalEl=document.getElementById('modal');
+  const back=HT.backClose(modalEl, function(){ modalEl.classList.remove('open'); });
+  window.closeM=function(){ back.close(); };
+  modalEl.onclick=e=>{ if(e.target.id==='modal') back.close(); };
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') back.close(); });
   function timelineHTML(id){
     const P=PROV.byId?PROV.byId[id]:null;
     if(!P) return '<div class="tl-stat" style="padding:0 24px">No transfer history for this Hypurr.</div>';

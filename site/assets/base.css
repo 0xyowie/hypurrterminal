@@ -27,6 +27,9 @@ nav.top{margin-left:auto;display:flex;gap:3px;flex-wrap:wrap}
 nav.top a{font-size:13px;font-weight:500;padding:8px 13px;border-radius:99px;color:var(--dim);cursor:pointer;transition:.35s var(--ease)}
 nav.top a:hover{color:var(--ink);background:rgba(255,255,255,.05)}
 nav.top a.active{color:#12100b;background:var(--ink);font-weight:600}
+.navtoggle{display:none;margin-left:auto;width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);cursor:pointer;align-items:center;justify-content:center;flex:0 0 auto}
+.navtoggle:hover{border-color:var(--faint)}
+.navtoggle.on{background:var(--ink);color:#12100b;border-color:var(--ink)}
 
 /* footer */
 footer.site{border-top:1px solid var(--line);margin-top:16px}
@@ -55,5 +58,14 @@ footer.site .foot .lg a{color:var(--dim);cursor:pointer}footer.site .foot .lg a:
 .spin{width:26px;height:26px;border:2.5px solid var(--line2);border-top-color:var(--mint);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+@media(max-width:640px){
+  header.site .bar{position:relative;flex-wrap:nowrap;gap:10px}
+  .navtoggle{display:flex}
+  nav.top{position:absolute;top:calc(100% + 8px);right:0;left:0;margin:0;flex-direction:column;gap:2px;
+    background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:8px;
+    box-shadow:0 24px 54px rgba(0,0,0,.6);display:none;z-index:40}
+  nav.top.navopen{display:flex}
+  nav.top a{padding:13px 14px;border-radius:10px;font-size:15px;width:100%}
+}
 @media(max-width:620px){#cookie{justify-content:flex-start}.cc-btns{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
