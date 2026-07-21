@@ -32,6 +32,9 @@
   .wpill.warm i{background:var(--gold)}
 
   /* ---- scrollytelling ---- */
+  html{scroll-snap-type:y mandatory}
+  .snapmark{position:absolute;left:0;width:1px;height:1px;scroll-snap-align:start;pointer-events:none}
+  .strip{scroll-snap-align:start}
   .story{position:relative;height:400svh;z-index:1}
   .pin{position:sticky;top:0;height:100svh;overflow:hidden}
   #stage{position:absolute;inset:0}
@@ -48,6 +51,8 @@
   .beat .row{display:flex;align-items:center;gap:18px;margin-top:26px;flex-wrap:wrap;pointer-events:auto}
   .btn{font-size:15px;font-weight:600;padding:14px 25px;border-radius:14px;background:var(--ink);color:#12100b;transition:.4s var(--ease);cursor:pointer;display:inline-block}
   .btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(245,239,228,.14)}
+  .glink{font-size:15px;font-weight:600;color:var(--mint);border-bottom:1px solid rgba(84,224,203,.4);padding-bottom:2px;transition:.3s var(--ease)}
+  .glink:hover{border-color:var(--mint);text-shadow:0 0 18px rgba(84,224,203,.5)}
   .awake{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--dim);font-weight:500}
   .awake .p{width:8px;height:8px;border-radius:50%;background:var(--mint);position:relative}
   .awake .p::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--mint);animation:pl 2s var(--ease) infinite}
@@ -90,6 +95,8 @@
 </header>
 
 <section class="story" id="story">
+  <i class="snapmark" style="top:0"></i><i class="snapmark" style="top:25%"></i>
+  <i class="snapmark" style="top:50%"></i><i class="snapmark" style="top:75%"></i>
   <div class="pin">
     <div id="stage"></div>
     <div class="vignette"></div>
@@ -108,12 +115,14 @@
       <div class="eyebrow">One airdrop · September 28, 2025</div>
       <div class="h disp">4,600 dealt<br>in a single night.</div>
       <p class="sub">Spiraling out in the order they were minted. No slow reveal, no waves — the whole pride at once.</p>
+      <div class="row"><a class="glink" href="/pride">Meet the diamond hands →</a></div>
     </div>
 
     <div class="beat" data-b="2">
       <div class="eyebrow">Live positioning · refreshed every 15 min</div>
       <div class="h disp">The pride leans<br><span class="live" id="leanpct">–%</span> long.</div>
       <p class="sub" id="leansub">The columns you're watching are built from the cats themselves — every holder with an open book, sorted long against short.</p>
+      <div class="row"><a class="glink" href="/positioning">Open the Index →</a></div>
     </div>
 
     <div class="beat" data-b="3">
@@ -168,10 +177,10 @@
   const awakeIdx = [], flatIdx = [];
   for (let i = 0; i < N_ALL; i++) (states[i] && states[i] !== '0' ? awakeIdx : flatIdx).push(i);
   const BUDGET = mobile ? 2400 : N_ALL;
-  awakeIdx.forEach(i => ids.push(i));
-  const need = Math.max(0, BUDGET - ids.length);
+  const need = Math.max(0, BUDGET - awakeIdx.length);
   const step = flatIdx.length / Math.max(1, need);
   for (let k = 0; k < need; k++) ids.push(flatIdx[Math.floor(k * step)]);
+  awakeIdx.forEach(i => ids.push(i));   // awake drawn last => always on top
   const COUNT = ids.length;
 
   // ---------- three setup ----------
@@ -216,7 +225,7 @@
   geo.setAttribute('aColor', new THREE.InstancedBufferAttribute(aColor, 3));
 
   const uniforms = {
-    uT:{value:1}, uTime:{value:0}, uSize:{value: mobile ? 0.5 : 0.42}, uDrift:{value:0.16},
+    uT:{value:1}, uTime:{value:0}, uSize:{value: mobile ? 0.42 : 0.34}, uDrift:{value:0.16},
     uAtlas:{value:null}, uAtlasReady:{value:0}, uCols:{value:COLS},
     uWarm:{value:warm}, uSleep:{value:1}
   };
@@ -235,7 +244,7 @@
         float w=uTime*0.55 + aRand*6.2831;
         pos += vec3(sin(w), cos(w*0.83+1.7), sin(w*0.47+3.1)) * uDrift * (0.35+0.65*aRand);
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        float s = uSize * (0.82+0.36*aRand) * (aState>0.5 ? 1.4 : 1.0);
+        float s = uSize * (0.82+0.36*aRand) * (aState>0.5 ? 1.28 : 1.0);
         mv.xy += position.xy * s;
         gl_Position = projectionMatrix * mv;
         vUv=uv; vColor=aColor; vState=aState; vRand=aRand;
@@ -269,10 +278,10 @@
           float pulse = 0.5+0.5*sin(uTime*2.1 + vRand*6.2831);
           vec3 g = vState > 1.5 ? vec3(0.95,0.52,0.44) : vec3(0.33,0.88,0.80);
           float ring = smoothstep(0.45, 1.0, d);
-          col += g * ring * (0.30+0.45*pulse);
-          col *= 1.0 + 0.13*pulse;
+          col += g * ring * (0.13+0.18*pulse);
+          col *= 1.0 + 0.06*pulse;
         } else {
-          col *= 0.94 * mix(0.5, 1.0, uSleep);
+          col *= 0.86 * mix(0.5, 1.0, uSleep);
           alpha *= mix(0.04, 1.0, uSleep);   // sleeping cats melt away in data formations
         }
         gl_FragColor = vec4(col, alpha);
@@ -299,32 +308,36 @@
     const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random());
     out[o] = cx + Math.cos(a)*rx*rr; out[o+1] = cy + Math.sin(a)*ry*rr;
   }
+  const perm = Array.from({length:COUNT},(_,i)=>i);
+  { let seed=1337; const rnd=()=>((seed=seed*16807%2147483647)/2147483647);
+    for(let i=COUNT-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); const t=perm[i]; perm[i]=perm[j]; perm[j]=t; } }
   function fNebula(out){
     for (let k=0;k<COUNT;k++){
-      const y = 1 - (k/(COUNT-1))*2, rad = Math.sqrt(Math.max(0,1-y*y));
-      const th = k*2.399963;
-      const R = 7.4 * (0.55+0.45*Math.random());
+      const q = perm[k];
+      const y = 1 - (q/(COUNT-1))*2, rad = Math.sqrt(Math.max(0,1-y*y));
+      const th = q*2.399963;
+      const R = 9.2 * (0.5+0.5*Math.random());
       out[k*3]   = Math.cos(th)*rad*R;
       out[k*3+1] = y*R*0.8;
-      out[k*3+2] = Math.sin(th)*rad*R*0.6;
+      out[k*3+2] = Math.sin(th)*rad*R*0.95;
     }
   }
   function fSpiral(out){
     for (let k=0;k<COUNT;k++){
       const i = ids[k];                          // mint order
       const t = i / N_ALL;
-      const a = 26.0 * Math.sqrt(t);             // turns
-      const r = 9.3 * Math.sqrt(t) + 0.35;
-      out[k*3]   = Math.cos(a)*r + R2()*0.12;
-      out[k*3+1] = Math.sin(a)*r*0.86 + R2()*0.12;
-      out[k*3+2] = R2()*0.5;
+      const a = 19.0 * Math.sqrt(t);             // turns
+      const r = 9.9 * Math.sqrt(t) + 0.4;
+      out[k*3]   = Math.cos(a)*r + R2()*0.38;
+      out[k*3+1] = Math.sin(a)*r*0.86 + R2()*0.38;
+      out[k*3+2] = R2()*1.5;
     }
   }
   function fBars(out){
     const longs=[], shorts=[], flats=[];
     for (let k=0;k<COUNT;k++) (aState[k]===1?longs:aState[k]===2?shorts:flats).push(k);
     const maxC = Math.max(longs.length, shorts.length, 1);
-    const colW = 10, sX = 0.62;
+    const colW = mobile ? 8 : 10, sX = mobile ? 0.6 : 0.78;
     function col(list, cx){
       const h = 11.5 * list.length/maxC;
       const rows = Math.ceil(list.length/colW);
@@ -336,7 +349,7 @@
         out[k*3+2] = R2()*0.4;
       });
     }
-    col(longs, -4.6); col(shorts, 4.6);
+    col(longs, mobile ? -2.9 : -4.9); col(shorts, mobile ? 2.9 : 4.9);
     flats.forEach((k,j)=>{                      // sleeping cats recede into a far mist disc
       const a=j*2.399963, r=10.5*Math.sqrt((j+1)/flats.length);
       out[k*3]=Math.cos(a)*r*1.9; out[k*3+1]=Math.sin(a)*r*1.15; out[k*3+2]=-13.0-Math.random()*5.0;
@@ -403,7 +416,7 @@
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;
     const p=Math.min(0.999,Math.max(0,-r.top/Math.max(1,total)));
-    const b=Math.min(3,Math.floor(p*4));
+    const b=Math.min(3,Math.floor(p*4+0.002));
     cue.classList.toggle('gone', p>0.03);
     if(b!==curBeat){
       curBeat=b;
