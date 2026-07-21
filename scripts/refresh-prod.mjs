@@ -85,6 +85,46 @@ for (const [owner, w] of Object.entries(positions)){
 rows.sort((a,b)=> b.totalNotional - a.totalNotional);
 fs.writeFileSync(path.join(OUT, "desk.json"), JSON.stringify({ generatedAt, holdersWithPosition, rows: rows.slice(0, 200) }));
 
+// ---- history.json : rolling sentiment history for The Pulse (append, cap ~90 days) ----
+try {
+  const HFILE = path.join(OUT, "history.json");
+  let hist = []; try { hist = JSON.parse(fs.readFileSync(HFILE)).points || []; } catch {}
+  hist.push({ t: Math.floor(Date.now()/1000),
+    nl: walletsNetLong, ns: walletsNetShort, live: holdersWithPosition,
+    lp: +(longNotional/Math.max(1,longNotional+shortNotional)).toFixed(4),
+    ln: Math.round(longNotional), sn: Math.round(shortNotional) });
+  if (hist.length > 8800) hist = hist.slice(hist.length - 8800);
+  fs.writeFileSync(HFILE, JSON.stringify({ updated: generatedAt, points: hist }));
+} catch (e) { console.error("history:", e.message); }
+
+// ---- hype_price.json : HYPE daily candles for the Pulse overlay ----
+try {
+  const now = Date.now();
+  const r = await fetch(INFO, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "candleSnapshot", req: { coin: "HYPE", interval: "1d", startTime: now - 120*86400e3, endTime: now } }),
+    signal: AbortSignal.timeout(15000) });
+  if (r.ok) {
+    const candles = await r.json();
+    const px = candles.map(c => ({ t: Math.floor(c.t/1000), c: +c.c }));
+    fs.writeFileSync(path.join(OUT, "hype_price.json"), JSON.stringify({ updated: generatedAt, px }));
+  }
+} catch (e) { console.error("hype price:", e.message); }
+
+// ---- leaders.json : leaderboards for The Pulse ----
+try {
+  const boards = { updated: generatedAt };
+  boards.biggest = rows.slice(0, 10).map(r => ({ owner: r.owner, id: r.id, notional: r.totalNotional, coins: r.posCount }));
+  boards.diversified = rows.slice().sort((a,b)=> (b.posCount||0)-(a.posCount||0)).slice(0,10)
+    .map(r => ({ owner: r.owner, id: r.id, coins: r.posCount, notional: r.totalNotional }));
+  const crowdLong = walletsNetLong >= walletsNetShort;
+  boards.contrarians = rows.filter(r => {
+    let net = 0; for (const p of r.positions) net += (p.direction==="long"?1:-1)*p.notionalUsd;
+    return crowdLong ? net < 0 : net > 0;
+  }).slice(0, 10).map(r => ({ owner: r.owner, id: r.id, notional: r.totalNotional }));
+  boards.crowd = crowdLong ? "long" : "short";
+  fs.writeFileSync(path.join(OUT, "leaders.json"), JSON.stringify(boards));
+} catch (e) { console.error("leaders:", e.message); }
+
 // ---- cat_states.json : per-cat live stance for the living hero (0 flat / 1 long / 2 short) ----
 let states = "";
 for (let id = 1; id <= 4600; id++) {

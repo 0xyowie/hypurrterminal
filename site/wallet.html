@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypurr Terminal — Wallet lookup</title>
+<meta name="description" content="Paste any wallet address — see its Hypurrs and its live Hyperliquid stance. No connect, no signing. Direction and size only, never PnL.">
+<meta name="theme-color" content="#0E0B08">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hypurr Terminal — Wallet lookup"><meta property="og:description" content="Any wallet's Hypurrs + live stance. No connect.">
+<meta property="og:image" content="https://hypurrterminal.xyz/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/base.css">
+<script src="/assets/app.js"></script>
+<style>
+  .wrap{max-width:980px}
+  h1.big{font-family:'Bricolage Grotesque';font-size:clamp(38px,6vw,58px);line-height:.96;font-weight:700;letter-spacing:-.03em;margin:10px 0 0}
+  .lead{color:var(--dim);font-weight:500;font-size:15px;margin:14px 0 0;max-width:620px;line-height:1.5}
+  .lookup{display:flex;gap:10px;margin:22px 0 8px;flex-wrap:wrap}
+  .lookup input{flex:1;min-width:240px;background:var(--panel2);border:1px solid var(--line2);border-radius:13px;padding:14px 16px;
+    font-family:'Inter';font-weight:600;font-size:14px;color:var(--ink);outline:none}
+  .lookup input:focus{border-color:var(--mint)}
+  .lookup button{cursor:pointer;border:0;background:var(--ink);color:#12100b;border-radius:13px;padding:14px 24px;font-weight:600;font-size:14.5px;font-family:inherit}
+  .status{font-weight:500;font-size:13px;color:var(--faint);margin:10px 0 0;min-height:18px}
+  .wsum{display:none;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .wsum .tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .wsum b{font-family:'Bricolage Grotesque';font-weight:700;font-size:26px;display:block;line-height:1}
+  .wsum span{font-weight:600;font-size:11.5px;color:var(--dim);margin-top:6px;display:block}
+  .wsum .long b{color:var(--mint)} .wsum .short b{color:var(--coral)}
+  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:18px}
+  .wcat{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .15s var(--ease)}
+  .wcat:hover{transform:translateY(-3px)}
+  .wcat img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--panel2)}
+  .wcat .m{padding:8px 10px;font-family:'Bricolage Grotesque';font-weight:600;font-size:13px}
+  .pos{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;display:none}
+  .pos h3{font-family:'Bricolage Grotesque';font-size:15.5px;font-weight:600;margin:0 0 10px}
+  .pp{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;font-weight:600;font-size:12.5px;background:var(--panel2);margin:0 6px 8px 0}
+  .pp .sd{font-weight:700;padding:0 7px;border-radius:999px;font-size:11px}
+  .sd.long{background:var(--long-soft);color:var(--long)}.sd.short{background:var(--short-soft);color:var(--short)}
+  .pp .nt{color:var(--dim)}
+</style></head>
+<body data-page="wallet">
+<header class="site"><div class="bar">
+  <a class="brand" href="/"><span class="logo">🐾</span><span>HYPURR</span></a>
+  <nav class="top">
+    <a href="/collection" data-nav="collection">The Collection</a>
+    <a href="/positioning" data-nav="positioning">The Index</a>
+    <a href="/desk" data-nav="desk">Live Desk</a>
+    <a href="/pride" data-nav="pride">The Pride</a>
+    <a href="/pulse" data-nav="pulse">The Pulse</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <div class="kicker">Wallet lookup · no connect, ever</div>
+  <h1 class="big disp">Whose cats are these?</h1>
+  <p class="lead">Paste any wallet address. You'll see its Hypurrs and the live stance of its Hyperliquid book — read straight from public data.</p>
+  <div class="lookup">
+    <input id="addr" placeholder="0x… wallet address" spellcheck="false" autocomplete="off">
+    <button id="go">Look up</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="wsum" id="wsum"></div>
+  <div class="pos" id="pos"></div>
+  <div class="cats" id="cats"></div>
+</div>
+<footer class="site"><div class="foot">
+  All from public on-chain + Hyperliquid data. Never PnL, never balances.
+  <div class="lg"><a href="/privacy">Privacy</a><a href="/pulse">The Pulse</a></div>
+</div></footer>
+<script>
+(async function(){
+  const $=id=>document.getElementById(id);
+  const money=HT.money;
+  let OWN=null, POS=null;
+  async function load(){ if(!OWN){ $('status').textContent='loading data…';
+    [OWN,POS]=await Promise.all([HT.json('/data/owners.json'),HT.json('/data/positions.json',true)]);
+    $('status').textContent=''; } }
+  const held={},heldReady=()=>Object.keys(held).length;
+  function index(){ for(const id in OWN){ (held[OWN[id]] ||= []).push(+id); } }
+  async function lookup(a){
+    a=(a||'').trim().toLowerCase();
+    if(!/^0x[a-f0-9]{40}$/.test(a)){ $('status').textContent='That doesn’t look like a wallet address (0x + 40 hex).'; return; }
+    await load(); if(!heldReady()) index();
+    history.replaceState(null,'','/wallet?a='+a);
+    const ids=held[a]||[];
+    const w=POS.wallets[a];
+    const ps=(w&&w.positions||[]).slice().sort((x,y)=>y.notionalUsd-x.notionalUsd);
+    let net=0,tot=0; ps.forEach(p=>{const s=(p.direction==='long'?1:-1)*p.notionalUsd; net+=s; tot+=p.notionalUsd;});
+    $('status').textContent=ids.length?'':'This wallet holds no Hypurrs — showing its book anyway.';
+    const sum=$('wsum'); sum.style.display='grid';
+    sum.innerHTML=`<div class="tile"><b>${ids.length}</b><span>HYPURRS HELD</span></div>`+
+      `<div class="tile ${net>0?'long':net<0?'short':''}"><b>${ps.length?(net>=0?'net long':'net short'):'flat'}</b><span>LIVE STANCE</span></div>`+
+      `<div class="tile"><b>${tot?money(tot):'—'}</b><span>TOTAL AT RISK</span></div>`;
+    const pos=$('pos');
+    if(ps.length){ pos.style.display='block';
+      pos.innerHTML='<h3>Open positions</h3>'+ps.slice(0,14).map(p=>`<span class="pp"><b>${HT.esc(p.coin)}</b>`+
+        `<span class="sd ${p.direction}">${p.leverage?p.leverage.value+'x ':''}${p.direction}</span><span class="nt">${money(p.notionalUsd)}</span></span>`).join('')+
+        (ps.length>14?`<span class="pp">+${ps.length-14} more</span>`:'');
+    } else pos.style.display='none';
+    $('cats').innerHTML=ids.sort((a,b)=>a-b).map(id=>`<a class="wcat" href="/cat/${id}"><img loading="lazy" src="/img/${id}.webp" alt=""><div class="m">#${id}</div></a>`).join('');
+  }
+  $('go').onclick=()=>lookup($('addr').value);
+  $('addr').addEventListener('keydown',e=>{ if(e.key==='Enter') lookup($('addr').value); });
+  const q=new URLSearchParams(location.search).get('a');
+  if(q){ $('addr').value=q; lookup(q); }
+})().catch(e=>console.error('wallet:',e));
+</script>
+</body></html>

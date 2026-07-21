@@ -1,0 +1,34 @@
+/* Hypurr passport pages */
+.pass{max-width:900px;padding-bottom:30px}
+.pcard{display:grid;grid-template-columns:340px 1fr;gap:26px;margin-top:34px;background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden}
+.part img{width:100%;height:100%;object-fit:cover;display:block}
+.pmeta{padding:26px 26px 24px;display:flex;flex-direction:column;justify-content:center}
+.pmeta .kicker{margin:0 0 10px}
+.pmeta h1{font-family:'Bricolage Grotesque';font-size:clamp(34px,5vw,52px);font-weight:700;letter-spacing:-.03em;margin:0;line-height:1}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--panel2);border-radius:999px;padding:6px 12px;font-weight:600;font-size:12.5px;color:var(--dim)}
+.chip b{color:var(--ink)}
+.chip.dia{color:var(--diamond,#7CC6F0);border-color:rgba(124,198,240,.4)}
+.chip.fire{color:var(--coral);border-color:rgba(242,133,111,.4)}
+.chip.gold{color:var(--gold);border-color:rgba(237,190,114,.4)}
+.chip.long{color:var(--mint);border-color:rgba(84,224,203,.45)}
+.chip.short{color:var(--coral);border-color:rgba(242,133,111,.45)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block}
+.chip.long .sdot{background:var(--mint)} .chip.short .sdot{background:var(--coral)}
+.ownerline{margin-top:14px;font-size:13px;color:var(--dim);font-weight:500}
+.ownerline code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+.ownerline .stale{color:var(--faint);font-size:11.5px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.actions .btn{font-size:14px;font-weight:600;padding:11px 18px;border-radius:12px;background:var(--ink);color:#12100b;border:0;cursor:pointer;font-family:inherit}
+.actions .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
+.actions .btn:hover{transform:translateY(-1px)}
+.traitsbox,.salebox{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin-top:16px}
+.traitsbox h3,.salebox h3{font-size:11.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin:0 0 12px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.trait{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:10px 12px}
+.trait .k{font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+.trait .v{font-family:'Bricolage Grotesque';font-weight:600;font-size:14px;margin-top:3px}
+.srow{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px dashed var(--line);font-weight:600;font-size:13.5px}
+.srow:last-child{border-bottom:0}
+.srow .d{color:var(--dim)} .srow .p{font-family:'Bricolage Grotesque';color:var(--gold)}
+@media(max-width:640px){.pcard{grid-template-columns:1fr}.part img{aspect-ratio:1}}

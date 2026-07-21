@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypurr Terminal — The Observatory</title>
+<meta name="description" content="All 4,600 Hypurrs in explorable 3D — clustered into visual families by their traits. Drag to orbit, pinch to zoom, tap a cat to open its passport.">
+<meta name="theme-color" content="#0E0B08">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hypurr Terminal — The Observatory"><meta property="og:description" content="The whole pride in 3D, clustered by visual family.">
+<meta property="og:image" content="https://hypurrterminal.xyz/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/base.css">
+<script src="/assets/app.js"></script>
+<style>
+  html,body{height:100%}
+  body{overflow:hidden}
+  #space{position:fixed;inset:0;z-index:1}
+  #space canvas{display:block}
+  header.site{background:linear-gradient(180deg,rgba(14,11,8,.9),rgba(14,11,8,.55));backdrop-filter:blur(10px)}
+  .hud{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:linear-gradient(0deg,rgba(14,11,8,.92),rgba(14,11,8,0))}
+  .hud .find{display:flex;align-items:center;gap:8px;background:rgba(30,23,15,.92);border:1px solid var(--line2);border-radius:12px;padding:9px 13px}
+  .hud input{border:0;outline:0;background:transparent;color:var(--ink);font-family:'Inter';font-weight:600;font-size:14px;width:120px}
+  .hud .hint{font-size:12px;color:var(--faint);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .hud .kicker{margin:0}
+  .tip{position:fixed;z-index:30;pointer-events:none;background:#000;border:1px solid var(--line2);color:var(--ink);
+    font-weight:600;font-size:12.5px;padding:7px 11px;border-radius:10px;opacity:0;transition:opacity .12s}
+  .load{position:fixed;inset:0;z-index:5;display:grid;place-items:center;color:var(--faint);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;transition:opacity .8s;pointer-events:none}
+</style></head>
+<body data-page="observatory">
+<header class="site"><div class="bar">
+  <a class="brand" href="/"><span class="logo">🐾</span><span>HYPURR</span></a>
+  <nav class="top">
+    <a href="/collection" data-nav="collection">The Collection</a>
+    <a href="/positioning" data-nav="positioning">The Index</a>
+    <a href="/desk" data-nav="desk">Live Desk</a>
+    <a href="/pride" data-nav="pride">The Pride</a>
+    <a href="/pulse" data-nav="pulse">The Pulse</a>
+  </nav>
+</div></header>
+<div id="space"></div>
+<div class="load" id="load">assembling the observatory…</div>
+<div class="hud">
+  <span class="kicker">The Observatory</span>
+  <span class="hint" id="hint">drag to orbit · scroll/pinch to zoom · tap a cat</span>
+  <label class="find">⌕ <input id="fly" placeholder="fly to # id" inputmode="numeric"></label>
+</div>
+<div class="tip" id="tip"></div>
+<script src="/assets/three.min.js"></script>
+<script>
+(async function(){
+  const mobile = matchMedia('(max-width:860px)').matches || 'ontouchstart' in window;
+  const [OBS, META, CS] = await Promise.all([
+    HT.json('/data/obs.json'), HT.json('/assets/atlas_meta.json'),
+    HT.json('/data/cat_states.json', true).catch(()=>({states:''}))
+  ]);
+  const N=OBS.n, COLS=META.cols, states=CS.states||'';
+  const mount=document.getElementById('space');
+  let W=innerWidth,H=innerHeight;
+  const renderer=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(mobile?1.5:2,devicePixelRatio||1)); renderer.setSize(W,H);
+  mount.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(55,W/H,0.1,400);
+  let camDist=mobile?46:38, camTarget=new THREE.Vector3(0,0,0);
+  const group=new THREE.Group(); scene.add(group);
+  const SPREAD=17;
+  // geometry (same instanced technique as the landing hero)
+  const quad=new THREE.PlaneBufferGeometry(1,1);
+  const geo=new THREE.InstancedBufferGeometry();
+  geo.index=quad.index; geo.attributes.position=quad.attributes.position; geo.attributes.uv=quad.attributes.uv;
+  const pos=new Float32Array(N*3), aIdx=new Float32Array(N), aRand=new Float32Array(N), aState=new Float32Array(N), aColor=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const p=OBS.pos[i];
+    pos[i*3]=p[0]*SPREAD; pos[i*3+1]=p[1]*SPREAD*0.8; pos[i*3+2]=p[2]*SPREAD;
+    aIdx[i]=i; aRand[i]=Math.random();
+    aState[i]=states[i]==='1'?1:states[i]==='2'?2:0;
+    const hex=META.colors[i]||'8a7a5f';
+    aColor[i*3]=parseInt(hex.slice(0,2),16)/255; aColor[i*3+1]=parseInt(hex.slice(2,4),16)/255; aColor[i*3+2]=parseInt(hex.slice(4,6),16)/255;
+  }
+  geo.setAttribute('aCur',new THREE.InstancedBufferAttribute(pos,3));
+  geo.setAttribute('aNext',new THREE.InstancedBufferAttribute(pos,3));
+  geo.setAttribute('aIdx',new THREE.InstancedBufferAttribute(aIdx,1));
+  geo.setAttribute('aDelay',new THREE.InstancedBufferAttribute(aRand,1));
+  geo.setAttribute('aRand',new THREE.InstancedBufferAttribute(aRand,1));
+  geo.setAttribute('aState',new THREE.InstancedBufferAttribute(aState,1));
+  geo.setAttribute('aColor',new THREE.InstancedBufferAttribute(aColor,3));
+  const uniforms={uT:{value:1},uTime:{value:0},uSize:{value:mobile?0.62:0.55},uDrift:{value:0.05},
+    uAtlas:{value:null},uAtlasReady:{value:0},uCols:{value:COLS},uWarm:{value:0.5},uSleep:{value:1}};
+  const mat=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,depthTest:false,
+    vertexShader:document.getElementById?`
+      attribute vec3 aCur; attribute vec3 aNext; attribute vec3 aColor;
+      attribute float aIdx; attribute float aDelay; attribute float aRand; attribute float aState;
+      uniform float uT; uniform float uTime; uniform float uSize; uniform float uDrift; uniform float uCols;
+      varying vec2 vUv; varying vec2 vCell; varying vec3 vColor; varying float vState; varying float vRand;
+      void main(){
+        vec3 pos=aCur;
+        float w=uTime*0.5+aRand*6.2831;
+        pos+=vec3(sin(w),cos(w*0.8+1.7),sin(w*0.45+3.1))*uDrift*(0.4+0.6*aRand);
+        vec4 mv=modelViewMatrix*vec4(pos,1.0);
+        float s=uSize*(0.85+0.3*aRand)*(aState>0.5?1.25:1.0);
+        mv.xy+=position.xy*s;
+        gl_Position=projectionMatrix*mv;
+        vUv=uv; vColor=aColor; vState=aState; vRand=aRand;
+        vCell=vec2(mod(aIdx,uCols),floor(aIdx/uCols));
+      }`:'',
+    fragmentShader:`
+      uniform sampler2D uAtlas; uniform float uAtlasReady; uniform float uTime; uniform float uCols;
+      varying vec2 vUv; varying vec2 vCell; varying vec3 vColor; varying float vState; varying float vRand;
+      void main(){
+        vec2 cuv=vec2((vCell.x+vUv.x)/uCols,1.0-(vCell.y+1.0-vUv.y)/uCols);
+        vec2 p=vUv*2.0-1.0; float r=0.38; vec2 q=abs(p)-(1.0-r);
+        float sd=length(max(q,0.0))-r; float mask=1.0-smoothstep(-0.10,0.03,sd);
+        if(mask<0.01) discard;
+        vec4 tex=texture2D(uAtlas,cuv);
+        float d=length(p); float ember=1.0-smoothstep(0.15,0.95,d);
+        vec3 col=mix(vColor*(0.9+0.6*ember),tex.rgb,uAtlasReady);
+        float alpha=mix(ember*0.95,mask,uAtlasReady);
+        if(vState>0.5){ float pulse=0.5+0.5*sin(uTime*2.0+vRand*6.2831);
+          vec3 g=vState>1.5?vec3(0.95,0.52,0.44):vec3(0.33,0.88,0.80);
+          col+=g*smoothstep(0.5,1.0,d)*(0.12+0.15*pulse); }
+        gl_FragColor=vec4(col,alpha);
+      }`});
+  group.add(new THREE.Mesh(geo,mat));
+  // atlas
+  const img=new Image(); let t0=0;
+  img.onload=()=>{const tex=new THREE.Texture(img);tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;tex.needsUpdate=true;uniforms.uAtlas.value=tex;t0=performance.now();document.getElementById('load').style.opacity=0;};
+  img.src = mobile ? '/assets/atlas24.webp' : '/assets/atlas48.webp';
+  // orbit + zoom + pick
+  let rotY=0.6, rotX=-0.15, vy=0.0012, vx=0, dragging=false, px=0, py=0, moved=0;
+  const el=renderer.domElement; el.style.touchAction='none';
+  el.addEventListener('pointerdown',e=>{dragging=true;moved=0;px=e.clientX;py=e.clientY;el.setPointerCapture(e.pointerId);});
+  el.addEventListener('pointermove',e=>{ if(!dragging) return;
+    const dx=e.clientX-px, dy=e.clientY-py; moved+=Math.abs(dx)+Math.abs(dy);
+    vy=dx*0.0026; vx=dy*0.0022; rotY+=vy; rotX=Math.max(-1.2,Math.min(1.2,rotX+vx)); px=e.clientX; py=e.clientY; });
+  el.addEventListener('pointerup',e=>{ dragging=false; if(moved<8) pick(e.clientX,e.clientY,true); });
+  el.addEventListener('pointercancel',()=>dragging=false);
+  el.addEventListener('wheel',e=>{ e.preventDefault(); camDist=Math.max(10,Math.min(90,camDist*(1+e.deltaY*0.0012))); },{passive:false});
+  let pinch0=0;
+  el.addEventListener('touchmove',e=>{ if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(pinch0) camDist=Math.max(10,Math.min(90,camDist*pinch0/d)); pinch0=d; } },{passive:true});
+  el.addEventListener('touchend',()=>pinch0=0,{passive:true});
+  // hover/tap picking via projection
+  const tip=document.getElementById('tip'); const v3=new THREE.Vector3();
+  function pick(cx,cy,go){
+    let best=-1,bd=1e9;
+    for(let i=0;i<N;i++){
+      v3.set(pos[i*3],pos[i*3+1],pos[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);
+      const sx=(v3.x*0.5+0.5)*W, sy=(-v3.y*0.5+0.5)*H;
+      const d=(sx-cx)*(sx-cx)+(sy-cy)*(sy-cy);
+      if(d<bd){bd=d;best=i;}
+    }
+    if(best>=0&&bd<(mobile?1200:500)){
+      if(go){ location.href='/cat/'+(best+1); return; }
+      tip.textContent='Hypurr #'+(best+1)+(states[best]!=='0'&&states[best]?' · live':'');
+      tip.style.opacity=1; tip.style.left=Math.min(cx+14,W-140)+'px'; tip.style.top=(cy+16)+'px';
+    } else tip.style.opacity=0;
+  }
+  if(!mobile) el.addEventListener('mousemove',e=>{ if(!dragging) pick(e.clientX,e.clientY,false); });
+  // fly-to
+  document.getElementById('fly').addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+    const id=parseInt(e.target.value,10);
+    if(id>=1&&id<=N){ flyTarget.set(pos[(id-1)*3],pos[(id-1)*3+1],pos[(id-1)*3+2]); flyDist=7; flying=true;
+      document.getElementById('hint').textContent='Hypurr #'+id+' — tap it to open the passport'; }
+  });
+  let flyTarget=new THREE.Vector3(0,0,0), flyDist=camDist, flying=false;
+  function resize(){ W=innerWidth;H=innerHeight;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H); }
+  addEventListener('resize',resize);
+  const clock={t:0,last:performance.now()};
+  (function frame(now){
+    requestAnimationFrame(frame);
+    const dt=Math.min(0.05,(now-clock.last)/1000); clock.last=now; clock.t+=dt;
+    uniforms.uTime.value=clock.t;
+    if(t0) uniforms.uAtlasReady.value=Math.min(1,(performance.now()-t0)/900);
+    if(!dragging){ vy+=(0.0012-vy)*0.02; rotY+=vy; }
+    group.rotation.y=rotY; group.rotation.x=rotX;
+    group.updateMatrixWorld();
+    if(flying){ camTarget.lerp(flyTarget,0.06); camDist+=(flyDist-camDist)*0.06;
+      if(camTarget.distanceTo(flyTarget)<0.2&&Math.abs(camDist-flyDist)<0.3) flying=false; }
+    const ct=camTarget.clone().applyMatrix4(group.matrixWorld);
+    camera.position.set(ct.x,ct.y,ct.z+camDist);
+    camera.lookAt(ct);
+    renderer.render(scene,camera);
+  })(performance.now());
+})().catch(e=>console.error('observatory:',e));
+</script>
+</body></html>

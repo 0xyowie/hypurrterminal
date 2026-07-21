@@ -18,7 +18,7 @@ Every phase must ship mobile-seamless: same experience philosophy, tuned budgets
 - **Perf gates**: 60fps desktop / ≥40fps mid-tier phone on the hero; LCP < 2.5s; landing
   critical path < 150KB before atmosphere assets.
 
-## Phase 1 — The Living Hero + Market Weather  *(in progress)*
+## Phase 1 — The Living Hero + Market Weather  *(SHIPPED)*
 
 The flagship thesis piece. The landing hero becomes an instanced-WebGL particle field where
 **each particle is a real Hypurr** (texture-atlas billboards), and the field physically
@@ -41,7 +41,7 @@ reorganizes into the data as you scroll.
   on different days.
 - Touch: horizontal drag spins the field; vertical scrolls the story. Pointer parallax on desktop.
 
-## Phase 2 — The Share Layer (distribution)
+## Phase 2 — The Share Layer (distribution)  *(SHIPPED — 4,600 static /cat pages + canvas share cards; Daily Pulse history accumulating; X auto-post deferred)*
 
 - **Cat passports**: `/cat/:id` permalinks (Cloudflare Pages function or client route) with
   per-cat OG unfurls (art + rarity + last sale + stance in title/desc). In-browser
@@ -51,7 +51,7 @@ reorganizes into the data as you scroll.
   a daily digest entry + one `pulse.png` share card (sharp, 1/day, committed). `/pulse` page
   with the archive. Optional later: auto-post to X (needs user's X API keys).
 
-## Phase 3 — Alpha Layer (retention)
+## Phase 3 — Alpha Layer (retention)  *(SHIPPED — /pulse chart+boards+scatter, /wallet lookup; leaders.json in cron)*
 
 - **Sentiment history chart** on /pulse and The Index: pride net-long % over time overlaid
   with HYPE price (candles from the Hyperliquid public API, fetched by the cron).
@@ -61,7 +61,7 @@ reorganizes into the data as you scroll.
 - **Trait value analytics**: rarity rank vs last-sale scatter ("undervalued rarity"),
   median sale by trait, on The Collection or its own tab.
 
-## Phase 4 — The Observatory (showpiece)
+## Phase 4 — The Observatory (showpiece)  *(SHIPPED — PCA trait-space 3D at /observatory, orbit+pinch+fly-to)*
 
 All 4,600 explorable in 3D: one-hot trait vectors → PCA/UMAP precomputed at build →
 cats cluster into visual-family neighborhoods you fly through. Reuses the Phase-1 atlas

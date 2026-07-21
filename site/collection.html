@@ -127,6 +127,7 @@
     <a href="/positioning" data-nav="positioning">The Index</a>
     <a href="/desk" data-nav="desk">Live Desk</a>
     <a href="/pride" data-nav="pride">The Pride</a>
+    <a href="/pulse" data-nav="pulse">The Pulse</a>
   </nav>
 </div></header>
 
@@ -202,6 +203,7 @@
   function fillVals(){ valSel.innerHTML='<option value="">any value</option>'; if(!state.cat)return;
     Object.keys(FREQ.freq[state.cat]||{}).sort().forEach(v=>valSel.insertAdjacentHTML('beforeend',`<option>${esc(v)}</option>`)); }
   document.getElementById('q').oninput=render;
+  { const qp=new URLSearchParams(location.search).get('q'); if(qp){ document.getElementById('q').value=qp; } }
   document.getElementById('onlyLive').onclick=e=>{ state.onlyLive=!state.onlyLive; e.target.classList.toggle('on',state.onlyLive); render(); };
   document.getElementById('sort').onclick=e=>{ state.sortRare=!state.sortRare; e.target.textContent=state.sortRare?"rarest first":"by id"; render(); };
   document.getElementById('rand').onclick=()=>{ const t=TOKENS[Math.floor(Math.random()*TOKENS.length)]; openCat(t.id); };
@@ -262,7 +264,7 @@
         <div class="art"><img src="${img(t.id)}" alt="${esc(t.name)}"></div>
         <div class="side-pad">
           <h2>${esc(t.name)}</h2>
-          <div class="owner">rarity rank <b>#${t.rarityRank}</b> · held by <code>${short(t.owner)}</code></div>
+          <div class="owner">rarity rank <b>#${t.rarityRank}</b> · held by <code>${short(t.owner)}</code> · <a href="/cat/${t.id}" style="color:var(--mint);font-weight:600">passport ↗</a></div>
           ${panel}
         </div>
       </div>
