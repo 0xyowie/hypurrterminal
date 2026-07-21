@@ -9,7 +9,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-body{min-height:100vh;position:relative;overflow-x:hidden;
+body{min-height:100vh;position:relative;overflow-x:clip;
   background:radial-gradient(1000px 640px at 88% -8%,rgba(84,224,203,.08),transparent 60%),
     radial-gradient(760px 620px at 2% 16%,rgba(237,190,114,.06),transparent 58%),var(--bg)}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.04;mix-blend-mode:overlay;

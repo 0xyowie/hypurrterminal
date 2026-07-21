@@ -54,10 +54,11 @@
   // usage: var back=HT.backClose(modalEl, hideFn); call back.onOpen() after showing; wire ×/backdrop/Esc to back.close()
   function backClose(modalEl, hide){
     var isOpen=function(){ return modalEl.classList.contains('open'); };
-    window.addEventListener('popstate', function(){ if(isOpen()) hide(); });
+    var pushed=false; // one history entry per modal SESSION, not per openCat call
+    window.addEventListener('popstate', function(){ pushed=false; if(isOpen()) hide(); });
     return {
-      onOpen:function(){ try{ history.pushState({htModal:1},''); }catch(e){} },
-      close:function(){ if(isOpen()){ if(history.state && history.state.htModal){ try{ history.back(); return; }catch(e){} } hide(); } }
+      onOpen:function(){ if(pushed) return; try{ history.pushState({htModal:1},''); pushed=true; }catch(e){} },
+      close:function(){ if(!isOpen()) return; if(pushed){ try{ history.back(); return; }catch(e){} } hide(); }
     };
   }
 
@@ -80,7 +81,7 @@
     num:function(n){ return Number(n).toLocaleString('en-US'); },
     pct:function(x){ return Math.round(x*100); },
     fmtD:function(ts){ return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); },
-    json:function(p){ return fetch(p,{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error(p+' '+r.status); return r.json(); }); },
+    json:function(p,fresh){ return fetch(p, fresh?{cache:'no-cache'}:undefined).then(function(r){ if(!r.ok) throw new Error(p+' '+r.status); return r.json(); }); },
     backClose:backClose
   };
 })();

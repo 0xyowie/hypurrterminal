@@ -4,6 +4,10 @@
 <title>Hypurr Terminal — The Pride</title>
 <meta name="description" content="Diamond hands vs the market — which Hypurrs never left the wallet they were dealt, which changed hands most, and their full HYPE price history.">
 <meta name="theme-color" content="#0E0B08">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hypurr Terminal — The Pride"><meta property="og:description" content="Diamond hands vs the market — which Hypurrs never left the wallet they were dealt, which changed hands most, and their full HYPE price history.">
+<meta property="og:image" content="https://hypurrterminal.xyz/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,9 +28,15 @@
   .toggle{display:flex;gap:8px;margin:22px 0 6px;flex-wrap:wrap;align-items:center}
   .toggle button{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:12px;padding:9px 16px;font-weight:600;font-size:14px;color:var(--dim);font-family:'Inter';transition:.25s var(--ease)}
   .toggle button.on{background:var(--ink);color:#12100b;border-color:var(--ink)}
-  .filt{margin-left:auto;display:flex;gap:8px;align-items:center}
   .btn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:11px;padding:8px 14px;font-weight:600;font-size:13.5px;color:var(--ink);transition:.25s var(--ease)}
   .btn.on{background:var(--mint);color:#0b0906;border-color:var(--mint)}
+  .pfilt{display:flex;gap:8px;margin:10px 0 6px;flex-wrap:wrap;align-items:center}
+  .pfilt .field{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:8px 12px;font-weight:600;color:var(--dim);font-size:13px;min-width:0}
+  .pfilt .field input,.pfilt .field select{border:0;outline:0;background:transparent;font-family:'Inter';font-weight:600;font-size:14px;color:var(--ink);min-width:0}
+  .pfilt .field select{cursor:pointer;text-overflow:ellipsis} .pfilt .field select option{background:#1a140d;color:var(--ink)}
+  .pfilt .qf{flex:1;min-width:150px}
+  .pfilt .qf input{width:100%}
+  .pcount{margin-left:auto;font-weight:700;font-size:12.5px;color:var(--faint)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:16px;margin:16px 0 20px}
   .oc{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;position:relative;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s;cursor:pointer}
   .oc:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.5);border-color:var(--line2)}
@@ -79,8 +89,10 @@
     .oc .m .sub{font-size:10.5px}
     .toggle{gap:8px}
     .toggle #t-dia,.toggle #t-flip{flex:1}
-    .toggle .filt{margin-left:0;width:100%}
-    .toggle .filt .btn{width:100%}
+    .pfilt{display:grid;grid-template-columns:1fr 1fr}
+    .pfilt > *{min-width:0;width:100%}
+    .pfilt .qf{grid-column:1 / -1}
+    .pcount{grid-column:1 / -1;margin-left:0;text-align:right}
   }
 </style></head>
 <body data-page="pride">
@@ -101,7 +113,12 @@
   <div class="toggle">
     <button id="t-dia" class="on">💎 Diamond hands</button>
     <button id="t-flip">🔥 Most flipped</button>
-    <div class="filt"><button class="btn" id="onlyTrade">only still trading</button></div>
+  </div>
+  <div class="pfilt">
+    <label class="field qf">⌕ <input id="pq" placeholder="wallet or Hypurr # id"></label>
+    <label class="field">sort <select id="psort"></select></label>
+    <button class="btn" id="onlyTrade">only still trading</button>
+    <span class="pcount" id="pcount"></span>
   </div>
   <div class="grid" id="grid"></div>
 </div>
@@ -114,14 +131,15 @@
 <script>
 (async function(){
   const [O, POS, PROVRAW, SALES] = await Promise.all([
-    HT.json('/data/og.json'), HT.json('/data/positions.json'), HT.json('/data/provenance.json'), HT.json('/data/sales.json')
+    HT.json('/data/og.json'), HT.json('/data/positions.json',true), HT.json('/data/provenance.json'), HT.json('/data/sales.json')
   ]);
   const PROV = { nowTs: PROVRAW.nowTs, byId: PROVRAW.prov };
   const positions = POS.wallets;
   const trading = a => !!(positions[a] && positions[a].hasPosition);
   const esc=HT.esc, short=HT.short, num=HT.num, fmtD=HT.fmtD, img=HT.img;
   const S=O.stats;
-  let view='dia', onlyTrade=false;
+  let view='dia', onlyTrade=false, q='', sortDia='count', sortFlip='flips';
+  const lastSale=id=>{const s=SALES&&SALES.byToken&&SALES.byToken[id];return s&&s.length?s[s.length-1].price:0;};
   document.getElementById('h-never').textContent=num(S.neverTraded);
   document.getElementById('lead').textContent=`All 4,600 Hypurrs were airdropped on the same day, ${S.airdropDate}, ${S.daysSinceAirdrop} days ago. ${num(S.neverTraded)} of them have sat in their original wallet ever since. The other ${num(S.tradedCats)} have changed hands ${num(S.totalTrades)} times. Click any Hypurr for its full history.`;
   document.getElementById('tiles').innerHTML=`
@@ -132,15 +150,32 @@
   document.getElementById('t-dia').onclick=()=>{view='dia';sync();};
   document.getElementById('t-flip').onclick=()=>{view='flip';sync();};
   document.getElementById('onlyTrade').onclick=e=>{onlyTrade=!onlyTrade;e.target.classList.toggle('on',onlyTrade);render();};
+  const pq=document.getElementById('pq'), psort=document.getElementById('psort');
+  pq.oninput=()=>{ q=pq.value.trim().toLowerCase(); render(); };
+  psort.onchange=()=>{ if(view==='dia') sortDia=psort.value; else sortFlip=psort.value; render(); };
+  function fillSort(){
+    const opts = view==='dia'
+      ? [['count','most held'],['rare','rarest held']]
+      : [['flips','most flips'],['rare','rarest'],['price','priciest last sale']];
+    psort.innerHTML = opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
+    psort.value = view==='dia' ? sortDia : sortFlip;
+  }
   function sync(){document.getElementById('t-dia').classList.toggle('on',view==='dia');document.getElementById('t-flip').classList.toggle('on',view==='flip');
-    document.getElementById('onlyTrade').style.display=view==='dia'?'block':'none';render();}
+    pq.placeholder = view==='dia' ? 'wallet address' : 'wallet or Hypurr # id';
+    fillSort(); render();}
   function render(){
-    let html='';
+    let html='', n=0;
     if(view==='dia'){
-      let rows=O.diamonds.slice(); if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
+      let rows=O.diamonds.slice();
+      if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
+      if(q) rows=rows.filter(r=>r.owner.toLowerCase().includes(q));
+      rows.sort(sortDia==='rare' ? (a,b)=>a.rarityRank-b.rarityRank
+                                 : (a,b)=>b.diamondCount-a.diamondCount||a.rarityRank-b.rarityRank);
+      const showRank = sortDia==='count' && !onlyTrade && !q;
+      n=rows.length;
       html=rows.map((r,i)=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
         <div class="th"><img loading="lazy" src="${img(r.id)}" alt="">
-          ${i<3&&!onlyTrade?`<span class="rank">${i+1}</span>`:`<span class="dbadge">💎 ${r.diamondCount}</span>`}
+          ${i<3&&showRank?`<span class="rank">${i+1}</span>`:`<span class="dbadge">💎 ${r.diamondCount}</span>`}
           ${st?`<span class="trbadge"><span class="tdot"></span>trading</span>`:''}</div>
         <div class="m"><div class="ow">${short(r.owner)}</div>
           <div class="sub"><b>${r.diamondCount}</b> held since day one${r.heldCount>r.diamondCount?` · ${r.heldCount} total`:''}</div></div>
@@ -148,14 +183,23 @@
     } else {
       const st=SALES?SALES.stats:null;
       const bar=st?`<div class="mktbar" style="grid-column:1/-1">Secondary sales: <b>${st.totalSales.toLocaleString()}</b> · <b>${st.totalVolumeHype.toLocaleString()}</b> HYPE volume · avg <b>${st.avgPriceHype.toLocaleString()}</b> HYPE · top sale <b>${st.maxSale.hype.toLocaleString()} HYPE</b> (#${st.maxSale.id})</div>`:'';
-      html=bar+O.flipped.map(r=>{const ot=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
+      let rows=O.flipped.slice();
+      if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
+      if(q) rows=rows.filter(r=>String(r.id).includes(q)||r.owner.toLowerCase().includes(q));
+      rows.sort(sortFlip==='rare' ? (a,b)=>a.rarityRank-b.rarityRank
+              : sortFlip==='price' ? (a,b)=>lastSale(b.id)-lastSale(a.id)
+              : (a,b)=>b.flips-a.flips||a.rarityRank-b.rarityRank);
+      n=rows.length;
+      html=bar+rows.map(r=>{const ot=trading(r.owner); const ls=lastSale(r.id);
+        return `<div class="oc" onclick="openCat(${r.id})">
         <div class="th"><img loading="lazy" src="${img(r.id)}" alt="">
           <span class="fbadge">🔥 ${r.flips}×</span>
           ${ot?`<span class="trbadge"><span class="tdot"></span>trading</span>`:''}</div>
         <div class="m"><div class="ow">Hypurr #${r.id}</div>
-          <div class="sub">traded <b>${r.flips}</b> times · rarest #${r.rarityRank} · now <code>${short(r.owner)}</code></div></div>
+          <div class="sub">traded <b>${r.flips}</b>× · rarest #${r.rarityRank}${ls?` · last ${ls.toLocaleString()} HYPE`:''} · <code>${short(r.owner)}</code></div></div>
       </div>`;}).join('');
     }
+    document.getElementById('pcount').textContent = n + (view==='dia' ? ' wallets' : ' Hypurrs');
     document.getElementById('grid').innerHTML=html;
   }
   function timelineHTML(id){

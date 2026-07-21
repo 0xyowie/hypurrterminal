@@ -4,6 +4,10 @@
 <title>Hypurr Terminal — Live Desk</title>
 <meta name="description" content="The Hypurr holders with skin in the game — the biggest live Hyperliquid books, by size. Direction and size only, never PnL.">
 <meta name="theme-color" content="#0E0B08">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hypurr Terminal — Live Desk"><meta property="og:description" content="The Hypurr holders with skin in the game — the biggest live Hyperliquid books, by size. Direction and size only, never PnL.">
+<meta property="og:image" content="https://hypurrterminal.xyz/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100D0A'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -75,7 +79,7 @@
 </div></footer>
 <script>
 (async function(){
-  const D = await HT.json('/data/desk.json');
+  const D = await HT.json('/data/desk.json',true);
   const esc=HT.esc, short=HT.short, money=HT.money;
   let sortDesc=true, coin="";
   const coins=[...new Set(D.rows.flatMap(r=>r.positions.map(p=>p.coin)))].sort();

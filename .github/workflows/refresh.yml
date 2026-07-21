@@ -27,5 +27,6 @@ jobs:
             echo "No change in positions this cycle."
           else
             git commit -m "data: refresh positions $(date -u +%FT%TZ)"
+            git pull --rebase origin main
             git push
           fi

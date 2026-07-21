@@ -8,14 +8,18 @@
 <link rel="canonical" href="https://hypurrterminal.xyz">
 <meta property="og:type" content="website"><meta property="og:url" content="https://hypurrterminal.xyz">
 <meta property="og:title" content="Hypurr Terminal"><meta property="og:description" content="Behind every Hypurr is a Hyperliquid wallet — see what the pride is trading, live.">
-<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Hypurr Terminal">
+<meta property="og:image" content="https://hypurrterminal.xyz/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Hypurr Terminal">
+<meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/base.css">
 <script src="/assets/app.js"></script>
 <style>
   :root{--violet:#9A8CE0}
-  html,body{height:100%;overflow-x:hidden}
+  html{min-height:100%}
+  body{min-height:100svh;overflow-x:clip}
   body{background:
     radial-gradient(1000px 700px at 82% 30%, rgba(84,224,203,.10), transparent 60%),
     radial-gradient(820px 640px at 12% 78%, rgba(237,190,114,.09), transparent 58%),
@@ -100,7 +104,7 @@
 <script src="/assets/three.min.js"></script>
 <script>
 (async function(){
-  const [GID, IX] = await Promise.all([HT.json('/data/globe.json'), HT.json('/data/index.json')]);
+  const [GID, IX] = await Promise.all([HT.json('/data/globe.json'), HT.json('/data/index.json',true)]);
   const G = { cats: GID.ids.map(id=>({id, img:HT.img(id)})), awake: IX.holdersWithPosition };
   document.getElementById('awake').textContent = G.awake;
   const mount=document.getElementById('globe');
@@ -134,13 +138,23 @@
   });
   let dragging=false, px=0, py=0, velY=0.0022, velX=0, tiltX=0, tiltY=0;
   const el=renderer.domElement; el.style.touchAction='pan-y';
-  el.addEventListener('pointerdown',e=>{document.getElementById('hint').classList.add('gone');if(e.pointerType==='touch')return;dragging=true;px=e.clientX;py=e.clientY;el.setPointerCapture(e.pointerId);});
+  // touch-action:pan-y => vertical touch gestures scroll the page (browser fires pointercancel),
+  // horizontal touch drags keep streaming pointermove => spin the globe. Mouse gets full 2-axis drag.
+  el.addEventListener('pointerdown',e=>{
+    document.getElementById('hint').classList.add('gone');
+    dragging=true; px=e.clientX; py=e.clientY;
+    if(e.pointerType!=='touch') el.setPointerCapture(e.pointerId);
+  });
   el.addEventListener('pointermove',e=>{
-    if(e.pointerType==='touch')return; // let the page scroll on touch (touch-action: pan-y)
-    if(dragging){velY=(e.clientX-px)*0.0009; velX=(e.clientY-py)*0.0009; px=e.clientX; py=e.clientY;}
-    const rx=(e.clientX/W-0.5), ry=(e.clientY/H-0.5); tiltY=rx*0.4; tiltX=ry*0.3;
+    if(dragging){
+      velY=(e.clientX-px)*0.0009;
+      if(e.pointerType!=='touch') velX=(e.clientY-py)*0.0009; // vertical belongs to page scroll on touch
+      px=e.clientX; py=e.clientY;
+    }
+    if(e.pointerType!=='touch'){ const rx=(e.clientX/W-0.5), ry=(e.clientY/H-0.5); tiltY=rx*0.4; tiltX=ry*0.3; }
   });
   el.addEventListener('pointerup',()=>{dragging=false;});
+  el.addEventListener('pointercancel',()=>{dragging=false;});
   el.addEventListener('pointerleave',()=>{dragging=false;});
   const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   function loop(){
