@@ -85,6 +85,16 @@ for (const [owner, w] of Object.entries(positions)){
 rows.sort((a,b)=> b.totalNotional - a.totalNotional);
 fs.writeFileSync(path.join(OUT, "desk.json"), JSON.stringify({ generatedAt, holdersWithPosition, rows: rows.slice(0, 200) }));
 
+// ---- cat_states.json : per-cat live stance for the living hero (0 flat / 1 long / 2 short) ----
+let states = "";
+for (let id = 1; id <= 4600; id++) {
+  const owner = ownersRaw[id]; const w = owner ? positions[owner] : null;
+  if (!w || !w.hasPosition) { states += "0"; continue; }
+  let net = 0; for (const p of w.positions) net += (p.direction === "long" ? 1 : -1) * p.notionalUsd;
+  states += net >= 0 ? "1" : "2";
+}
+fs.writeFileSync(path.join(OUT, "cat_states.json"), JSON.stringify({ generatedAt, states }));
+
 console.log(`\nholders ${holdersTotal}, live ${holdersWithPosition} (${(index.participationRate*100).toFixed(1)}%), errors ${errors}`);
 console.log(`net-long wallets ${walletsNetLong}, net-short ${walletsNetShort}; long by notional ${(index.byNotional.longPct*100).toFixed(1)}%`);
 console.log(`desk rows ${Math.min(200,rows.length)} (of ${rows.length} trading holders)`);
