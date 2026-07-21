@@ -32,7 +32,7 @@
   .wpill.warm i{background:var(--gold)}
 
   /* ---- scrollytelling ---- */
-  .story{position:relative;height:400svh;z-index:1}
+  .story{position:relative;height:600svh;z-index:1}
   .pin{position:sticky;top:0;height:100svh;overflow:hidden}
   #stage{position:absolute;inset:0}
   #stage canvas{display:block}
@@ -75,7 +75,7 @@
 
   @media(max-width:860px){
     header.land{padding:16px 18px}
-    .story{height:360svh}
+    .story{height:540svh}
     .beat{padding:0 22px 11svh}
     .beat h1,.beat .h{font-size:clamp(40px,12.5vw,72px)}
     .progress{right:14px}
@@ -117,7 +117,7 @@
     <div class="beat" data-b="2">
       <div class="eyebrow">Live positioning · refreshed every 15 min</div>
       <div class="h disp">The pride leans<br><span class="live" id="leanpct">–%</span> long.</div>
-      <p class="sub" id="leansub">The columns you're watching are built from the cats themselves — every holder with an open book, sorted long against short.</p>
+      <p class="sub" id="leansub">The columns you're watching are built from the Hypurrs themselves — every holder with an open book, sorted long against short.</p>
       <div class="row"><a class="btn" href="/positioning">Open the Index →</a></div>
     </div>
 
@@ -128,7 +128,21 @@
       <div class="row"><a class="btn" href="/desk">See the live desk →</a></div>
     </div>
 
-    <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="beat" data-b="4">
+      <div class="eyebrow">The daily pulse · snapshotted every 15 min</div>
+      <div class="h disp">The pride has<br>a <em>pulse.</em></div>
+      <p class="sub">Net-long share charted against HYPE itself — plus leaderboards for the biggest and boldest books in the den.</p>
+      <div class="row"><a class="btn" href="/pulse">Feel the pulse →</a></div>
+    </div>
+
+    <div class="beat" data-b="5">
+      <div class="eyebrow">4,600 plotted in trait-space</div>
+      <div class="h disp">One sky. Every<br>Hypurr a <em>star.</em></div>
+      <p class="sub">The whole collection mapped into 3D by its traits — visual families cluster into constellations you can fly through.</p>
+      <div class="row"><a class="btn" href="/observatory">Enter the Observatory →</a></div>
+    </div>
+
+    <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="scrollcue" id="cue"><span>scroll</span><span class="ch">↓</span></div>
   </div>
 </section>
@@ -331,6 +345,13 @@
       out[k*3+2] = R2()*1.5;
     }
   }
+  function mist(list,out){                      // sleepers recede into a shapeless far starfield (never a readable ring)
+    for(let j=0;j<list.length;j++){
+      const k=list[j];
+      const a=Math.random()*Math.PI*2, R=2+24*Math.sqrt(Math.random());
+      out[k*3]=Math.cos(a)*R*1.15; out[k*3+1]=Math.sin(a)*R*0.55; out[k*3+2]=-15-Math.random()*10;
+    }
+  }
   function fBars(out){
     const longs=[], shorts=[], flats=[];
     for (let k=0;k<COUNT;k++) (aState[k]===1?longs:aState[k]===2?shorts:flats).push(k);
@@ -348,10 +369,7 @@
       });
     }
     col(longs, mobile ? -2.6 : -4.2); col(shorts, mobile ? 2.6 : 4.2);
-    flats.forEach((k,j)=>{                      // sleeping cats recede into a far mist disc
-      const a=j*2.399963, r=10.5*Math.sqrt((j+1)/flats.length);
-      out[k*3]=Math.cos(a)*r*1.9; out[k*3+1]=Math.sin(a)*r*1.15; out[k*3+2]=-13.0-Math.random()*5.0;
-    });
+    mist(flats,out);
   }
   function fPaw(out){
     const awake=[], flats=[];
@@ -367,19 +385,52 @@
       for (let j=0;j<cnt && ptr<awake.length;j++,ptr++){
         const k=awake[ptr];
         ellipsePoint(cx,cy,rx,ry,out,k*3);
-        out[k*3+2]=1.5+R2()*0.6;
+        out[k*3+2]=0.4+R2()*0.5;               // stay near the z=0 plane so projection matches the measured box
       }
     });
-    flats.forEach((k,j)=>{
-      const a=j*2.399963, r=11+3*Math.sqrt((j+1)/flats.length);
-      out[k*3]=Math.cos(a)*r; out[k*3+1]=Math.sin(a)*r*0.7; out[k*3+2]=-11-Math.random()*3;
-    });
+    mist(flats,out);
   }
-  const formations=[fNebula,fSpiral,fBars,fPaw];
-  const drifts=[0.16,0.05,0.035,0.09];
-  const sleeps=[1,1,0.05,0.07];               // how present sleeping cats are per beat
+  function fWave(out){                          // the pulse: awake cats ride a sentiment wave
+    const awake=[], flats=[];
+    for (let k=0;k<COUNT;k++) (aState[k]>0?awake:flats).push(k);
+    const w = mobile ? 12.5 : 16;
+    awake.forEach((k,j)=>{
+      const t=j/Math.max(1,awake.length-1);
+      const x=(t-0.5)*w;
+      const y=Math.sin(t*Math.PI*2.2)*2.5 + Math.sin(t*Math.PI*5.1+1.3)*0.7;
+      out[k*3]=x+R2()*0.22; out[k*3+1]=y+R2()*0.8; out[k*3+2]=R2()*0.6;
+    });
+    mist(flats,out);
+  }
+  function fClusters(out){                      // the observatory: visual families as constellations
+    const C=8;
+    const hues=new Float32Array(COUNT);
+    for (let k=0;k<COUNT;k++){
+      const r=aColor[k*3],g=aColor[k*3+1],b=aColor[k*3+2];
+      const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let h=0;
+      if(mx>mn){ const d=mx-mn;
+        h = mx===r ? ((g-b)/d+6)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h/=6; }
+      hues[k]=h+ (mx-mn<0.04 ? 0.9+mx*0.09 : 0);   // near-greys get their own end of the scale
+    }
+    const sorted=Array.from(hues).sort((a,b)=>a-b);
+    const th=[]; for(let c=1;c<C;c++) th.push(sorted[Math.floor(sorted.length*c/C)]);
+    const centers=[];
+    for(let c=0;c<C;c++){
+      const a=c/C*Math.PI*2+0.55, r=(c%2? (mobile?5.1:6.6):(mobile?2.7:3.5));
+      centers.push([Math.cos(a)*r*1.35, Math.sin(a)*r*0.78, ((c*2.3)%2-1)*1.6]);
+    }
+    for (let k=0;k<COUNT;k++){
+      let c=0; while(c<C-1 && hues[k]>th[c]) c++;
+      const ctr=centers[c];
+      const g1=(R2()+R2()+R2())/3, g2=(R2()+R2()+R2())/3, g3=(R2()+R2()+R2())/3;
+      out[k*3]=ctr[0]+g1*2.7; out[k*3+1]=ctr[1]+g2*2.0; out[k*3+2]=ctr[2]+g3*1.8;
+    }
+  }
+  const formations=[fNebula,fSpiral,fBars,fPaw,fWave,fClusters];
+  const drifts=[0.16,0.05,0.035,0.09,0.06,0.05];
+  const sleeps=[1,1,0.05,0.07,0.06,1];        // how present sleeping cats are per beat
   // world-space extents (w,h) of each formation, before group scaling
-  const EXT=[[17.5,14],[18.5,16.5],[15.5,12.5],[13,11]];
+  const EXT=[[17.5,14],[18.5,16.5],[15.5,12.5],[13,11],[16.5,8.5],[20.5,12.5]];
   const beatEls=[...document.querySelectorAll('.beat')];
   function measureBeat(i){
     // free box = viewport minus header minus THIS beat's actual text block
@@ -390,7 +441,7 @@
     const headH=78;
     let bx0,bx1,by0,by1;
     if(mobile){ bx0=12; bx1=W-12; by0=headH+6; by1=Math.max(headH+120, textTop-16); }
-    else      { bx0=Math.min(Math.max(textRight+36, W*0.44), W*0.62); bx1=W-28; by0=headH+4; by1=H-26; }
+    else      { bx0=Math.min(Math.max(textRight+24, W*0.42), W*0.56); bx1=W-Math.max(48,Math.round(W*0.05)); by0=headH+10; by1=H-40; }
     const pxW=(2*camera.position.z*Math.tan(camera.fov*Math.PI/360))/H;  // world units per px
     const wx=((bx0+bx1)/2 - W/2)*pxW, wy=-(((by0+by1)/2) - H/2)*pxW;
     const fit=Math.max(0.4, Math.min((bx1-bx0)*pxW/(EXT[i][0]*kBase), (by1-by0)*pxW/(EXT[i][1]*kBase), 1.25));
@@ -425,12 +476,12 @@
   const dots=[...document.querySelectorAll('#prog i')];
   const cue=document.getElementById('cue');
   document.getElementById('awake2').textContent=IX.holdersWithPosition;
-  document.getElementById('leansub').textContent=`${bw.netLong} holders lean long, ${bw.netShort} lean short — the columns you're watching are the cats themselves.`;
+  document.getElementById('leansub').textContent=`${bw.netLong} holders lean long, ${bw.netShort} lean short — the columns you're watching are the Hypurrs themselves.`;
   function onScroll(){
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;
     const p=Math.min(0.999,Math.max(0,-r.top/Math.max(1,total)));
-    const b=Math.min(3,Math.floor(p*4+0.002));
+    const b=Math.min(5,Math.floor(p*6+0.002));
     cue.classList.toggle('gone', p>0.03);
     if(b!==curBeat){
       curBeat=b;
@@ -453,8 +504,8 @@
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;
     const y=-r.top;
-    if(y<-8 || y>total+innerHeight*1.2) return;      // outside the story
-    const cands=[0, total*0.25, total*0.5, total*0.75, total, total+innerHeight];
+    if(y<8 || y>total-8) return;                     // only snap INSIDE the story — strip & footer scroll free
+    const cands=[0, total*0.2, total*0.4, total*0.6, total*0.8, total];
     let best=cands[0], bd=1e9;
     for(const c of cands){ const d=Math.abs(y-c); if(d<bd){bd=d; best=c;} }
     if(bd>8){ snapping=true; scrollTo({top:scrollY+(best-y), behavior:'smooth'}); setTimeout(()=>snapping=false,700); }
