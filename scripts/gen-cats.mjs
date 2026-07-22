@@ -42,7 +42,6 @@ const tpl = (t) => {
     <a href="/positioning" data-nav="positioning">The Index</a>
     <a href="/desk" data-nav="desk">Live Desk</a>
     <a href="/pride" data-nav="pride">The Pride</a>
-    <a href="/pulse" data-nav="pulse">The Pulse</a>
   </nav>
 </div></header>
 <div class="wrap pass">

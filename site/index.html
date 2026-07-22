@@ -45,7 +45,8 @@
   .beat h1 em,.beat .h em{font-style:normal;color:var(--gold)}
   .beat .h .live{color:var(--mint)}
   .beat .sub{margin:18px 0 0;color:#cfc4ad;font-size:clamp(15px,1.8vw,18px);line-height:1.55;max-width:460px;text-shadow:0 1px 12px rgba(0,0,0,.8)}
-  .beat .row{display:flex;align-items:center;gap:18px;margin-top:26px;flex-wrap:wrap;pointer-events:auto}
+  .beat .row{display:flex;align-items:center;gap:18px;margin-top:26px;flex-wrap:wrap;pointer-events:none}
+  .beat.on .row{pointer-events:auto}
   .btn{font-size:15px;font-weight:600;padding:14px 25px;border-radius:14px;background:var(--ink);color:#12100b;transition:.4s var(--ease);cursor:pointer;display:inline-block}
   .btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(245,239,228,.14)}
   .glink{font-size:15px;font-weight:600;color:var(--mint);border-bottom:1px solid rgba(84,224,203,.4);padding-bottom:2px;transition:.3s var(--ease)}
@@ -63,10 +64,9 @@
   .progress i{width:6px;height:6px;border-radius:50%;background:var(--line2);transition:.4s var(--ease)}
   .progress i.on{background:var(--mint);box-shadow:0 0 12px rgba(84,224,203,.7)}
 
-  .strip{position:relative;z-index:3;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg)}
+  .strip{position:relative;z-index:3;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg)}
   .strip a{padding:26px 30px;border-left:1px solid var(--line);transition:.4s var(--ease);display:block}
-  .strip a:nth-child(3n+1){border-left:0}
-  .strip a:nth-child(n+4){border-top:1px solid var(--line)}
+  .strip a:first-child{border-left:0}
   .strip a:hover{background:rgba(255,255,255,.03)}
   .strip .n{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.14em}
   .strip .t{font-family:'Bricolage Grotesque';font-weight:600;font-size:20px;margin-top:8px}
@@ -81,6 +81,7 @@
     .progress{right:14px}
     .strip{grid-template-columns:1fr 1fr}
     .strip a{border-left:0;border-top:1px solid var(--line)}
+    .strip a:first-child{border-top:0}
   }
   @media(prefers-reduced-motion:reduce){
     .scrollcue .ch,.awake .p::after{animation:none}
@@ -132,7 +133,7 @@
       <div class="eyebrow">The daily pulse · snapshotted every 15 min</div>
       <div class="h disp">The pride has<br>a <em>pulse.</em></div>
       <p class="sub">Net-long share charted against HYPE itself — plus leaderboards for the biggest and boldest books in the den.</p>
-      <div class="row"><a class="btn" href="/pulse">Feel the pulse →</a></div>
+      <div class="row"><a class="btn" href="/positioning#pulse">Feel the pulse →</a></div>
     </div>
 
     <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i><i></i></div>
@@ -142,11 +143,9 @@
 
 <nav class="strip">
   <a href="/collection"><div class="n">01</div><div class="t">The Collection</div><div class="d">4,600 Hypurrs, by trait &amp; rarity</div></a>
-  <a href="/positioning"><div class="n">02</div><div class="t">The Index</div><div class="d">what the cohort is trading</div></a>
+  <a href="/positioning"><div class="n">02</div><div class="t">The Index</div><div class="d">live positioning · history · wallet lookup</div></a>
   <a href="/desk"><div class="n">03</div><div class="t">Live Desk</div><div class="d">the biggest live books</div></a>
   <a href="/pride"><div class="n">04</div><div class="t">The Pride</div><div class="d">diamond hands &amp; price history</div></a>
-  <a href="/pulse"><div class="n">05</div><div class="t">The Pulse</div><div class="d">sentiment history &amp; leaderboards</div></a>
-  <a href="/wallet"><div class="n">06</div><div class="t">Wallet Lookup</div><div class="d">any address → its Hypurrs &amp; stance</div></a>
 </nav>
 
 <script src="/assets/three.min.js"></script>

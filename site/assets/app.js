@@ -31,6 +31,10 @@
   // --- active nav ---
   function markNav(){
     var pg=document.body.getAttribute('data-page'); if(!pg)return;
+    // older generated pages may still carry links to retired sections — drop them
+    ['pulse','observatory'].forEach(function(k){
+      var st=document.querySelector('nav.top a[data-nav="'+k+'"]'); if(st) st.remove();
+    });
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }

@@ -51,7 +51,7 @@ reorganizes into the data as you scroll.
   a daily digest entry + one `pulse.png` share card (sharp, 1/day, committed). `/pulse` page
   with the archive. Optional later: auto-post to X (needs user's X API keys).
 
-## Phase 3 — Alpha Layer (retention)  *(SHIPPED — /pulse chart+boards+scatter, /wallet lookup; leaders.json in cron)*
+## Phase 3 — Alpha Layer (retention)  *(SHIPPED, then MERGED — Pulse chart+boards+scatter and wallet lookup now live inside The Index (/positioning#pulse, #wallet); /pulse and /wallet are redirects. Site is 4 sections.)*
 
 - **Sentiment history chart** on /pulse and The Index: pride net-long % over time overlaid
   with HYPE price (candles from the Hyperliquid public API, fetched by the cron).
