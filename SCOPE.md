@@ -61,7 +61,7 @@ reorganizes into the data as you scroll.
 - **Trait value analytics**: rarity rank vs last-sale scatter ("undervalued rarity"),
   median sale by trait, on The Collection or its own tab.
 
-## Phase 4 — The Observatory (showpiece)  *(SHIPPED — PCA trait-space 3D at /observatory, orbit+pinch+fly-to)*
+## Phase 4 — The Observatory (showpiece)  *(SCRATCHED — two iterations didn't earn their place; page and links removed)*
 
 All 4,600 explorable in 3D: one-hot trait vectors → PCA/UMAP precomputed at build →
 cats cluster into visual-family neighborhoods you fly through. Reuses the Phase-1 atlas

@@ -31,12 +31,6 @@
   // --- active nav ---
   function markNav(){
     var pg=document.body.getAttribute('data-page'); if(!pg)return;
-    // older static pages (e.g. generated passports) may predate newer sections — patch them in
-    var nav=document.querySelector('nav.top');
-    if(nav && !nav.querySelector('a[data-nav="observatory"]')){
-      var a=document.createElement('a'); a.href='/observatory'; a.setAttribute('data-nav','observatory'); a.textContent='The Observatory';
-      nav.appendChild(a);
-    }
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }

@@ -104,7 +104,6 @@
     <a href="/desk" data-nav="desk">Live Desk</a>
     <a href="/pride" data-nav="pride">The Pride</a>
     <a href="/pulse" data-nav="pulse">The Pulse</a>
-    <a href="/observatory" data-nav="observatory">The Observatory</a>
   </nav>
 </div></header>
 <div class="wrap">
@@ -140,7 +139,7 @@
   const trading = a => !!(positions[a] && positions[a].hasPosition);
   const esc=HT.esc, short=HT.short, num=HT.num, fmtD=HT.fmtD, img=HT.img;
   const S=O.stats;
-  let view='dia', onlyTrade=false, q='', sortDia='count', sortFlip='flips';
+  let view='dia', onlyTrade=false, q='', sortDia='rare', sortFlip='flips';
   const lastSale=id=>{const s=SALES&&SALES.byToken&&SALES.byToken[id];return s&&s.length?s[s.length-1].price:0;};
   document.getElementById('h-never').textContent=num(S.neverTraded);
   document.getElementById('lead').textContent=`All 4,600 Hypurrs were airdropped on the same day, ${S.airdropDate}, ${S.daysSinceAirdrop} days ago. ${num(S.neverTraded)} of them have sat in their original wallet ever since. The other ${num(S.tradedCats)} have changed hands ${num(S.totalTrades)} times. Click any Hypurr for its full history.`;
@@ -157,30 +156,29 @@
   psort.onchange=()=>{ if(view==='dia') sortDia=psort.value; else sortFlip=psort.value; render(); };
   function fillSort(){
     const opts = view==='dia'
-      ? [['count','most held'],['rare','rarest held']]
+      ? [['rare','rarest first'],['id','mint order']]
       : [['flips','most flips'],['rare','rarest'],['price','priciest last sale']];
     psort.innerHTML = opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
     psort.value = view==='dia' ? sortDia : sortFlip;
   }
   function sync(){document.getElementById('t-dia').classList.toggle('on',view==='dia');document.getElementById('t-flip').classList.toggle('on',view==='flip');
-    pq.placeholder = view==='dia' ? 'wallet address' : 'wallet or Hypurr # id';
+    pq.placeholder = 'wallet or Hypurr # id';
     fillSort(); render();}
   function render(){
     let html='', n=0;
     if(view==='dia'){
+      // the airdrop was one-per-wallet, so diamonds are the never-traded Hypurrs themselves
       let rows=O.diamonds.slice();
       if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
-      if(q) rows=rows.filter(r=>r.owner.toLowerCase().includes(q));
-      rows.sort(sortDia==='rare' ? (a,b)=>a.rarityRank-b.rarityRank
-                                 : (a,b)=>b.diamondCount-a.diamondCount||a.rarityRank-b.rarityRank);
-      const showRank = sortDia==='count' && !onlyTrade && !q;
+      if(q) rows=rows.filter(r=>String(r.id).includes(q)||r.owner.toLowerCase().includes(q));
+      rows.sort(sortDia==='id' ? (a,b)=>a.id-b.id : (a,b)=>a.rarityRank-b.rarityRank);
       n=rows.length;
-      html=rows.map((r,i)=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
+      html=rows.map(r=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
         <div class="th"><img loading="lazy" src="${img(r.id)}" alt="">
-          ${i<3&&showRank?`<span class="rank">${i+1}</span>`:`<span class="dbadge">💎 ${r.diamondCount}</span>`}
+          <span class="dbadge">💎 day one</span>
           ${st?`<span class="trbadge"><span class="tdot"></span>trading</span>`:''}</div>
-        <div class="m"><div class="ow">${short(r.owner)}</div>
-          <div class="sub"><b>${r.diamondCount}</b> held since day one${r.heldCount>r.diamondCount?` · ${r.heldCount} total`:''}</div></div>
+        <div class="m"><div class="ow">Hypurr #${r.id}</div>
+          <div class="sub">rarest <b>#${r.rarityRank}</b> · never left <code>${short(r.owner)}</code></div></div>
       </div>`;}).join('');
     } else {
       const st=SALES?SALES.stats:null;
@@ -201,7 +199,7 @@
           <div class="sub">traded <b>${r.flips}</b>× · rarest #${r.rarityRank}${ls?` · last ${ls.toLocaleString()} HYPE`:''} · <code>${short(r.owner)}</code></div></div>
       </div>`;}).join('');
     }
-    document.getElementById('pcount').textContent = n + (view==='dia' ? ' wallets' : ' Hypurrs');
+    document.getElementById('pcount').textContent = n + ' Hypurrs';
     document.getElementById('grid').innerHTML=html;
   }
   function timelineHTML(id){

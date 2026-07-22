@@ -39,10 +39,12 @@ const heldBy = {}; for (const id in ownersRaw){ (heldBy[ownersRaw[id]] ||= []).p
 // never-traded tokens grouped by current owner
 const neverByOwner = {}; let neverTraded = 0, totalTrades = 0;
 for (const id in prov){ const p = prov[id]; totalTrades += p.trades; if (p.trades === 0){ neverTraded++; (neverByOwner[p.currentOwner] ||= []).push(+id); } }
-const diamonds = Object.entries(neverByOwner).map(([owner, ids]) => {
-  const rep = ids.slice().sort((a,b)=> rrOf[a]-rrOf[b])[0]; // rarest never-traded held
-  return { owner, diamondCount: ids.length, heldCount: (heldBy[owner]||[]).length, id: rep, rarityRank: rrOf[rep] };
-}).sort((a,b)=> b.diamondCount - a.diamondCount || a.rarityRank - b.rarityRank).slice(0, 120);
+// The airdrop was one-per-wallet (one treasury vault aside), so a per-wallet
+// "most held" leaderboard is degenerate. Diamonds = the never-traded TOKENS themselves.
+const diamonds = [];
+for (const owner in neverByOwner) for (const id of neverByOwner[owner])
+  diamonds.push({ id, rarityRank: rrOf[id], owner, heldCount: (heldBy[owner]||[]).length });
+diamonds.sort((a,b)=> a.rarityRank - b.rarityRank);
 // most flipped tokens
 const flipped = Object.keys(prov).map(id => ({ id:+id, flips: prov[id].trades, rarityRank: rrOf[id], owner: prov[id].currentOwner }))
   .sort((a,b)=> b.flips - a.flips || a.rarityRank - b.rarityRank).slice(0, 90);

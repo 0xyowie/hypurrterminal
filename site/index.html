@@ -32,7 +32,7 @@
   .wpill.warm i{background:var(--gold)}
 
   /* ---- scrollytelling ---- */
-  .story{position:relative;height:600svh;z-index:1}
+  .story{position:relative;height:500svh;z-index:1}
   .pin{position:sticky;top:0;height:100svh;overflow:hidden}
   #stage{position:absolute;inset:0}
   #stage canvas{display:block}
@@ -75,7 +75,7 @@
 
   @media(max-width:860px){
     header.land{padding:16px 18px}
-    .story{height:540svh}
+    .story{height:450svh}
     .beat{padding:0 22px 11svh}
     .beat h1,.beat .h{font-size:clamp(40px,12.5vw,72px)}
     .progress{right:14px}
@@ -135,14 +135,7 @@
       <div class="row"><a class="btn" href="/pulse">Feel the pulse →</a></div>
     </div>
 
-    <div class="beat" data-b="5">
-      <div class="eyebrow">4,600 plotted in trait-space</div>
-      <div class="h disp">One sky. Every<br>Hypurr a <em>star.</em></div>
-      <p class="sub">The whole collection mapped into 3D by its traits — visual families cluster into constellations you can fly through.</p>
-      <div class="row"><a class="btn" href="/observatory">Enter the Observatory →</a></div>
-    </div>
-
-    <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i><i></i></div>
     <div class="scrollcue" id="cue"><span>scroll</span><span class="ch">↓</span></div>
   </div>
 </section>
@@ -153,7 +146,7 @@
   <a href="/desk"><div class="n">03</div><div class="t">Live Desk</div><div class="d">the biggest live books</div></a>
   <a href="/pride"><div class="n">04</div><div class="t">The Pride</div><div class="d">diamond hands &amp; price history</div></a>
   <a href="/pulse"><div class="n">05</div><div class="t">The Pulse</div><div class="d">sentiment history &amp; leaderboards</div></a>
-  <a href="/observatory"><div class="n">06</div><div class="t">The Observatory</div><div class="d">the whole pride in 3D</div></a>
+  <a href="/wallet"><div class="n">06</div><div class="t">Wallet Lookup</div><div class="d">any address → its Hypurrs &amp; stance</div></a>
 </nav>
 
 <script src="/assets/three.min.js"></script>
@@ -402,35 +395,11 @@
     });
     mist(flats,out);
   }
-  function fClusters(out){                      // the observatory: visual families as constellations
-    const C=8;
-    const hues=new Float32Array(COUNT);
-    for (let k=0;k<COUNT;k++){
-      const r=aColor[k*3],g=aColor[k*3+1],b=aColor[k*3+2];
-      const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let h=0;
-      if(mx>mn){ const d=mx-mn;
-        h = mx===r ? ((g-b)/d+6)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h/=6; }
-      hues[k]=h+ (mx-mn<0.04 ? 0.9+mx*0.09 : 0);   // near-greys get their own end of the scale
-    }
-    const sorted=Array.from(hues).sort((a,b)=>a-b);
-    const th=[]; for(let c=1;c<C;c++) th.push(sorted[Math.floor(sorted.length*c/C)]);
-    const centers=[];
-    for(let c=0;c<C;c++){
-      const a=c/C*Math.PI*2+0.55, r=(c%2? (mobile?5.1:6.6):(mobile?2.7:3.5));
-      centers.push([Math.cos(a)*r*1.35, Math.sin(a)*r*0.78, ((c*2.3)%2-1)*1.6]);
-    }
-    for (let k=0;k<COUNT;k++){
-      let c=0; while(c<C-1 && hues[k]>th[c]) c++;
-      const ctr=centers[c];
-      const g1=(R2()+R2()+R2())/3, g2=(R2()+R2()+R2())/3, g3=(R2()+R2()+R2())/3;
-      out[k*3]=ctr[0]+g1*2.7; out[k*3+1]=ctr[1]+g2*2.0; out[k*3+2]=ctr[2]+g3*1.8;
-    }
-  }
-  const formations=[fNebula,fSpiral,fBars,fPaw,fWave,fClusters];
-  const drifts=[0.16,0.05,0.035,0.09,0.06,0.05];
-  const sleeps=[1,1,0.05,0.07,0.06,1];        // how present sleeping cats are per beat
+  const formations=[fNebula,fSpiral,fBars,fPaw,fWave];
+  const drifts=[0.16,0.05,0.035,0.09,0.06];
+  const sleeps=[1,1,0.05,0.07,0.06];          // how present sleeping cats are per beat
   // world-space extents (w,h) of each formation, before group scaling
-  const EXT=[[17.5,14],[18.5,16.5],[15.5,12.5],[13,11],[16.5,8.5],[20.5,12.5]];
+  const EXT=[[17.5,14],[18.5,16.5],[15.5,12.5],[13,11],[16.5,8.5]];
   const beatEls=[...document.querySelectorAll('.beat')];
   function measureBeat(i){
     // free box = viewport minus header minus THIS beat's actual text block
@@ -481,7 +450,7 @@
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;
     const p=Math.min(0.999,Math.max(0,-r.top/Math.max(1,total)));
-    const b=Math.min(5,Math.floor(p*6+0.002));
+    const b=Math.min(4,Math.floor(p*5+0.002));
     cue.classList.toggle('gone', p>0.03);
     if(b!==curBeat){
       curBeat=b;
@@ -493,7 +462,7 @@
   addEventListener('scroll', onScroll, {passive:true});
 
   // ---- section stepper: one gesture = one beat; below the story the page scrolls free ----
-  const SNAPS=5;                                   // snap points at i/SNAPS * total, i=0..5
+  const SNAPS=4;                                   // snap points at i/SNAPS * total, i=0..4
   let stepAnim=null, lastLand=0;
   function storyPos(){ const r=story.getBoundingClientRect(); return {total:r.height-innerHeight, y:-r.top}; }
   function goTo(i,total){
