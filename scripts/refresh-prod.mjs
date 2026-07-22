@@ -34,7 +34,8 @@ await pool(addrs, async (addr) => {
   const ps = (j.assetPositions||[]).map(p => { const pos = p.position||{};
     return { coin: pos.coin, direction: Number(pos.szi)>=0?"long":"short",
       size: Math.abs(Number(pos.szi)||0), notionalUsd: Math.round(Number(pos.positionValue)||0),
-      leverage: pos.leverage ? { type: pos.leverage.type, value: pos.leverage.value } : null }; });
+      leverage: pos.leverage ? { type: pos.leverage.type, value: pos.leverage.value } : null }; })
+    .filter(p => p.notionalUsd >= 10);   // drop dust legs — a "$0 long" is noise, and a dust-only wallet isn't "awake"
   positions[addr] = { hasPosition: ps.length>0, positions: ps };
 }, 15, (d,t)=>process.stdout.write(`positions ${d}/${t} (err ${errors})\r`));
 

@@ -353,7 +353,7 @@
     history.replaceState(null,'','/positioning?a='+a+'#wallet');
     const ids=held[a]||[];
     const w=POSD.wallets[a];
-    const ps=(w&&w.positions||[]).slice().sort((x,y)=>y.notionalUsd-x.notionalUsd);
+    const ps=(w&&w.positions||[]).filter(p=>p.notionalUsd>=10).sort((x,y)=>y.notionalUsd-x.notionalUsd);
     let net=0,tot=0; ps.forEach(p=>{const s=(p.direction==='long'?1:-1)*p.notionalUsd; net+=s; tot+=p.notionalUsd;});
     $('status').textContent=ids.length?'':'This wallet holds no Hypurrs — showing its book anyway.';
     const sum=$('wsum'); sum.style.display='grid';

@@ -81,7 +81,7 @@
     img:function(id){ return '/img/'+id+'.webp'; },
     esc:function(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); },
     short:function(a){ return a? a.slice(0,6)+'…'+a.slice(-4) : 'unknown'; },
-    money:function(n){ return n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'k':'$'+n; },
+    money:function(n){ return n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'k':'$'+Math.round(n); },
     num:function(n){ return Number(n).toLocaleString('en-US'); },
     pct:function(x){ return Math.round(x*100); },
     fmtD:function(ts){ return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); },
