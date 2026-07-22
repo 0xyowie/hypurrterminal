@@ -441,7 +441,7 @@
     const headH=78;
     let bx0,bx1,by0,by1;
     if(mobile){ bx0=12; bx1=W-12; by0=headH+6; by1=Math.max(headH+120, textTop-16); }
-    else      { bx0=Math.min(Math.max(textRight+24, W*0.42), W*0.56); bx1=W-Math.max(48,Math.round(W*0.05)); by0=headH+10; by1=H-40; }
+    else      { bx0=Math.min(Math.max(textRight+24, W*0.40), W*0.54); bx1=W-Math.max(72,Math.round(W*0.10)); by0=headH+10; by1=H-40; }
     const pxW=(2*camera.position.z*Math.tan(camera.fov*Math.PI/360))/H;  // world units per px
     const wx=((bx0+bx1)/2 - W/2)*pxW, wy=-(((by0+by1)/2) - H/2)*pxW;
     const fit=Math.max(0.4, Math.min((bx1-bx0)*pxW/(EXT[i][0]*kBase), (by1-by0)*pxW/(EXT[i][1]*kBase), 1.25));
@@ -492,24 +492,101 @@
   }
   addEventListener('scroll', onScroll, {passive:true});
 
-  // ---- JS section snap: after any scroll settles, glide to the nearest beat ----
-  let snapT=null, touching=false, snapping=false;
-  addEventListener('touchstart',()=>{touching=true; clearTimeout(snapT);},{passive:true});
-  addEventListener('touchend',()=>{touching=false; queueSnap();},{passive:true});
-  addEventListener('touchcancel',()=>{touching=false; queueSnap();},{passive:true});  // browsers fire THIS when scroll takes the gesture
-  setInterval(()=>{ if(touching) queueSnap(); }, 900);  // belt & braces: never let a stuck flag kill snapping
-  addEventListener('scroll',queueSnap,{passive:true});
-  function queueSnap(){ clearTimeout(snapT); snapT=setTimeout(trySnap,130); }
-  function trySnap(){
-    const r=story.getBoundingClientRect();
-    const total=r.height-innerHeight;
-    const y=-r.top;
-    if(y<8 || y>total-8) return;                     // only snap INSIDE the story — strip & footer scroll free
-    const cands=[0, total*0.2, total*0.4, total*0.6, total*0.8, total];
-    let best=cands[0], bd=1e9;
-    for(const c of cands){ const d=Math.abs(y-c); if(d<bd){bd=d; best=c;} }
-    if(bd>8){ snapping=true; scrollTo({top:scrollY+(best-y), behavior:'smooth'}); setTimeout(()=>snapping=false,700); }
+  // ---- section stepper: one gesture = one beat; below the story the page scrolls free ----
+  const SNAPS=5;                                   // snap points at i/SNAPS * total, i=0..5
+  let stepAnim=null, lastLand=0;
+  function storyPos(){ const r=story.getBoundingClientRect(); return {total:r.height-innerHeight, y:-r.top}; }
+  function goTo(i,total){
+    i=Math.max(0,Math.min(SNAPS,i));
+    const from=scrollY, to=scrollY+(i*total/SNAPS - storyPos().y);
+    if(Math.abs(to-from)<2){ stepAnim=null; return; }
+    stepAnim={from,to,t0:performance.now(),d:620};
+    requestAnimationFrame(stepFrame);
   }
+  function stepFrame(now){
+    if(!stepAnim) return;
+    const t=Math.min(1,(now-stepAnim.t0)/stepAnim.d);
+    const k=t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    scrollTo(0, stepAnim.from+(stepAnim.to-stepAnim.from)*k);
+    if(t<1) requestAnimationFrame(stepFrame);
+    else { stepAnim=null; lastLand=performance.now(); }
+  }
+  function stepTarget(y,total,dir){                // next snap point in a direction, from any y
+    const t=y/(total/SNAPS), frac=t-Math.floor(t);
+    if(frac>0.06&&frac<0.94) return dir>0?Math.ceil(t):Math.floor(t);
+    return Math.round(t)+dir;
+  }
+  // wheel (mouse + trackpad): one step per event stream — a trackpad inertia tail
+  // keeps the stream alive (so it can't re-trigger), only a clear re-acceleration can
+  let acc=0, accDir=0, lastWheel=0, streamStepped=false, recentD=[];
+  addEventListener('wheel',e=>{
+    const {total,y}=storyPos();
+    const down=e.deltaY>0, dir=down?1:-1;
+    if(y>total+2) return;                          // below the story: native scroll
+    if(y>=total-2 && down) return;                 // leaving the story into the strip: native
+    if(y<=2 && !down) return;                      // at the very top going up: native
+    e.preventDefault();
+    const now=performance.now(), ad=Math.abs(e.deltaY), gap=now-lastWheel;
+    lastWheel=now;
+    if(dir!==accDir){ accDir=dir; streamStepped=false; acc=0; recentD=[]; }
+    const avg=recentD.length?recentD.reduce((a,b)=>a+b,0)/recentD.length:0;
+    recentD.push(ad); if(recentD.length>5) recentD.shift();
+    if(stepAnim){ streamStepped=true; return; }    // anything arriving during the glide is the same gesture
+    if(gap>300){ streamStepped=false; acc=0; }     // real silence = a fresh gesture
+    else if(streamStepped && ad>Math.max(40,avg*2.5)){ streamStepped=false; acc=0; }  // hard re-push mid-tail
+    if(streamStepped || now-lastLand<420) return;
+    acc+=ad;
+    if(acc<60) return;
+    acc=0; streamStepped=true;
+    goTo(stepTarget(y,total,dir),total);
+  },{passive:false});
+  // touch (phones): a swipe steps exactly one beat; at the edges the gesture hands back to native scroll
+  let tY0=0, tTracking=false, tFree=false;
+  addEventListener('touchstart',e=>{ tY0=e.touches[0].clientY; tTracking=true; tFree=false; },{passive:true});
+  addEventListener('touchmove',e=>{
+    if(!tTracking||tFree) return;
+    const {total,y}=storyPos();
+    if(y>total+2){ tFree=true; return; }
+    const dy=e.touches[0].clientY-tY0;             // dy<0 = swiping up = moving down the story
+    if(y>=total-2 && dy<0){ tFree=true; return; }
+    if(y<=2 && dy>0){ tFree=true; return; }
+    if(e.cancelable) e.preventDefault();
+  },{passive:false});
+  function touchDone(e){
+    if(!tTracking) return; tTracking=false;
+    if(tFree) return;
+    const {total,y}=storyPos();
+    if(y>total+2 || stepAnim) return;
+    const tp=e.changedTouches&&e.changedTouches[0];
+    const dy=(tp?tp.clientY:tY0)-tY0;
+    if(Math.abs(dy)>42) goTo(stepTarget(y,total,dy<0?1:-1),total);
+    else if(performance.now()-lastLand>400) goTo(Math.round(y/(total/SNAPS)),total);
+  }
+  addEventListener('touchend',touchDone,{passive:true});
+  addEventListener('touchcancel',touchDone,{passive:true});
+  // keyboard
+  addEventListener('keydown',e=>{
+    if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    const {total,y}=storyPos();
+    if(y>total+2) return;
+    const down=e.key==='ArrowDown'||e.key==='PageDown'||e.key===' ', up=e.key==='ArrowUp'||e.key==='PageUp';
+    if(!down&&!up) return;
+    if(y>=total-2&&down) return;
+    e.preventDefault();
+    if(!stepAnim) goTo(stepTarget(y,total,down?1:-1),total);
+  });
+  // settle fallback: anything that lands mid-beat (anchor jump, resize, re-entry from the strip) glides to the nearest snap
+  let settleT=null;
+  addEventListener('scroll',()=>{
+    clearTimeout(settleT);
+    settleT=setTimeout(()=>{
+      if(stepAnim||tTracking) return;
+      const {total,y}=storyPos();
+      if(y<8||y>total-8) return;
+      const near=Math.round(y/(total/SNAPS));
+      if(Math.abs(y-near*total/SNAPS)>10) goTo(near,total);
+    },170);
+  },{passive:true});
 
   // ---------- interaction: horizontal touch/mouse drag spins; vertical scrolls ----------
   const el=renderer.domElement;
