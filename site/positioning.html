@@ -124,7 +124,7 @@
   <div class="hero">
     <div class="big disp"><span id="h-net" class="u">–</span> net long</div>
     <h1 id="h-sub">of Hypurr holders with an open position are leaning long right now.</h1>
-    <div class="ts"><span class="dot"></span><span id="h-ts">loading…</span> · refreshes about every 15 minutes</div>
+    <div class="ts"><span class="dot"></span><span id="h-ts">loading…</span> · refreshes on a rolling cycle through the day</div>
   </div>
 
   <div class="legend"><span><span class="swatch" style="background:var(--long)"></span>long</span>
@@ -165,7 +165,7 @@
   </div>
 
   <h2 class="sech disp" id="pulse">The pulse</h2>
-  <p class="secsub">The snapshot above, kept over time — every 15 minutes a point lands on this chart, so it deepens every day the terminal is alive.</p>
+  <p class="secsub">The snapshot above, kept over time — every refresh lands a point on this chart, so it deepens every day the terminal is alive.</p>
 
   <div class="panelbox">
     <h2>Pride sentiment vs HYPE</h2>
@@ -241,7 +241,7 @@
   const tt=document.getElementById('tt');
   document.addEventListener('mousemove',e=>{const el=e.target.closest('[data-t]');
     if(el){tt.innerHTML=el.getAttribute('data-t');tt.style.opacity=1;tt.style.left=Math.min(e.clientX+12,innerWidth-250)+"px";tt.style.top=(e.clientY+14)+"px";}else tt.style.opacity=0;});
-  document.getElementById('note').textContent="Live read across all "+num(IX.holdersTotal)+" holders' Hyperliquid positions, refreshed on a rolling ~15 minute cycle. Direction and size only, never PnL. Many holders run delta-neutral or hedged books, so this is a read on the pride, not a signal or financial advice.";
+  document.getElementById('note').textContent="Live read across all "+num(IX.holdersTotal)+" holders' Hyperliquid positions, refreshed on a rolling cycle through the day. Direction and size only, never PnL. Many holders run delta-neutral or hedged books, so this is a read on the pride, not a signal or financial advice.";
 })().catch(e=>{document.getElementById('h-ts').textContent='could not load data';console.error(e);});
 
 // ---------- the pulse: sentiment history, leaderboards, scatter ----------
@@ -287,7 +287,7 @@
       pts.forEach((p,i)=>{ const v=p.nl/(p.nl+p.ns)*100, x=X(p.t), y=Ys(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke();
       pts.forEach(p=>{ const v=p.nl/(p.nl+p.ns)*100; ctx.fillStyle=COL.mint; ctx.beginPath(); ctx.arc(X(p.t),Ys(v),pts.length<50?3.5:1.6,0,7); ctx.fill(); });
       const lastv=Math.round(pts[pts.length-1].nl/(pts[pts.length-1].nl+pts[pts.length-1].ns)*100);
-      document.getElementById('sentnote').textContent='Latest: '+lastv+'% of live holders lean long · '+pts.length+' snapshots recorded so far (every ~15 min).';
+      document.getElementById('sentnote').textContent='Latest: '+lastv+'% of live holders lean long · '+pts.length+' snapshots recorded so far.';
     } else document.getElementById('sentnote').textContent='First snapshots land within the hour — check back.';
     document.getElementById('ax0').textContent=new Date(t0*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     document.getElementById('ax1').textContent='today';

@@ -111,7 +111,7 @@
       </div>`;
     }).join("");
   }
-  document.getElementById('note').textContent="The biggest trading holders from a full sweep of all 3,423 wallets, refreshed on a rolling ~15 minute cycle. Each row is a holder's Hypurr and the positions on that wallet. Direction and size only, never PnL.";
+  document.getElementById('note').textContent="The biggest trading holders from a full sweep of all 3,423 wallets, refreshed on a rolling cycle through the day. Each row is a holder's Hypurr and the positions on that wallet. Direction and size only, never PnL.";
   render();
 })().catch(e=>{document.getElementById('lead').textContent='could not load data';console.error(e);});
 </script>

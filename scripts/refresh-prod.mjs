@@ -39,6 +39,13 @@ await pool(addrs, async (addr) => {
   positions[addr] = { hasPosition: ps.length>0, positions: ps };
 }, 15, (d,t)=>process.stdout.write(`positions ${d}/${t} (err ${errors})\r`));
 
+// Guard: a degraded sweep (rate-limited / network trouble) marks failed wallets "flat".
+// Better to fail the run and keep yesterday's data than to commit a half-empty snapshot.
+if (errors > addrs.length * 0.05){
+  console.error(`FATAL: ${errors}/${addrs.length} wallets failed to fetch — refusing to write a degraded snapshot.`);
+  process.exit(1);
+}
+
 const generatedAt = new Date().toISOString();
 const posOut = JSON.stringify({ generatedAt, source:"clearinghouseState", wallets: positions });
 if (FORBIDDEN.some(k => posOut.includes(k))){ console.error("FATAL: forbidden PnL key"); process.exit(1); }
@@ -80,7 +87,8 @@ for (const [owner, w] of Object.entries(positions)){
   const rep = held.slice().sort((a,b)=> rrOf[a]-rrOf[b])[0];       // rarest held
   const pos = w.positions.slice().sort((a,b)=> b.notionalUsd-a.notionalUsd);
   const totalNotional = pos.reduce((s,p)=> s+p.notionalUsd, 0);
-  rows.push({ owner, id: rep, rarityRank: rrOf[rep], heldCount: held.length, totalNotional,
+  const netNotional = pos.reduce((s,p)=> s+(p.direction==="long"?1:-1)*p.notionalUsd, 0); // full book, not just the top-12 slice
+  rows.push({ owner, id: rep, rarityRank: rrOf[rep], heldCount: held.length, totalNotional, netNotional,
     positions: pos.slice(0, 12), posCount: pos.length });
 }
 rows.sort((a,b)=> b.totalNotional - a.totalNotional);
@@ -118,10 +126,8 @@ try {
   boards.diversified = rows.slice().sort((a,b)=> (b.posCount||0)-(a.posCount||0)).slice(0,10)
     .map(r => ({ owner: r.owner, id: r.id, coins: r.posCount, notional: r.totalNotional }));
   const crowdLong = walletsNetLong >= walletsNetShort;
-  boards.contrarians = rows.filter(r => {
-    let net = 0; for (const p of r.positions) net += (p.direction==="long"?1:-1)*p.notionalUsd;
-    return crowdLong ? net < 0 : net > 0;
-  }).slice(0, 10).map(r => ({ owner: r.owner, id: r.id, notional: r.totalNotional }));
+  boards.contrarians = rows.filter(r => crowdLong ? r.netNotional < 0 : r.netNotional > 0)
+    .slice(0, 10).map(r => ({ owner: r.owner, id: r.id, notional: r.totalNotional }));
   boards.crowd = crowdLong ? "long" : "short";
   fs.writeFileSync(path.join(OUT, "leaders.json"), JSON.stringify(boards));
 } catch (e) { console.error("leaders:", e.message); }
