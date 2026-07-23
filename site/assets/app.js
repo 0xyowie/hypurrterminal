@@ -44,6 +44,11 @@
       var im=document.createElement('img'); im.className='logo'; im.src='/favicon.svg'; im.alt=''; im.width=33; im.height=33;
       lg.replaceWith(im);
     }
+    // ...and extend the wordmark on older pages
+    var bw=document.querySelector('.brand span:last-child');
+    if(bw && !bw.querySelector('.tm') && /^HYPURR\s*$/.test(bw.textContent)){
+      var em=document.createElement('em'); em.className='tm'; em.textContent='TERMINAL'; bw.appendChild(em);
+    }
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }
