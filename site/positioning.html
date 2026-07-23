@@ -14,12 +14,11 @@
 <link rel="stylesheet" href="/assets/base.css">
 <script src="/assets/app.js"></script>
 <style>
-  .wrap{max-width:1080px}
-  .kicker{margin:34px 0 0}
-  .hero{padding:6px 0 6px}
-  .hero .big{font-family:'Bricolage Grotesque';font-size:clamp(60px,9vw,104px);line-height:.92;font-weight:700;letter-spacing:-.03em;margin:10px 0 0}
+  .wrap{max-width:1120px}
+  .hero{padding:0}
+  .hero .big{font-family:'Bricolage Grotesque';font-size:clamp(38px,5.6vw,60px);line-height:.97;font-weight:700;letter-spacing:-.03em;margin:10px 0 0;max-width:860px}
   .hero .big .u{color:var(--mint)}
-  .hero h1{font-weight:500;font-size:clamp(20px,2.6vw,27px);margin:14px 0 0;max-width:640px;line-height:1.28;color:var(--ink)}
+  .hero h1{font-weight:500;font-size:15.5px;margin:14px 0 0;max-width:640px;line-height:1.5;color:var(--dim)}
   .hero .ts{color:var(--faint);font-weight:500;font-size:13px;margin-top:14px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);display:inline-block;margin-right:7px;position:relative;vertical-align:middle}
   .dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--mint);animation:pl 2s var(--ease) infinite}
@@ -122,8 +121,8 @@
 <div class="wrap">
   <div class="kicker">The Index · what the pride is positioned in</div>
   <div class="hero">
-    <div class="big disp"><span id="h-net" class="u">–</span> net long</div>
-    <h1 id="h-sub">of Hypurr holders with an open position are leaning long right now.</h1>
+    <div class="big disp">The pride is <span id="h-net" class="u">–</span> net long.</div>
+    <h1 id="h-sub">The share of Hypurr holders with an open position who are leaning long right now — counted one holder, one vote.</h1>
     <div class="ts"><span class="dot"></span><span id="h-ts">loading…</span> · refreshes on a rolling cycle through the day</div>
   </div>
 
