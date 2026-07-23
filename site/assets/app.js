@@ -49,6 +49,13 @@
     if(bw && !bw.querySelector('.tm') && /^HYPURR\s*$/.test(bw.textContent)){
       var em=document.createElement('em'); em.className='tm'; em.textContent='TERMINAL'; bw.appendChild(em);
     }
+    // ...and the maker credit in the footer
+    var lgRow=document.querySelector('footer .lg');
+    if(lgRow && !lgRow.querySelector('a[href*="0xYowie"]')){
+      var xa=document.createElement('a'); xa.href='https://x.com/intent/user?screen_name=0xYowie';
+      xa.target='_blank'; xa.rel='noopener'; xa.textContent='made by @0xyowie ↗';
+      lgRow.appendChild(xa);
+    }
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }

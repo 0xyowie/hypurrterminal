@@ -69,7 +69,7 @@ const tpl = (t) => {
 </div>
 <canvas id="pp" width="1000" height="1250" hidden></canvas>
 <footer class="site"><div class="foot">Direction and size only, never PnL. Unofficial community tool.
-<div class="lg"><a href="/privacy">Privacy</a><a href="/">Home</a></div></div></footer>
+<div class="lg"><a href="/privacy">Privacy</a><a href="/">Home</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a></div></div></footer>
 </body></html>`;
 };
 let n = 0;
