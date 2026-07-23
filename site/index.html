@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hypurr Terminal — the pride, and what they trade</title>
-<meta name="description" content="An unofficial community terminal for the 4,600 Hypurr NFTs — behind every Hypurr is a Hyperliquid wallet, and right now hundreds are live on the tape. Direction and size only, never PnL.">
+<title>Hypurr Terminal · the pride, and what they trade</title>
+<meta name="description" content="An unofficial community terminal for the 4,600 Hypurr NFTs. Behind every Hypurr is a Hyperliquid wallet, and right now hundreds are live on the tape. Direction and size only, never PnL.">
 <meta name="theme-color" content="#0E0B08">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="https://hypurrterminal.xyz">
 <meta property="og:type" content="website"><meta property="og:url" content="https://hypurrterminal.xyz">
-<meta property="og:title" content="Hypurr Terminal"><meta property="og:description" content="Behind every Hypurr is a Hyperliquid wallet — see what the pride is trading, live.">
+<meta property="og:title" content="Hypurr Terminal"><meta property="og:description" content="Behind every Hypurr is a Hyperliquid wallet. See what the pride is trading, live.">
 <meta property="og:image" content="https://hypurrterminal.xyz/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Hypurr Terminal">
@@ -104,7 +104,7 @@
     <div class="beat on" data-b="0">
       <div class="eyebrow">4,600 Hypurrs · dealt in one night · awake on-chain</div>
       <h1 class="disp">The pride<br>never <em>sleeps.</em></h1>
-      <p class="sub">Every particle you see is a real Hypurr. Behind each one is a Hyperliquid wallet — and hundreds are live on the tape right now.</p>
+      <p class="sub">Every particle you see is a real Hypurr. Behind each one is a Hyperliquid wallet, and hundreds are live on the tape right now.</p>
       <div class="row">
         <a class="btn" href="/collection">Enter the den →</a>
         <span class="awake"><span class="p"></span><b id="awake">–</b>&nbsp;awake right now</span>
@@ -114,28 +114,28 @@
     <div class="beat" data-b="1">
       <div class="eyebrow">One airdrop · September 28, 2025</div>
       <div class="h disp">4,600 dealt<br>in a single night.</div>
-      <p class="sub">Spiraling out in the order they were minted. No slow reveal, no waves — the whole pride at once.</p>
+      <p class="sub">Spiraling out in the order they were minted. No slow reveal, no waves. The whole pride at once.</p>
       <div class="row"><a class="btn" href="/pride">Meet the diamond hands →</a></div>
     </div>
 
     <div class="beat" data-b="2">
       <div class="eyebrow">Live positioning · rolling refresh</div>
       <div class="h disp">The pride leans<br><span class="live" id="leanpct">–%</span> long.</div>
-      <p class="sub" id="leansub">The columns you're watching are built from the Hypurrs themselves — every holder with an open book, sorted long against short.</p>
+      <p class="sub" id="leansub">The columns you're watching are built from the Hypurrs themselves: every holder with an open book, sorted long against short.</p>
       <div class="row"><a class="btn" href="/positioning">Open the Index →</a></div>
     </div>
 
     <div class="beat" data-b="3">
       <div class="eyebrow">Right now, on the tape</div>
       <div class="h disp"><span class="live" id="awake2">–</span> awake.<br>The rest are dreaming.</div>
-      <p class="sub">Direction and size only — never PnL. Keep scrolling to explore the terminal.</p>
+      <p class="sub">Direction and size only, never PnL. Keep scrolling to explore the terminal.</p>
       <div class="row"><a class="btn" href="/desk">See the live desk →</a></div>
     </div>
 
     <div class="beat" data-b="4">
       <div class="eyebrow">The daily pulse · snapshotted all day</div>
       <div class="h disp">The pride has<br>a <em>pulse.</em></div>
-      <p class="sub">Net-long share charted against HYPE itself — plus leaderboards for the biggest and boldest books in the den.</p>
+      <p class="sub">Net-long share charted against HYPE itself, plus leaderboards for the biggest and boldest books in the den.</p>
       <div class="row"><a class="btn" href="/positioning#pulse">Feel the pulse →</a></div>
     </div>
 
@@ -412,7 +412,7 @@
     let textTop=H, textRight=0;
     parts.forEach(p=>{const r=p.getBoundingClientRect(); if(r.height>0){textTop=Math.min(textTop,r.top); textRight=Math.max(textRight,r.right);}});
     const hd=document.querySelector('header.land');
-    const headH=Math.max(70, hd?hd.getBoundingClientRect().bottom-8:78);   // real header height — the pill can wrap it taller
+    const headH=Math.max(70, hd?hd.getBoundingClientRect().bottom-8:78);   // real header height (the pill can wrap it taller)
     let bx0,bx1,by0,by1;
     if(mobile){ bx0=12; bx1=W-12; by0=headH+8; by1=Math.max(headH+120, textTop-26); }
     else      { bx0=Math.min(Math.max(textRight+24, W*0.40), W*0.54); bx1=W-Math.max(72,Math.round(W*0.10)); by0=headH+10; by1=H-40; }
@@ -450,7 +450,7 @@
   const dots=[...document.querySelectorAll('#prog i')];
   const cue=document.getElementById('cue');
   document.getElementById('awake2').textContent=IX.holdersWithPosition;
-  document.getElementById('leansub').textContent=`${bw.netLong} holders lean long, ${bw.netShort} lean short — the columns you're watching are the Hypurrs themselves.`;
+  document.getElementById('leansub').textContent=`${bw.netLong} holders lean long, ${bw.netShort} lean short. The columns you're watching are the Hypurrs themselves.`;
   function onScroll(){
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;
@@ -490,7 +490,7 @@
     if(frac>0.06&&frac<0.94) return dir>0?Math.ceil(t):Math.floor(t);
     return Math.round(t)+dir;
   }
-  // wheel (mouse + trackpad): one step per event stream — a trackpad inertia tail
+  // wheel (mouse + trackpad): one step per event stream: a trackpad inertia tail
   // keeps the stream alive (so it can't re-trigger), only a clear re-acceleration can
   let acc=0, accDir=0, lastWheel=0, streamStepped=false, recentD=[];
   addEventListener('wheel',e=>{

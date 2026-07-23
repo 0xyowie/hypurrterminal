@@ -18,10 +18,10 @@ const tpl = (t) => {
   const flips = p.trades || 0;
   const diamond = flips === 0;
   const ownerShort = (p.currentOwner||"").slice(0,6)+"…"+(p.currentOwner||"").slice(-4);
-  const desc = `Rarity rank #${rr} of 4,600 · ${diamond ? "diamond hands — never traded" : `traded ${flips}×`}${last ? ` · last sale ${last} HYPE` : ""} · live on Hyperliquid.`;
+  const desc = `Rarity rank #${rr} of 4,600 · ${diamond ? "diamond hands, never traded" : `traded ${flips}×`}${last ? ` · last sale ${last} HYPE` : ""} · live on Hyperliquid.`;
   const DATA = JSON.stringify({ id, rr, traits: t.traits, flips, diamond, owner: p.currentOwner, sales: sl });
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hypurr #${id} — rank #${rr} · Hypurr Terminal</title>
+<title>Hypurr #${id} · rank #${rr} · Hypurr Terminal</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="theme-color" content="#0E0B08">
 <meta property="og:type" content="website"><meta property="og:url" content="https://hypurrterminal.xyz/cat/${id}">

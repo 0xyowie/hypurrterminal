@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hypurr Terminal — The Index</title>
-<meta name="description" content="What the Hypurr pride is positioned in right now — plus sentiment history vs HYPE, leaderboards, and wallet lookup. Direction and size only, never PnL.">
+<title>Hypurr Terminal · The Index</title>
+<meta name="description" content="What the Hypurr pride is positioned in right now, plus sentiment history vs HYPE, leaderboards, and wallet lookup. Direction and size only, never PnL.">
 <meta name="theme-color" content="#0E0B08">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Hypurr Terminal — The Index"><meta property="og:description" content="What the Hypurr pride is positioned in right now — net long vs short across every holder's live Hyperliquid book. Direction and size only, never PnL.">
+<meta property="og:title" content="Hypurr Terminal · The Index"><meta property="og:description" content="What the Hypurr pride is positioned in right now: net long vs short across every holder's live Hyperliquid book. Direction and size only, never PnL.">
 <meta property="og:image" content="https://hypurrterminal.xyz/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -122,7 +122,7 @@
   <div class="kicker">The Index · what the pride is positioned in</div>
   <div class="hero">
     <div class="big disp">The pride is <span id="h-net" class="u">–</span> net long.</div>
-    <h1 id="h-sub">The share of Hypurr holders with an open position who are leaning long right now — counted one holder, one vote.</h1>
+    <h1 id="h-sub">The share of Hypurr holders with an open position who are leaning long right now, counted one holder, one vote.</h1>
     <div class="ts"><span class="dot"></span><span id="h-ts">loading…</span> · refreshes on a rolling cycle through the day</div>
   </div>
 
@@ -160,11 +160,11 @@
   </div>
 
   <div class="explain">
-    <span class="q">How to read this.</span> The index counts open positions by <b>direction only</b>. A lot of Hypurr wallets aren't taking a bet at all — they run <b>delta-neutral</b>, hedged, or market-making books, so a "long" you see here is often just one leg against a short somewhere else (a funding-rate carry, a basis trade, an LP hedge). That's why holders can lean heavily long while the biggest dollars lean short. Read it as a live <b>positioning snapshot of the pride</b> — not crowd sentiment, and never a signal to copy.
+    <span class="q">How to read this.</span> The index counts open positions by <b>direction only</b>. A lot of Hypurr wallets aren't taking a bet at all. They run <b>delta-neutral</b>, hedged, or market-making books, so a "long" you see here is often just one leg against a short somewhere else (a funding-rate carry, a basis trade, an LP hedge). That's why holders can lean heavily long while the biggest dollars lean short. Read it as a live <b>positioning snapshot of the pride</b>, not crowd sentiment, and never a signal to copy.
   </div>
 
   <h2 class="sech disp" id="pulse">The pulse</h2>
-  <p class="secsub">The snapshot above, kept over time — every refresh lands a point on this chart, so it deepens every day the terminal is alive.</p>
+  <p class="secsub">The snapshot above, kept over time. Every refresh lands a point on this chart, so it deepens every day the terminal is alive.</p>
 
   <div class="panelbox">
     <h2>Pride sentiment vs HYPE</h2>
@@ -183,11 +183,11 @@
     <div class="psub">every Hypurr with an on-chain HYPE sale · x: rarity rank (rarest left) · y: last sale · hover a dot</div>
     <canvas class="chart tall" id="scatchart"></canvas>
     <div class="axisnote"><span>#1 rarest</span><span>#4600</span></div>
-    <div class="accnote">Down-left = rare but cheap. Nothing here is financial advice — thin sale counts distort single dots.</div>
+    <div class="accnote">Down-left = rare but cheap. Nothing here is financial advice; thin sale counts distort single dots.</div>
   </div>
 
   <h2 class="sech disp" id="wallet">Wallet lookup</h2>
-  <p class="secsub">Paste any wallet address — its Hypurrs and the live stance of its Hyperliquid book, read straight from public data. No connect, ever.</p>
+  <p class="secsub">Paste any wallet address to see its Hypurrs and the live stance of its Hyperliquid book, read straight from public data. No connect, ever.</p>
   <div class="lookup">
     <input id="addr" placeholder="0x… wallet address" spellcheck="false" autocomplete="off">
     <button id="go">Look up</button>
@@ -287,7 +287,7 @@
       pts.forEach(p=>{ const v=p.nl/(p.nl+p.ns)*100; ctx.fillStyle=COL.mint; ctx.beginPath(); ctx.arc(X(p.t),Ys(v),pts.length<50?3.5:1.6,0,7); ctx.fill(); });
       const lastv=Math.round(pts[pts.length-1].nl/(pts[pts.length-1].nl+pts[pts.length-1].ns)*100);
       document.getElementById('sentnote').textContent='Latest: '+lastv+'% of live holders lean long · '+pts.length+' snapshots recorded so far.';
-    } else document.getElementById('sentnote').textContent='First snapshots land within the hour — check back.';
+    } else document.getElementById('sentnote').textContent='First snapshots land within the hour. Check back.';
     document.getElementById('ax0').textContent=new Date(t0*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     document.getElementById('ax1').textContent='today';
     cv.addEventListener('mousemove',e=>{
@@ -354,11 +354,11 @@
     const w=POSD.wallets[a];
     const ps=(w&&w.positions||[]).filter(p=>p.notionalUsd>=10).sort((x,y)=>y.notionalUsd-x.notionalUsd);
     let net=0,tot=0; ps.forEach(p=>{const s=(p.direction==='long'?1:-1)*p.notionalUsd; net+=s; tot+=p.notionalUsd;});
-    $('status').textContent=ids.length?'':'This wallet holds no Hypurrs — showing its book anyway.';
+    $('status').textContent=ids.length?'':'This wallet holds no Hypurrs. Showing its book anyway.';
     const sum=$('wsum'); sum.style.display='grid';
     sum.innerHTML=`<div class="tile"><b>${ids.length}</b><span>HYPURRS HELD</span></div>`+
       `<div class="tile ${net>0?'long':net<0?'short':''}"><b>${ps.length?(net>=0?'net long':'net short'):'flat'}</b><span>LIVE STANCE</span></div>`+
-      `<div class="tile"><b>${tot?money(tot):'—'}</b><span>TOTAL AT RISK</span></div>`;
+      `<div class="tile"><b>${tot?money(tot):'–'}</b><span>TOTAL AT RISK</span></div>`;
     const pos=$('pos');
     if(ps.length){ pos.style.display='block';
       pos.innerHTML='<h3>Open positions</h3>'+ps.slice(0,14).map(p=>`<span class="pp"><b>${HT.esc(p.coin)}</b>`+

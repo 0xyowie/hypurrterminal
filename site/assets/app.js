@@ -1,4 +1,4 @@
-/* Hypurr Terminal — shared runtime: consent-gated GA, cookie banner, nav, helpers */
+/* Hypurr Terminal: shared runtime: consent-gated GA, cookie banner, nav, helpers */
 (function(){
   var GA_ID='G-N4VNS4KXWH', CK='hypurr_cookie_consent';
 
@@ -31,11 +31,11 @@
   // --- active nav ---
   function markNav(){
     var pg=document.body.getAttribute('data-page'); if(!pg)return;
-    // older generated pages may still carry links to retired sections — drop them
+    // older generated pages may still carry links to retired sections: drop them
     ['pulse','observatory'].forEach(function(k){
       var st=document.querySelector('nav.top a[data-nav="'+k+'"]'); if(st) st.remove();
     });
-    // ...and the old emoji favicon — swap in the brand mark
+    // ...and the old emoji favicon: swap in the brand mark
     var ic=document.querySelector('link[rel="icon"]');
     if(ic && (ic.getAttribute('href')||'').indexOf('data:')===0) ic.href='/favicon.svg';
     // ...and the old emoji header logo
