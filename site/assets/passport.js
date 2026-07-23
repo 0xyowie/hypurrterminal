@@ -63,15 +63,30 @@
     ctx.beginPath(); ctx.moveTo(0,1247); ctx.lineTo(1000,1247); ctx.stroke();
   }
   drawCard();
-  $('shareBtn').onclick=function(){
+  // Share UX: native share sheet is a phone pattern; on desktop it opens a clunky
+  // OS dialog, so there the card simply downloads. Plus a real "Post on X" action.
+  var phone = matchMedia('(pointer:coarse)').matches && !!navigator.canShare;
+  var shareBtn=$('shareBtn');
+  if(!phone) shareBtn.textContent='Download card';
+  shareBtn.onclick=function(){
     var cv=$('pp');
     cv.toBlob(function(blob){
       var file=new File([blob],'hypurr-'+C.id+'-passport.png',{type:'image/png'});
-      if(navigator.canShare && navigator.canShare({files:[file]})){
+      if(phone && navigator.canShare({files:[file]})){
         navigator.share({files:[file], title:'Hypurr #'+C.id, text:'Hypurr #'+C.id+' on Hypurr Terminal', url:'https://hypurrterminal.xyz/cat/'+C.id}).catch(function(){});
       } else {
         var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hypurr-'+C.id+'-passport.png'; a.click();
+        shareBtn.textContent='Saved ✓'; setTimeout(function(){shareBtn.textContent=phone?'Share passport ↗':'Download card';},1600);
       }
     },'image/png');
   };
+  // "Post on X" (added here so all 4,600 static pages get it without regeneration)
+  var acts=document.querySelector('.actions');
+  if(acts && !document.getElementById('xBtn')){
+    var xb=document.createElement('a'); xb.id='xBtn'; xb.className='btn ghost'; xb.target='_blank'; xb.rel='noopener';
+    var txt='Hypurr #'+C.id+' · rarity #'+C.rr+(C.diamond?' · never left the hand it was dealt 💎':'')+' · the pride never sleeps';
+    xb.href='https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://hypurrterminal.xyz/cat/'+C.id);
+    xb.textContent='Post on X ↗';
+    acts.appendChild(xb);
+  }
 })();

@@ -106,17 +106,21 @@ try {
   fs.writeFileSync(HFILE, JSON.stringify({ updated: generatedAt, points: hist }));
 } catch (e) { console.error("history:", e.message); }
 
-// ---- hype_price.json : HYPE daily candles for the Pulse overlay ----
+// ---- hype_price.json : HYPE candles for the Pulse overlay ----
+// daily for the long arc, hourly for the young-terminal window (the chart picks by span)
 try {
   const now = Date.now();
-  const r = await fetch(INFO, { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "candleSnapshot", req: { coin: "HYPE", interval: "1d", startTime: now - 120*86400e3, endTime: now } }),
-    signal: AbortSignal.timeout(15000) });
-  if (r.ok) {
-    const candles = await r.json();
-    const px = candles.map(c => ({ t: Math.floor(c.t/1000), c: +c.c }));
-    fs.writeFileSync(path.join(OUT, "hype_price.json"), JSON.stringify({ updated: generatedAt, px }));
+  async function candles(interval, days){
+    const r = await fetch(INFO, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "candleSnapshot", req: { coin: "HYPE", interval, startTime: now - days*86400e3, endTime: now } }),
+      signal: AbortSignal.timeout(15000) });
+    if (!r.ok) return null;
+    const j = await r.json();
+    return Array.isArray(j) ? j.map(c => ({ t: Math.floor(c.t/1000), c: +c.c })) : null;
   }
+  const px = await candles("1d", 120);
+  const pxh = await candles("1h", 14);
+  if (px) fs.writeFileSync(path.join(OUT, "hype_price.json"), JSON.stringify({ updated: generatedAt, px, pxh: pxh||[] }));
 } catch (e) { console.error("hype price:", e.message); }
 
 // ---- leaders.json : leaderboards for The Pulse ----

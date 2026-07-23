@@ -168,7 +168,7 @@
 
   <div class="panelbox">
     <h2>Pride sentiment vs HYPE</h2>
-    <div class="psub">net-long % of holders with an open book (left) · HYPE daily close (right)</div>
+    <div class="psub">net-long % of holders with an open book (left) · HYPE price (right) · since the terminal went live</div>
     <div class="leg2"><span><span class="sw" style="background:var(--mint)"></span>net-long %</span>
       <span><span class="sw" style="background:var(--gold)"></span>HYPE price</span></div>
     <canvas class="chart tall" id="sentchart"></canvas>
@@ -264,9 +264,16 @@
   (function(){
     const cv=document.getElementById('sentchart'); const [ctx,W,Ht]=prep(cv);
     const pad={l:44,r:52,t:14,b:22};
-    const px=(P.px||[]);
-    const t0=Math.min(pts[0]?pts[0].t:1e15, px[0]?px[0].t:1e15);
-    const t1=Math.max(pts.length?pts[pts.length-1].t:0, px.length?px[px.length-1].t:0, t0+3600);
+    // window = the terminal's lifetime (sentiment range), not HYPE's 120 days;
+    // otherwise a young history squashes into a blob at the right edge
+    const nowS=Math.floor(Date.now()/1000);
+    const t0=pts.length ? pts[0].t-7200 : nowS-2*86400;
+    const t1=Math.max(pts.length?pts[pts.length-1].t:0, nowS-1800)+1800;
+    const span=t1-t0;
+    // hourly candles for young windows, daily once the story is long
+    let px=(span<=13*86400 && (P.pxh||[]).length ? P.pxh : (P.px||[])).filter(p=>p.t>=t0-3600&&p.t<=t1);
+    if(px.length<2) px=(P.px||[]).filter(p=>p.t>=t0-86400&&p.t<=t1);
+    if(px.length<2) px=(P.px||[]).slice(-3);
     const X=t=>pad.l+(t-t0)/(t1-t0)*(W-pad.l-pad.r);
     ctx.strokeStyle=COL.line; ctx.lineWidth=1;
     for(let i=0;i<=4;i++){ const y=pad.t+i*(Ht-pad.t-pad.b)/4; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); }
