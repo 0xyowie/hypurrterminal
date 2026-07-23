@@ -34,6 +34,8 @@
   .btn.p{background:var(--ink);color:#12100b;border-color:var(--ink)}
   .btn.live{color:var(--mint);border-color:rgba(84,224,203,.35)}
   .btn.live.on{background:var(--mint);color:#0b0906;border-color:var(--mint)}
+  .btn.ghost{color:var(--dim);border-style:dashed}
+  .btn.ghost:hover{color:var(--ink)}
   .count{margin-left:auto;font-weight:700;color:var(--faint);font-size:13px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin:16px 0 20px}
   .cat{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s;position:relative}
@@ -145,13 +147,14 @@
 
 <div class="wrap">
   <div class="controls">
-    <label class="field qfield">⌕ <input id="q" placeholder="Hypurr # id" inputmode="numeric"></label>
+    <label class="field qfield">⌕ <input id="q" placeholder="# id or 0x wallet"></label>
     <label class="field">Trait <select id="cat"><option value="">any</option></select></label>
     <label class="field"><select id="val"><option value="">any value</option></select></label>
     <button class="btn live" id="onlyLive">only trading</button>
-    <button class="btn" id="sort">rarest first</button>
+    <label class="field">sort <select id="sortSel"><option value="rare">rarest first</option><option value="id">mint order</option></select></label>
     <button class="btn" id="dense">large view</button>
     <button class="btn p" id="rand">random</button>
+    <button class="btn ghost" id="clear" hidden>✕ clear</button>
     <span class="count" id="count"></span>
   </div>
   <div id="board" class="loading"><div class="spin"></div>loading the pride…</div>
@@ -204,17 +207,28 @@
   document.getElementById('q').oninput=render;
   { const qp=new URLSearchParams(location.search).get('q'); if(qp){ document.getElementById('q').value=qp; } }
   document.getElementById('onlyLive').onclick=e=>{ state.onlyLive=!state.onlyLive; e.target.classList.toggle('on',state.onlyLive); render(); };
-  document.getElementById('sort').onclick=e=>{ state.sortRare=!state.sortRare; e.target.textContent=state.sortRare?"rarest first":"by id"; render(); };
+  document.getElementById('sortSel').onchange=e=>{ state.sortRare=e.target.value==='rare'; render(); };
   document.getElementById('rand').onclick=()=>{ const t=TOKENS[Math.floor(Math.random()*TOKENS.length)]; openCat(t.id); };
   document.getElementById('dense').onclick=e=>{ const large=document.getElementById('grid').classList.toggle('large'); e.target.textContent=large?'compact view':'large view'; };
+  document.getElementById('clear').onclick=()=>{
+    document.getElementById('q').value=''; state.cat=''; state.val=''; state.onlyLive=false;
+    catSel.value=''; fillVals();
+    document.getElementById('onlyLive').classList.remove('on');
+    history.replaceState(null,'','/collection');
+    render();
+  };
   const topPos=t=>t.positions&&t.positions.length?t.positions[0]:null;
+  // digits = id prefix ("40" → #40, #400–409…), anything else = wallet match
+  function matchQ(q,id,owner){ if(/^\d+$/.test(q)) return String(id).startsWith(q);
+    return (owner||'').toLowerCase().includes(q.toLowerCase()); }
   function filtered(){
     const q=document.getElementById('q').value.trim();
     let list=TOKENS.slice();
-    if(q) list=list.filter(t=>String(t.id).includes(q));
+    if(q) list=list.filter(t=>matchQ(q,t.id,t.owner));
     if(state.onlyLive) list=list.filter(t=>t.positions&&t.positions.length);
     if(state.cat&&state.val) list=list.filter(t=>t.traits[state.cat]===state.val);
     list.sort((a,b)=> state.sortRare ? a.rarityRank-b.rarityRank : a.id-b.id);
+    document.getElementById('clear').hidden = !(q||state.cat||state.val||state.onlyLive);
     return list;
   }
   function cardHTML(t){
@@ -231,7 +245,7 @@
   const grid=document.getElementById('grid');
   function render(){
     curList=filtered(); shown=0; grid.innerHTML="";
-    document.getElementById('count').textContent=curList.length.toLocaleString()+" Hypurrs";
+    document.getElementById('count').textContent=curList.length===TOKENS.length?curList.length.toLocaleString()+" Hypurrs":curList.length.toLocaleString()+" of "+TOKENS.length.toLocaleString();
     more();
   }
   function more(){

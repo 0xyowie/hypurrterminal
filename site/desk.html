@@ -65,9 +65,10 @@
   <div class="lead"><span class="dot"></span><span id="lead">loading…</span></div>
   <div class="deskcaveat">Heads up: many of these holders run delta-neutral, hedged or market-making books. What you see is one leg, not a directional call and not a copy-trade signal. Nothing here is financial advice.</div>
   <div class="controls">
-    <label class="field">⌕ <input id="q" placeholder="Hypurr # id" inputmode="numeric" style="width:100px"></label>
+    <label class="field">⌕ <input id="q" placeholder="# id or 0x wallet" style="width:140px"></label>
     <label class="field">coin <select id="coin"><option value="">any</option></select></label>
-    <button class="btn on" id="sort">biggest first</button>
+    <label class="field">stance <select id="stance"><option value="">any</option><option value="long">net long</option><option value="short">net short</option></select></label>
+    <label class="field">sort <select id="sortSel"><option value="big">biggest book</option><option value="markets">most markets</option><option value="cats">most Hypurrs held</option></select></label>
     <span class="legend"><span class="swatch" style="background:var(--long)"></span>long<span class="swatch" style="background:var(--short)"></span>short</span>
   </div>
   <div class="count" id="count"></div>
@@ -81,19 +82,27 @@
 (async function(){
   const D = await HT.json('/data/desk.json',true);
   const esc=HT.esc, short=HT.short, money=HT.money;
-  let sortDesc=true, coin="";
+  let sortBy="big", coin="", stance="";
   const coins=[...new Set(D.rows.flatMap(r=>r.positions.map(p=>p.coin)))].sort();
   const cs=document.getElementById('coin'); coins.forEach(c=>cs.insertAdjacentHTML('beforeend',`<option>${esc(c)}</option>`));
   cs.onchange=()=>{coin=cs.value;render()};
+  document.getElementById('stance').onchange=e=>{stance=e.target.value;render()};
+  document.getElementById('sortSel').onchange=e=>{sortBy=e.target.value;render()};
   document.getElementById('q').oninput=render;
-  document.getElementById('sort').onclick=e=>{sortDesc=!sortDesc;e.target.textContent=sortDesc?"biggest first":"smallest first";render()};
+  const netOf=r=> r.netNotional!==undefined ? r.netNotional
+    : r.positions.reduce((s,p)=>s+(p.direction==="long"?1:-1)*p.notionalUsd,0);
+  function matchQ(q,id,owner){ if(/^\d+$/.test(q)) return String(id).startsWith(q);
+    return (owner||'').toLowerCase().includes(q.toLowerCase()); }
   document.getElementById('lead').textContent=D.holdersWithPosition.toLocaleString()+" Hypurr holders have an open position. Here are the biggest.";
   function render(){
     const q=document.getElementById('q').value.trim();
     let rows=D.rows.slice();
     if(coin) rows=rows.filter(r=>r.positions.some(p=>p.coin===coin));
-    if(q) rows=rows.filter(r=>String(r.id).includes(q));
-    rows.sort((a,b)=>sortDesc?b.totalNotional-a.totalNotional:a.totalNotional-b.totalNotional);
+    if(stance) rows=rows.filter(r=> stance==="long" ? netOf(r)>0 : netOf(r)<0);
+    if(q) rows=rows.filter(r=>matchQ(q,r.id,r.owner));
+    rows.sort(sortBy==="markets" ? (a,b)=>(b.posCount||b.positions.length)-(a.posCount||a.positions.length)||b.totalNotional-a.totalNotional
+            : sortBy==="cats"    ? (a,b)=>(b.heldCount||0)-(a.heldCount||0)||b.totalNotional-a.totalNotional
+            :                      (a,b)=>b.totalNotional-a.totalNotional);
     document.getElementById('count').textContent=rows.length+" holders";
     document.getElementById('rows').innerHTML=rows.map(r=>{
       const pills=r.positions.slice(0,5).map(p=>`<span class="pp"><span class="cn">${esc(p.coin)}</span>

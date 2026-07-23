@@ -140,6 +140,9 @@
   const S=O.stats;
   let view='dia', onlyTrade=false, q='', sortDia='rare', sortFlip='flips';
   const lastSale=id=>{const s=SALES&&SALES.byToken&&SALES.byToken[id];return s&&s.length?s[s.length-1].price:0;};
+  const lastTs=id=>{const s=SALES&&SALES.byToken&&SALES.byToken[id];return s&&s.length?(s[s.length-1].ts||0):0;};
+  // digits = id prefix, anything else = wallet match
+  const matchQ=(q,id,owner)=> /^\d+$/.test(q) ? String(id).startsWith(q) : (owner||'').toLowerCase().includes(q);
   document.getElementById('h-never').textContent=num(S.neverTraded);
   document.getElementById('lead').textContent=`All 4,600 Hypurrs were airdropped on the same day, ${S.airdropDate}, ${S.daysSinceAirdrop} days ago. ${num(S.neverTraded)} of them have sat in their original wallet ever since. The other ${num(S.tradedCats)} have changed hands ${num(S.totalTrades)} times. Click any Hypurr for its full history.`;
   document.getElementById('tiles').innerHTML=`
@@ -156,7 +159,7 @@
   function fillSort(){
     const opts = view==='dia'
       ? [['rare','rarest first'],['id','mint order']]
-      : [['flips','most flips'],['rare','rarest'],['price','priciest last sale']];
+      : [['flips','most flips'],['recent','recently traded'],['price','priciest last sale'],['rare','rarest']];
     psort.innerHTML = opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
     psort.value = view==='dia' ? sortDia : sortFlip;
   }
@@ -169,7 +172,7 @@
       // the airdrop was one-per-wallet, so diamonds are the never-traded Hypurrs themselves
       let rows=O.diamonds.slice();
       if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
-      if(q) rows=rows.filter(r=>String(r.id).includes(q)||r.owner.toLowerCase().includes(q));
+      if(q) rows=rows.filter(r=>matchQ(q,r.id,r.owner));
       rows.sort(sortDia==='id' ? (a,b)=>a.id-b.id : (a,b)=>a.rarityRank-b.rarityRank);
       n=rows.length;
       html=rows.map(r=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
@@ -184,9 +187,10 @@
       const bar=st?`<div class="mktbar" style="grid-column:1/-1">Secondary sales: <b>${st.totalSales.toLocaleString()}</b> · <b>${st.totalVolumeHype.toLocaleString()}</b> HYPE volume · avg <b>${st.avgPriceHype.toLocaleString()}</b> HYPE · top sale <b>${st.maxSale.hype.toLocaleString()} HYPE</b> (#${st.maxSale.id})</div>`:'';
       let rows=O.flipped.slice();
       if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
-      if(q) rows=rows.filter(r=>String(r.id).includes(q)||r.owner.toLowerCase().includes(q));
+      if(q) rows=rows.filter(r=>matchQ(q,r.id,r.owner));
       rows.sort(sortFlip==='rare' ? (a,b)=>a.rarityRank-b.rarityRank
               : sortFlip==='price' ? (a,b)=>lastSale(b.id)-lastSale(a.id)
+              : sortFlip==='recent' ? (a,b)=>lastTs(b.id)-lastTs(a.id)
               : (a,b)=>b.flips-a.flips||a.rarityRank-b.rarityRank);
       n=rows.length;
       html=bar+rows.map(r=>{const ot=trading(r.owner); const ls=lastSale(r.id);
