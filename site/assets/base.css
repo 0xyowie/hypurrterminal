@@ -22,7 +22,7 @@ a{color:inherit;text-decoration:none}
 header.site{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(14,11,8,.92),rgba(14,11,8,.7));backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 header.site .bar{display:flex;align-items:center;gap:16px;padding:14px 0;max-width:1200px;margin:0 auto;padding-left:24px;padding-right:24px}
 .brand{display:flex;align-items:center;gap:11px;font-family:'Bricolage Grotesque';font-weight:700;font-size:16px;letter-spacing:.03em;cursor:pointer;color:var(--ink)}
-.logo{width:33px;height:33px;border-radius:10px;display:grid;place-items:center;font-size:16px;background:#1a140d;border:1px solid var(--line2)}
+.logo{width:33px;height:33px;border-radius:10px;display:block}
 nav.top{margin-left:auto;display:flex;gap:3px;flex-wrap:wrap}
 nav.top a{font-size:13px;font-weight:500;padding:8px 13px;border-radius:99px;color:var(--dim);cursor:pointer;transition:.35s var(--ease)}
 nav.top a:hover{color:var(--ink);background:rgba(255,255,255,.05)}

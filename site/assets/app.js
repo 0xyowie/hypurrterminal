@@ -38,6 +38,12 @@
     // ...and the old emoji favicon — swap in the brand mark
     var ic=document.querySelector('link[rel="icon"]');
     if(ic && (ic.getAttribute('href')||'').indexOf('data:')===0) ic.href='/favicon.svg';
+    // ...and the old emoji header logo
+    var lg=document.querySelector('.brand .logo');
+    if(lg && lg.tagName==='SPAN'){
+      var im=document.createElement('img'); im.className='logo'; im.src='/favicon.svg'; im.alt=''; im.width=33; im.height=33;
+      lg.replaceWith(im);
+    }
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }
