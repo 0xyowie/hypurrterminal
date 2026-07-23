@@ -228,6 +228,7 @@
     if(state.onlyLive) list=list.filter(t=>t.positions&&t.positions.length);
     if(state.cat&&state.val) list=list.filter(t=>t.traits[state.cat]===state.val);
     list.sort((a,b)=> state.sortRare ? a.rarityRank-b.rarityRank : a.id-b.id);
+    if(/^\d+$/.test(q)){ const ix=list.findIndex(t=>t.id===+q); if(ix>0){ const t=list.splice(ix,1)[0]; list.unshift(t); } }
     document.getElementById('clear').hidden = !(q||state.cat||state.val||state.onlyLive);
     return list;
   }

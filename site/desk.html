@@ -47,6 +47,8 @@
   .tot{text-align:right;font-family:'Bricolage Grotesque';font-weight:600;font-size:16px}
   .tot small{display:block;font-family:'Inter';font-weight:600;font-size:10.5px;color:var(--faint);margin-top:2px}
   .count{font-weight:600;font-size:12.5px;color:var(--faint);margin:0 2px 8px}
+  .qnote{background:var(--panel);border:1px dashed var(--line2);border-radius:13px;padding:11px 15px;font-weight:600;font-size:13px;color:var(--dim)}
+  .qnote a{color:var(--mint);font-weight:700}
   @media(max-width:720px){.row{grid-template-columns:48px 1fr;gap:10px}.row .tot,.row .who .ow{grid-column:2}.ppills{grid-column:1/-1}}
 </style></head>
 <body data-page="desk">
@@ -103,8 +105,14 @@
     rows.sort(sortBy==="markets" ? (a,b)=>(b.posCount||b.positions.length)-(a.posCount||a.positions.length)||b.totalNotional-a.totalNotional
             : sortBy==="cats"    ? (a,b)=>(b.heldCount||0)-(a.heldCount||0)||b.totalNotional-a.totalNotional
             :                      (a,b)=>b.totalNotional-a.totalNotional);
+    let qn='';
+    if(/^\d+$/.test(q) && +q>=1 && +q<=4600){
+      const ix=rows.findIndex(r=>r.id===+q);
+      if(ix>0){ const r=rows.splice(ix,1)[0]; rows.unshift(r); }
+      if(ix<0) qn=`<div class="qnote">Hypurr #${+q} isn't on the desk (its holder has no live book in the top 200) · <a href="/cat/${+q}">open its passport →</a></div>`;
+    }
     document.getElementById('count').textContent=rows.length+" holders";
-    document.getElementById('rows').innerHTML=rows.map(r=>{
+    document.getElementById('rows').innerHTML=qn+rows.map(r=>{
       const pills=r.positions.slice(0,5).map(p=>`<span class="pp"><span class="cn">${esc(p.coin)}</span>
         <span class="sd ${p.direction}">${p.leverage?p.leverage.value+"x ":""}${p.direction}</span>
         <span class="nt">${money(p.notionalUsd)}</span></span>`).join("");

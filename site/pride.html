@@ -37,6 +37,8 @@
   .pfilt .qf{flex:1;min-width:150px}
   .pfilt .qf input{width:100%}
   .pcount{margin-left:auto;font-weight:700;font-size:12.5px;color:var(--faint)}
+  .qnote{background:var(--panel);border:1px dashed var(--line2);border-radius:13px;padding:11px 15px;font-weight:600;font-size:13px;color:var(--dim)}
+  .qnote a{color:var(--mint);font-weight:700}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:16px;margin:16px 0 20px}
   .oc{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;position:relative;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s;cursor:pointer}
   .oc:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.5);border-color:var(--line2)}
@@ -143,6 +145,15 @@
   const lastTs=id=>{const s=SALES&&SALES.byToken&&SALES.byToken[id];return s&&s.length?(s[s.length-1].ts||0):0;};
   // digits = id prefix, anything else = wallet match
   const matchQ=(q,id,owner)=> /^\d+$/.test(q) ? String(id).startsWith(q) : (owner||'').toLowerCase().includes(q);
+  // exact id first; if the exact id isn't in this list, say so instead of silently hiding it
+  function pinExact(rows,q,listName){
+    if(!/^\d+$/.test(q)) return '';
+    const idq=+q; if(idq<1||idq>4600) return '';
+    const ix=rows.findIndex(r=>r.id===idq);
+    if(ix>0){ const r=rows.splice(ix,1)[0]; rows.unshift(r); return ''; }
+    if(ix<0) return `<div class="qnote" style="grid-column:1/-1">Hypurr #${idq} isn't ${listName} · <a href="/cat/${idq}">open its passport →</a></div>`;
+    return '';
+  }
   document.getElementById('h-never').textContent=num(S.neverTraded);
   document.getElementById('lead').textContent=`All 4,600 Hypurrs were airdropped on the same day, ${S.airdropDate}, ${S.daysSinceAirdrop} days ago. ${num(S.neverTraded)} of them have sat in their original wallet ever since. The other ${num(S.tradedCats)} have changed hands ${num(S.totalTrades)} times. Click any Hypurr for its full history.`;
   document.getElementById('tiles').innerHTML=`
@@ -174,8 +185,9 @@
       if(onlyTrade) rows=rows.filter(r=>trading(r.owner));
       if(q) rows=rows.filter(r=>matchQ(q,r.id,r.owner));
       rows.sort(sortDia==='id' ? (a,b)=>a.id-b.id : (a,b)=>a.rarityRank-b.rarityRank);
+      const qn=pinExact(rows,q,'a diamond hand (it has traded)');
       n=rows.length;
-      html=rows.map(r=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
+      html=qn+rows.map(r=>{const st=trading(r.owner);return `<div class="oc" onclick="openCat(${r.id})">
         <div class="th"><img loading="lazy" src="${img(r.id)}" alt="">
           <span class="dbadge">💎 day one</span>
           ${st?`<span class="trbadge"><span class="tdot"></span>trading</span>`:''}</div>
@@ -192,8 +204,9 @@
               : sortFlip==='price' ? (a,b)=>lastSale(b.id)-lastSale(a.id)
               : sortFlip==='recent' ? (a,b)=>lastTs(b.id)-lastTs(a.id)
               : (a,b)=>b.flips-a.flips||a.rarityRank-b.rarityRank);
+      const qn=pinExact(rows,q,'among the most flipped');
       n=rows.length;
-      html=bar+rows.map(r=>{const ot=trading(r.owner); const ls=lastSale(r.id);
+      html=qn+bar+rows.map(r=>{const ot=trading(r.owner); const ls=lastSale(r.id);
         return `<div class="oc" onclick="openCat(${r.id})">
         <div class="th"><img loading="lazy" src="${img(r.id)}" alt="">
           <span class="fbadge">🔥 ${r.flips}×</span>
