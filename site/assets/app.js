@@ -35,6 +35,9 @@
     ['pulse','observatory'].forEach(function(k){
       var st=document.querySelector('nav.top a[data-nav="'+k+'"]'); if(st) st.remove();
     });
+    // ...and the old emoji favicon — swap in the brand mark
+    var ic=document.querySelector('link[rel="icon"]');
+    if(ic && (ic.getAttribute('href')||'').indexOf('data:')===0) ic.href='/favicon.svg';
     var links=document.querySelectorAll('nav.top a[data-nav]');
     for(var i=0;i<links.length;i++){ if(links[i].getAttribute('data-nav')===pg) links[i].classList.add('active'); }
   }
