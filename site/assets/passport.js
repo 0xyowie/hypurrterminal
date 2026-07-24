@@ -7,13 +7,42 @@
   tg.innerHTML=Object.entries(C.traits).map(function(kv){
     return '<div class="trait"><div class="k">'+HT.esc(kv[0])+'</div><div class="v">'+HT.esc(kv[1])+'</div></div>';
   }).join('');
-  // sales
-  var sb=$('salebox');
-  if(C.sales && C.sales.length){
-    sb.innerHTML='<h3>Sale history (HYPE)</h3>'+C.sales.slice().reverse().map(function(s){
-      return '<div class="srow"><span class="d">'+HT.fmtD(s.t)+'</span><span class="p">'+s.p.toLocaleString()+' HYPE</span></div>';
-    }).join('');
-  } else { sb.innerHTML='<h3>Sale history</h3><div class="srow"><span class="d">No on-chain HYPE sales yet'+(C.diamond?', still in the hand it was dealt.':'.')+'</span></div>'; }
+  // sales (re-rendered after live upgrade)
+  function renderSales(){
+    var sb=$('salebox');
+    if(C.sales && C.sales.length){
+      sb.innerHTML='<h3>Sale history (HYPE)</h3>'+C.sales.slice().reverse().map(function(s){
+        return '<div class="srow"><span class="d">'+HT.fmtD(s.t)+'</span><span class="p">'+s.p.toLocaleString()+' HYPE</span></div>';
+      }).join('');
+    } else { sb.innerHTML='<h3>Sale history</h3><div class="srow"><span class="d">No on-chain HYPE sales yet'+(C.diamond?', still in the hand it was dealt.':'.')+'</span></div>'; }
+  }
+  renderSales();
+  // rebuild the diamond/traded + last-sale chips from current C
+  function renderChips(){
+    var chips=document.querySelector('.chips'); if(!chips) return;
+    var dc=chips.querySelector('.chip.dia, .chip.fire');
+    if(dc){ if(C.diamond){ dc.className='chip dia'; dc.innerHTML='💎 never traded'; }
+      else { dc.className='chip fire'; dc.innerHTML='🔥 traded '+C.flips+'×'; } }
+    var last=C.sales&&C.sales.length?C.sales[C.sales.length-1].p:0;
+    var gc=chips.querySelector('.chip.gold');
+    if(last){ if(!gc){ gc=document.createElement('span'); gc.className='chip gold'; chips.appendChild(gc); }
+      gc.innerHTML='last sale <b>'+last.toLocaleString()+' HYPE</b>'; }
+    else if(gc){ gc.remove(); }
+  }
+  // ---- live upgrade: static pages bake owner/sales/flips at index time; refresh from JSON ----
+  Promise.all([
+    HT.json('/data/owners.json',true).catch(function(){return null;}),
+    HT.json('/data/sales.json',true).catch(function(){return null;}),
+    HT.json('/data/flips.json',true).catch(function(){return null;})
+  ]).then(function(r){
+    var OWN=r[0], SALES=r[1], FL=r[2];
+    if(OWN){ var o=(OWN.owners||OWN)[C.id];
+      if(o){ C.owner=o; var oc=document.querySelector('.ownerline code'); if(oc) oc.textContent=HT.short(o);
+        var stale=document.querySelector('.ownerline .stale'); if(stale) stale.remove(); } }
+    if(FL && FL.flips){ var f=FL.flips[C.id]; if(typeof f==='number'){ C.flips=f; C.diamond=(f===0); } }
+    if(SALES && SALES.byToken){ C.sales=(SALES.byToken[C.id]||[]).map(function(x){return {t:x.ts,p:x.price};}); }
+    renderSales(); renderChips(); drawCard();
+  }).catch(function(){});
   // live stance
   var stanceTxt='sitting flat', stanceCls='';
   HT.json('/data/cat_states.json', true).then(function(cs){

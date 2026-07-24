@@ -1,18 +1,237 @@
-// Refresh DYNAMIC production data into site/data/: positions.json, index.json, desk.json.
-// Run on a schedule (GitHub Actions). NO PnL fields, ever.
+// Refresh production data into site/data/. NO PnL fields, ever.
+// Phase 1 (chain): incremental on-chain log scan -> current ownership, provenance
+//   (trade history) and sales, extending the committed snapshots. Pure fetch, no deps.
+// Phase 2 (positions): live Hyperliquid perp positioning for the CURRENT holders.
 import fs from "node:fs";
 import path from "node:path";
-const INFO = "https://api.hyperliquid.xyz/info"; // Hyperliquid public info API (no deps needed)
+
+const INFO = "https://api.hyperliquid.xyz/info";     // Hyperliquid public info API
+// HyperEVM JSON-RPC endpoints (rotated for resilience). The official node caps
+// eth_getLogs at 1000 blocks, so we scan in 1000-block windows on both.
+const RPCS = ["https://rpc.hyperliquid.xyz/evm", "https://hyperliquid.lava.build"];
+const NFT  = "0x9125e2d6827a00b0f8330d6ef7bef07730bac685";
+const WHYPE = "0x5555555555555555555555555555555555555555";
+const XFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+const ZERO = "0x0000000000000000000000000000000000000000";
+const DIST = "0xdc97b8a7023c5e29b1ca17ed9e850b8ba457d610"; // airdrop distributor
+const SUPPLY = 4600;
+const CHAIN_ID = 999;
+const GENESIS_BLOCK = 40876211; // first ownership snapshot block (fallback scan floor)
+
 const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
-const D = path.join(ROOT, "data");
-const OUT = path.join(ROOT, "site/data");
+const D = path.join(ROOT, "data");        // static inputs (traits)
+const OUT = path.join(ROOT, "site/data"); // outputs + prior state
 fs.mkdirSync(OUT, { recursive: true });
-const wallets = JSON.parse(fs.readFileSync(path.join(D, "wallets.json"))).wallets;
+const rd = f => JSON.parse(fs.readFileSync(f));
+const readOut = f => { try { return rd(path.join(OUT, f)); } catch { return null; } };
+const hex = n => "0x" + n.toString(16);
+const sleep = ms => new Promise(s => setTimeout(s, ms));
+
+const traits = rd(path.join(D, "traits.json")).tokens;
+const rrOf = {}; traits.forEach(t => { rrOf[t.id] = t.rarityRank; });
+
+// ---- JSON-RPC helpers (multi-endpoint, resilient) ----
+function chunk(arr, n) { const o = []; for (let i = 0; i < arr.length; i += n) o.push(arr.slice(i, i + n)); return o; }
+async function rpcCall(url, method, params, timeout = 20000) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }), signal: AbortSignal.timeout(timeout) });
+  const j = await r.json();
+  if (j.error) throw new Error(j.error.message || "rpc error");
+  return j.result;
+}
+// call `method` with retry + endpoint rotation; returns result or null after all tries
+async function rpc(method, params, tries = 6) {
+  for (let a = 0; a < tries; a++) {
+    const url = RPCS[a % RPCS.length];
+    try { return await rpcCall(url, method, params); }
+    catch { await sleep(250 * (a + 1)); }
+  }
+  return null;
+}
+// eth_getLogs for a block window; throws if it can't be fetched (so caller can bail safely)
+async function getLogsRange(from, to, tries = 8) {
+  for (let a = 0; a < tries; a++) {
+    const url = RPCS[a % RPCS.length];
+    try { const l = await rpcCall(url, "eth_getLogs", [{ address: NFT, topics: [XFER], fromBlock: hex(from), toBlock: hex(to) }]);
+      if (Array.isArray(l)) return l; }
+    catch { await sleep(250 * (a + 1)); }
+  }
+  throw new Error(`eth_getLogs ${from}-${to} failed`);
+}
+// bounded-concurrency map
+async function pmap(items, fn, c = 6) {
+  const out = new Array(items.length); let i = 0;
+  async function run() { while (i < items.length) { const my = i++; out[my] = await fn(items[my], my); } }
+  await Promise.all(Array.from({ length: Math.min(c, items.length || 1) }, run));
+  return out;
+}
+
+// =====================================================================
+// PHASE 1 — chain refresh: ownership + provenance + sales (fail-safe)
+// =====================================================================
+// Base state (committed snapshots we extend). owners.json carries the block
+// it is accurate to; we scan Transfer logs from there to chain head.
+const ownersRawFile = readOut("owners.json") || rd(path.join(D, "owners.json")).owners;
+const owners = Object.assign({}, ownersRawFile.owners || ownersRawFile); // bare {id: addr} map the site reads
+let ownersBlock = (readOut("provenance.json") || {}).lastBlock || GENESIS_BLOCK;
+let ownersChanged = false;
+let chainOK = false;
+
+try {
+  const headHex = await rpc("eth_blockNumber", []);
+  const head = headHex ? parseInt(headHex, 16) : NaN;
+  if (!Number.isFinite(head)) throw new Error("no head block");
+  const fromB = ownersBlock + 1;
+
+  // pull all Transfer logs since the snapshot, in 1000-block windows (official RPC cap),
+  // scanned concurrently across endpoints. First run backfills ~months; later runs are tiny.
+  let logs = [];
+  if (head >= fromB) {
+    const ranges = [];
+    for (let f = fromB; f <= head; f += 1000) ranges.push([f, Math.min(f + 999, head)]);
+    const parts = await pmap(ranges, ([f, t]) => getLogsRange(f, t), 6);
+    logs = parts.flat();
+  }
+  const xfers = logs.map(l => ({
+    id: parseInt(l.topics[3], 16),
+    from: ("0x" + l.topics[1].slice(26)).toLowerCase(),
+    to:   ("0x" + l.topics[2].slice(26)).toLowerCase(),
+    block: parseInt(l.blockNumber, 16),
+    tx: l.transactionHash,
+    li: parseInt(l.logIndex, 16),
+  })).sort((a, b) => a.block - b.block || a.li - b.li);
+
+  // apply ownership deltas (authoritative: latest transfer wins)
+  for (const x of xfers) { if (x.id >= 1 && x.id <= SUPPLY) { owners[x.id] = x.to; ownersChanged = true; } }
+
+  // block timestamps for the (few) new blocks
+  const blks = [...new Set(xfers.map(x => x.block))];
+  const tsMap = {};
+  await pmap(blks, async (n) => { const b = await rpc("eth_getBlockByNumber", [hex(n), false]);
+    if (b && b.timestamp) tsMap[n] = parseInt(b.timestamp, 16); }, 8);
+  const nowS = Math.floor(Date.now() / 1000);
+  const tsOf = bk => tsMap[bk] ?? nowS;
+
+  // ---- provenance: append new hops, bump trade counts ----
+  const provBase = readOut("provenance.json") || { prov: {} };
+  const prov = provBase.prov || {};
+  for (const x of xfers) {
+    const p = prov[x.id]; if (!p) continue;
+    const kind = x.from === ZERO ? "mint" : x.from === DIST ? "airdrop" : "trade";
+    p.chain = p.chain || [];
+    p.chain.push({ owner: x.to, ts: tsOf(x.block), kind });
+    p.currentOwner = x.to;
+    if (kind === "trade") p.trades = (p.trades || 0) + 1;
+  }
+  // reconcile currentOwner with the applied ownership map
+  for (const id in prov) { if (owners[id]) prov[id].currentOwner = owners[id]; }
+
+  // ---- sales: price the new trade txs (native HYPE, else WHYPE from receipt) ----
+  const salesBase = readOut("sales.json") || { byToken: {} };
+  const byToken = salesBase.byToken || {};
+  const tradeXfers = xfers.filter(x => x.from !== ZERO && x.from !== DIST);
+  const byTx = {}; for (const t of tradeXfers) (byTx[t.tx] ||= []).push(t);
+  const txHashes = Object.keys(byTx);
+  const txInfo = {};
+  await pmap(txHashes, async (h) => { const tx = await rpc("eth_getTransactionByHash", [h]);
+    if (tx) txInfo[h] = { to: (tx.to || "").toLowerCase(), val: tx.value || "0x0" }; }, 8);
+  const needRc = txHashes.filter(h => { const tx = txInfo[h]; if (!tx) return false;
+    const val = Number(BigInt(tx.val)) / 1e18; return !(val > 0.001) && tx.to !== NFT; });
+  const rcInfo = {};
+  await pmap(needRc, async (h) => { const rc = await rpc("eth_getTransactionReceipt", [h]);
+    if (rc && rc.logs) { const w = [];
+      for (const e of rc.logs) { if (e.topics[0] === XFER && e.topics.length === 3 && e.address.toLowerCase() !== NFT) {
+        const amt = Number(BigInt(e.data)) / 1e18; if (e.address.toLowerCase() === WHYPE) w.push(amt); } }
+      rcInfo[h] = { w }; } }, 8);
+  const DUST = 1; // HYPE floor: below this is a fee-leg / nominal, not a real market sale
+  function priceFor(h) {
+    const tx = txInfo[h]; if (!tx) return null;
+    const val = Number(BigInt(tx.val)) / 1e18;
+    if (val > 0.001) return val;
+    if (tx.to === NFT) return null;
+    const rc = rcInfo[h];
+    if (rc && rc.w && rc.w.length) return Math.max(...rc.w);
+    return null;
+  }
+  for (const h of txHashes) {
+    const items = byTx[h]; const price = priceFor(h); if (price == null) continue;
+    const per = price / items.length; if (per < DUST) continue;
+    for (const it of items) (byToken[it.id] ||= []).push({ ts: tsOf(it.block), price: Math.round(per * 100) / 100 });
+  }
+  for (const id in byToken) byToken[id].sort((a, b) => a.ts - b.ts);
+
+  const generatedAt = new Date().toISOString();
+
+  // write chain outputs only when something actually moved (avoid re-committing 2MB every run)
+  if (xfers.length > 0) {
+    // sales stats
+    const flat = []; for (const id in byToken) for (const s of byToken[id]) flat.push({ id: +id, hype: s.price, ts: s.ts });
+    flat.sort((a, b) => a.hype - b.hype);
+    const recent = flat.slice().sort((a, b) => b.ts - a.ts);
+    const totalHype = flat.reduce((s, x) => s + x.hype, 0);
+    const stats = { totalSales: flat.length, totalVolumeHype: Math.round(totalHype),
+      avgPriceHype: Math.round(totalHype / Math.max(1, flat.length)),
+      minPriceHype: flat.length ? Math.round(flat[0].hype) : null,
+      maxPriceHype: flat.length ? Math.round(flat[flat.length - 1].hype) : null,
+      maxSale: flat.length ? { id: flat[flat.length - 1].id, hype: Math.round(flat[flat.length - 1].hype) } : null,
+      lastSaleTs: recent[0]?.ts || null, tokensWithSale: Object.keys(byToken).length,
+      currencyNote: salesBase.stats?.currencyNote || "HYPE + WHYPE, reconstructed from on-chain payments across all marketplaces" };
+    fs.writeFileSync(path.join(OUT, "provenance.json"), JSON.stringify({ nowTs: nowS, lastBlock: head, distributor: DIST, prov }));
+    fs.writeFileSync(path.join(OUT, "sales.json"), JSON.stringify({ generatedAt, stats, byToken }));
+    // compact per-token trade counts so the 4,600 static passports can show a live
+    // "traded N×" / "never traded" without downloading the 2MB provenance file
+    const flipsMap = {}; for (const id in prov) flipsMap[id] = prov[id].trades || 0;
+    fs.writeFileSync(path.join(OUT, "flips.json"), JSON.stringify({ updated: generatedAt, flips: flipsMap }));
+    // refresh The Pride (diamonds are never-traded tokens) so it stays consistent
+    try { rebuildPride(prov, generatedAt); } catch (e) { console.error("pride:", e.message); }
+  }
+
+  // rewrite the ownership map (bare {id:addr}, the shape the site reads) when it changed.
+  // The scan-floor block lives in provenance.json.lastBlock (written above when xfers>0).
+  if (ownersChanged) {
+    fs.writeFileSync(path.join(OUT, "owners.json"), JSON.stringify(owners));
+  }
+  ownersBlock = head;
+  chainOK = true;
+  console.log(`chain: scanned ${fromB}->${head}, ${xfers.length} transfers applied, ${txHashes.length} trade txs`);
+} catch (e) {
+  console.error(`chain refresh failed (keeping last-known ownership @${ownersBlock}):`, e.message);
+}
+
+// The Pride rebuild (diamonds = never-traded tokens, grouped by holder)
+function rebuildPride(prov, generatedAt) {
+  const heldBy = {}; for (const id in owners) (heldBy[owners[id]] ||= []).push(+id);
+  const neverByOwner = {}; let neverTraded = 0, totalTrades = 0;
+  for (const id in prov) { const p = prov[id]; totalTrades += (p.trades || 0);
+    if ((p.trades || 0) === 0) { neverTraded++; (neverByOwner[p.currentOwner] ||= []).push(+id); } }
+  const diamonds = [];
+  for (const owner in neverByOwner) for (const id of neverByOwner[owner])
+    diamonds.push({ id, rarityRank: rrOf[id], owner, heldCount: (heldBy[owner] || []).length });
+  diamonds.sort((a, b) => a.rarityRank - b.rarityRank);
+  const flipped = Object.keys(prov).map(id => ({ id: +id, flips: prov[id].trades || 0, rarityRank: rrOf[id], owner: prov[id].currentOwner }))
+    .sort((a, b) => b.flips - a.flips || a.rarityRank - b.rarityRank).slice(0, 90);
+  const prevOg = readOut("og.json") || {};
+  const airdropTs = prov["1"]?.airdropTs || 1759074300;
+  const og = {
+    stats: {
+      supply: SUPPLY, diamondWallets: Object.keys(neverByOwner).length, neverTraded, tradedCats: SUPPLY - neverTraded,
+      totalTrades, totalTransfers: prevOg.stats?.totalTransfers || 18928,
+      mostFlipped: { id: flipped[0].id, flips: flipped[0].flips },
+      airdropDate: new Date(airdropTs * 1000).toISOString().slice(0, 10),
+      daysSinceAirdrop: Math.floor((Date.now() / 1000 - airdropTs) / 86400),
+    }, diamonds, flipped,
+  };
+  fs.writeFileSync(path.join(OUT, "og.json"), JSON.stringify(og));
+}
+
+// =====================================================================
+// PHASE 2 — live positions for the CURRENT holders (no PnL, ever)
+// =====================================================================
+const wallets = {};
+for (const id in owners) { const a = owners[id]; if (!a) continue; (wallets[a] ||= { tokenIds: [], count: 0 }); wallets[a].tokenIds.push(+id); wallets[a].count++; }
 const addrs = Object.keys(wallets);
-const ownersRaw = JSON.parse(fs.readFileSync(path.join(D, "owners.json"))).owners; // {id:owner}
-const traits = JSON.parse(fs.readFileSync(path.join(D, "traits.json"))).tokens;
-const rrOf = {}, nameKnown = {}; traits.forEach(t => { rrOf[t.id] = t.rarityRank; });
-const heldBy = {}; for (const id in ownersRaw){ (heldBy[ownersRaw[id]] ||= []).push(+id); }
+const ownersRaw = owners; // {id:owner}
+const heldBy = {}; for (const id in ownersRaw) { (heldBy[ownersRaw[id]] ||= []).push(+id); }
 
 const FORBIDDEN = ["unrealizedPnl", "returnOnEquity", "entryPx", "liquidationPx"];
 async function clearinghouse(addr, tries = 4){
@@ -138,7 +357,7 @@ try {
 
 // ---- cat_states.json : per-cat live stance for the living hero (0 flat / 1 long / 2 short) ----
 let states = "";
-for (let id = 1; id <= 4600; id++) {
+for (let id = 1; id <= SUPPLY; id++) {
   const owner = ownersRaw[id]; const w = owner ? positions[owner] : null;
   if (!w || !w.hasPosition) { states += "0"; continue; }
   let net = 0; for (const p of w.positions) net += (p.direction === "long" ? 1 : -1) * p.notionalUsd;
@@ -146,6 +365,7 @@ for (let id = 1; id <= 4600; id++) {
 }
 fs.writeFileSync(path.join(OUT, "cat_states.json"), JSON.stringify({ generatedAt, states }));
 
-console.log(`\nholders ${holdersTotal}, live ${holdersWithPosition} (${(index.participationRate*100).toFixed(1)}%), errors ${errors}`);
+console.log(`\nchain ${chainOK ? "OK" : "SKIPPED"} @block ${ownersBlock}`);
+console.log(`holders ${holdersTotal}, live ${holdersWithPosition} (${(index.participationRate*100).toFixed(1)}%), errors ${errors}`);
 console.log(`net-long wallets ${walletsNetLong}, net-short ${walletsNetShort}; long by notional ${(index.byNotional.longPct*100).toFixed(1)}%`);
 console.log(`desk rows ${Math.min(200,rows.length)} (of ${rows.length} trading holders)`);
