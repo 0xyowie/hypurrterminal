@@ -1,32 +1,88 @@
 name: Refresh positions
+
+# GitHub delivers scheduled runs late — the measured median gap between real runs was
+# 95 minutes against a 15-minute cron, with blackouts up to 4 hours. Two changes make
+# the cadence survive that:
+#   1. every triggered run performs SEVERAL sweeps, 15 minutes apart, so one delayed
+#      trigger still produces a series of refreshes instead of a single stale snapshot;
+#   2. a push to main (code, not data) refreshes too, so a deploy is never served with
+#      a stale book.
 on:
   schedule:
-    - cron: '4,19,34,49 * * * *'   # every 15 minutes (GitHub may delay under load)
-  workflow_dispatch: {}        # allow manual runs
+    - cron: '4,34 * * * *'      # asks for every 30 min; each run then sweeps SWEEPS times
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'site/data/**'          # the bot's own data commits must not retrigger this
+      - '**.md'
+      - 'tests/**'
+  workflow_dispatch:
+    inputs:
+      sweeps:
+        description: 'How many sweeps this run should perform'
+        required: false
+        default: '3'
+
 concurrency:
   group: refresh
   cancel-in-progress: false
+
 permissions:
   contents: write
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      SWEEPS: ${{ github.event.inputs.sweeps || (github.event_name == 'push' && '1' || '3') }}
+      GAP_SECONDS: '900'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Sweep Hyperliquid positions -> site/data
-        run: node scripts/refresh-prod.mjs
-      - name: Commit refreshed data
         run: |
+          set -u
           git config user.name  "hypurr-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add site/data
-          if git diff --cached --quiet; then
-            echo "No change in positions this cycle."
-          else
-            git commit -m "data: refresh positions $(date -u +%FT%TZ)"
-            git pull --rebase origin main
-            git push
+          fail=0
+          for i in $(seq 1 "$SWEEPS"); do
+            echo "::group::sweep $i/$SWEEPS"
+            if node scripts/refresh-prod.mjs; then
+              git add site/data
+              if git diff --cached --quiet; then
+                echo "No change in positions this cycle."
+              else
+                git commit -m "data: refresh positions $(date -u +%FT%TZ)"
+                # Rebase onto whatever landed while we were sweeping, then push.
+                for attempt in 1 2 3; do
+                  git pull --rebase origin main && git push && break
+                  echo "push attempt $attempt failed, retrying"
+                  sleep 10
+                done
+              fi
+            else
+              echo "sweep $i failed"
+              fail=$((fail+1))
+            fi
+            echo "::endgroup::"
+            if [ "$i" -lt "$SWEEPS" ]; then sleep "$GAP_SECONDS"; fi
+          done
+          # One bad sweep inside a run is survivable; every sweep failing is not.
+          if [ "$fail" -ge "$SWEEPS" ]; then
+            echo "every sweep in this run failed"
+            exit 1
           fi
+
+      - name: Report freshness
+        if: always()
+        run: |
+          node -e "
+            const d = require('./site/data/index.json');
+            const age = Math.round((Date.now() - new Date(d.generatedAt)) / 60000);
+            console.log('published cycle ' + d.generatedAt + ' (' + age + ' min old)');
+            console.log('holders ' + d.holdersTotal + ', live ' + d.holdersWithPosition + ', unread ' + (d.holdersUnread ?? 'n/a'));
+          "

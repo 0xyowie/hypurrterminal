@@ -11,12 +11,16 @@
 //     belong in the visible page, where passport.js refreshes them on load.
 import fs from "node:fs"; import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeTraits } from "./traits-normalize.mjs";
 // fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
 // checkout under a folder with a space in it resolves to "Perps%20trading" and every
 // read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
 const ROOT = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const D = p => path.join(ROOT, "data", p), S = p => path.join(ROOT, "site", p);
 const traits = JSON.parse(fs.readFileSync(D("traits.json"))).tokens;   // static metadata
+// Same normalisation the data build applies, so a passport lists every category and
+// "None" means the same thing here as it does in the Collection filter.
+normalizeTraits(traits, JSON.parse(fs.readFileSync(D("trait_freq.json"))).categories);
 const owners = JSON.parse(fs.readFileSync(S("data/owners.json")));      // {id: owner}
 const prov = JSON.parse(fs.readFileSync(S("data/provenance.json"))).prov;
 const sales = JSON.parse(fs.readFileSync(S("data/sales.json"))).byToken;
@@ -39,13 +43,15 @@ const tpl = (t) => {
 <title>Hypurr #${id} · rank #${rr} · Hypurr Terminal</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="theme-color" content="#0E0B08">
+<link rel="canonical" href="https://hypurrterminal.xyz/cat/${id}">
 <meta property="og:type" content="website"><meta property="og:url" content="https://hypurrterminal.xyz/cat/${id}">
 <meta property="og:title" content="Hypurr #${id} · rank #${rr}"><meta property="og:description" content="${esc(desc)}">
 <meta property="og:image" content="https://hypurrterminal.xyz/img/${id}.webp">
 <meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://hypurrterminal.xyz/img/${id}.webp">
+<meta name="twitter:title" content="Hypurr #${id} · rank #${rr}"><meta name="twitter:description" content="${esc(desc)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/base.css"><script src="/assets/app.js"></script>
 <link rel="stylesheet" href="/assets/passport.css"><script defer src="/assets/passport.js"></script>
 <script>window.CAT=${DATA};</script>
@@ -59,6 +65,7 @@ const tpl = (t) => {
     <a href="/pride" data-nav="pride">The Pride</a>
   </nav>
 </div></header>
+<main id="content">
 <div class="wrap pass">
   <div class="pcard">
     <div class="part"><img src="/img/${id}.webp" alt="Hypurr #${id}" width="400" height="400"></div>
@@ -79,10 +86,11 @@ const tpl = (t) => {
       </div>
     </div>
   </div>
-  <div class="traitsbox"><h3>Traits</h3><div class="tgrid" id="tgrid"></div></div>
+  <div class="traitsbox"><h2>Traits</h2><div class="tgrid" id="tgrid"></div></div>
   <div class="salebox" id="salebox"></div>
 </div>
 <canvas id="pp" width="1000" height="1250" hidden></canvas>
+</main>
 <footer class="site"><div class="foot">Direction and size only, never PnL. Unofficial community tool.
 <div class="lg"><a href="/privacy">Privacy</a><a href="/">Home</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a></div></div></footer>
 </body></html>`;

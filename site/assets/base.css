@@ -1,7 +1,7 @@
 /* Hypurr Terminal — shared design system */
 :root{
   --bg:#0E0B08; --panel:#17120C; --panel2:#1E170F; --line:#2A2216; --line2:#3B3020;
-  --ink:#F5EFE4; --dim:#B0A48D; --faint:#7C6F58;
+  --ink:#F5EFE4; --dim:#B0A48D; --faint:#8F8065;
   --mint:#54E0CB; --gold:#EDBE72; --coral:#F2856F; --grape:#B7A6F0;
   --diamond:#7CC6F0; --fire:#F2856F;
   --long:#54E0CB; --short:#F2856F; --long-soft:rgba(84,224,203,.14); --short-soft:rgba(242,133,111,.14);
@@ -77,3 +77,15 @@ footer.site .foot .lg button{background:none;border:0;padding:0;font:inherit}
 /* Keyboard focus has to be visible against these dark panels; the browser default ring
    washes out on some platforms and several controls here are divs with role=button. */
 :focus-visible{outline:2px solid var(--mint);outline-offset:2px;border-radius:8px}
+
+/* Touch targets. SCOPE.md sets a >=40px floor and the filter rows were landing at
+   33-35px: big enough to see, small enough to miss with a thumb. Applied to the
+   controls themselves rather than their labels, so the hit area is the control. */
+@media (hover: none), (max-width: 760px){
+  .field,.btn,button.navtoggle,select,.toggle button{min-height:42px}
+  .field{padding-top:4px;padding-bottom:4px}
+  .field input,.field select{min-height:34px}
+  .brand{min-height:44px}
+  button.link{min-height:24px;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+  footer .lg button.link,footer .lg a{display:inline-flex;align-items:center;min-height:40px}
+}

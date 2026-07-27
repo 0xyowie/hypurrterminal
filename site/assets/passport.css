@@ -23,7 +23,7 @@
 .actions .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
 .actions .btn:hover{transform:translateY(-1px)}
 .traitsbox,.salebox{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin-top:16px}
-.traitsbox h3,.salebox h3{font-size:11.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin:0 0 12px}
+.traitsbox h3,.salebox h3,.traitsbox h2,.salebox h2{font-size:11.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin:0 0 12px}
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .trait{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:10px 12px}
 .trait .k{font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.12em}

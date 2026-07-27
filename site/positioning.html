@@ -3,6 +3,8 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hypurr Terminal · The Index</title>
 <meta name="description" content="What the Hypurr pride is positioned in right now, plus sentiment history vs HYPE, leaderboards, and wallet lookup. Direction and size only, never PnL.">
+<link rel="canonical" href="https://hypurrterminal.xyz/positioning">
+<meta property="og:url" content="https://hypurrterminal.xyz/positioning">
 <meta name="theme-color" content="#0E0B08">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Hypurr Terminal · The Index"><meta property="og:description" content="What the Hypurr pride is positioned in right now: net long vs short across every holder's live Hyperliquid book. Direction and size only, never PnL.">
@@ -10,7 +12,7 @@
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hypurrterminal.xyz/og.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/base.css">
 <script src="/assets/app.js"></script>
 <style>
@@ -30,7 +32,7 @@
   .swatch{display:inline-block;width:11px;height:11px;border-radius:4px;vertical-align:middle;margin-right:6px}
   .cards{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:12px 0}
   .card{background:linear-gradient(180deg,var(--panel),var(--bg));border:1px solid var(--line);border-radius:20px;padding:22px 24px}
-  .card h3{font-family:'Bricolage Grotesque';margin:0 0 4px;font-size:18px;font-weight:600}
+  .card h3,.card h2{font-family:'Bricolage Grotesque';margin:0 0 4px;font-size:18px;font-weight:600}
   .card .sub{color:var(--dim);font-weight:500;font-size:13px;margin-bottom:18px}
   .divbar{height:36px;border-radius:11px;display:flex;overflow:hidden;background:#241c12;gap:2px}
   .divbar .seg{position:relative;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b0906;font-size:13.5px;min-width:2px;overflow:hidden}
@@ -118,6 +120,7 @@
     <a href="/pride" data-nav="pride">The Pride</a>
   </nav>
 </div></header>
+<main id="content">
 
 <div class="wrap">
   <div class="kicker">The Index · what the pride is positioned in</div>
@@ -132,13 +135,13 @@
 
   <div class="cards">
     <div class="card">
-      <h3>The mood</h3>
+      <h2>The mood</h2>
       <div class="sub" id="mood-sub"></div>
       <div class="divbar" id="mood-bar"></div>
       <div class="barlbl"><span class="l" id="mood-l"></span><span class="s" id="mood-s"></span></div>
     </div>
     <div class="card">
-      <h3>Crowd vs whales</h3>
+      <h2>Crowd vs whales</h2>
       <div class="sub">the same book, counted two ways</div>
       <div class="mini"><div class="mlab"><span>by wallet (one holder, one vote)</span><span id="w-long"></span></div>
         <div class="divbar" id="w-bar"></div></div>
@@ -199,6 +202,7 @@
   <div class="wcats" id="wcats"></div>
 </div>
 
+</main>
 <footer class="site"><div class="foot">
   <span id="note"></span>
   <div class="lg"><a href="/privacy">Privacy</a><a href="/privacy">Cookies</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a><span>· Hypurr Terminal, unofficial community tool</span></div>
@@ -266,7 +270,7 @@
   ]);
   const css = getComputedStyle(document.documentElement);
   const COL = { mint: css.getPropertyValue('--mint').trim()||'#54E0CB', gold: css.getPropertyValue('--gold').trim()||'#EDBE72',
-    faint:'#7C6F58', line:'rgba(255,255,255,.07)' };
+    faint: css.getPropertyValue('--faint').trim()||'#8F8065', line:'rgba(255,255,255,.07)' };
   const tt=document.getElementById('tt');
   function showTT(html,x,y){ tt.innerHTML=html; tt.style.opacity=1; tt.style.left=Math.min(x+12,innerWidth-190)+'px'; tt.style.top=(y+14)+'px'; }
   function hideTT(){ tt.style.opacity=0; }

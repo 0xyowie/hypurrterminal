@@ -11,10 +11,10 @@
   function renderSales(){
     var sb=$('salebox');
     if(C.sales && C.sales.length){
-      sb.innerHTML='<h3>Sale history (HYPE)</h3>'+C.sales.slice().reverse().map(function(s){
+      sb.innerHTML='<h2>Sale history (HYPE)</h2>'+C.sales.slice().reverse().map(function(s){
         return '<div class="srow"><span class="d">'+HT.fmtD(s.t)+'</span><span class="p">'+s.p.toLocaleString()+' HYPE</span></div>';
       }).join('');
-    } else { sb.innerHTML='<h3>Sale history</h3><div class="srow"><span class="d">No on-chain HYPE sales yet'+(C.diamond?', still in the hand it was dealt.':'.')+'</span></div>'; }
+    } else { sb.innerHTML='<h2>Sale history</h2><div class="srow"><span class="d">No on-chain HYPE sales yet'+(C.diamond?', still in the hand it was dealt.':'.')+'</span></div>'; }
   }
   renderSales();
   // rebuild the diamond/traded + last-sale chips from current C

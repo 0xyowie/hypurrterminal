@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeTraits, normalizeFreq } from "./traits-normalize.mjs";
 // fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
 // checkout under a folder with a space in it resolves to "Perps%20trading" and every
 // read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
@@ -29,6 +30,12 @@ const CRON_OWNED = ["owners.json", "provenance.json", "sales.json", "og.json",
 
 const traits = rd("traits.json");
 const freq = rd("trait_freq.json");
+
+// A missing trait key means "wears nothing here", which is itself a trait. Spell it
+// out so every category sums to the full supply and the Collection filter can find it.
+const added = normalizeTraits(traits.tokens, freq.categories);
+if (Object.keys(added).length) console.log("traits: filled implicit None ->", JSON.stringify(added));
+normalizeFreq(freq.freq, freq.categories, added);
 
 // tokens.json — {id, rr, t} (name derived as "Hypurr #id")
 const tokens = traits.tokens.map(t => ({ id: t.id, rr: t.rarityRank, t: t.traits }));

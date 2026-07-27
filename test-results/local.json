@@ -1,0 +1,3855 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "tests/playwright.config.mjs"
+    ],
+    "configFile": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/playwright.config.mjs",
+    "rootDir": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/test-results/local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/test-results/local.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/test-results/local-html"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.0",
+    "workers": 5,
+    "webServer": {
+      "command": "node \"/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/helpers/serve.mjs\"",
+      "port": 4173,
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "01-pages.spec.mjs",
+      "file": "01-pages.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Landing (/) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4834,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:51.116Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-c8404581dddc09b42c7c",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "The Collection (/collection) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1510,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:51.105Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-5cbf3c851bb9d6ecb8f8",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "The Index (/positioning) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 1991,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:51.115Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-bedc52638d3465c4331a",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "The Desk (/desk) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 1498,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:51.118Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-2ec34206b58b035d99ec",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "The Pride (/pride) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 1460,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:51.113Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-0c388722871a61c34c76",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "Privacy (/privacy) loads clean",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 293,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.112Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-4fcbc7cbcf1540af2e03",
+          "file": "01-pages.spec.mjs",
+          "line": 8,
+          "column": 3
+        },
+        {
+          "title": "passport /cat/1 loads and renders",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 282,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.126Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-c2d874f2127b015ce5e6",
+          "file": "01-pages.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "passport /cat/8 loads and renders",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 281,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.129Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-322523410b09ebd7cdec",
+          "file": "01-pages.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "passport /cat/2300 loads and renders",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 702,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.420Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-71f640ae7a027c06d06f",
+          "file": "01-pages.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "passport /cat/4203 loads and renders",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 685,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.421Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-482f63f4ed80b9c7d753",
+          "file": "01-pages.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "passport /cat/4600 loads and renders",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 285,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.426Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-42016d11d0909b7cf2dd",
+          "file": "01-pages.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "retired routes redirect into The Index",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 975,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.605Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-b93fc28a95cdb43a24eb",
+          "file": "01-pages.spec.mjs",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "unknown URL serves the 404 page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 291,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:56.727Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-e514d09c67d8e977236b",
+          "file": "01-pages.spec.mjs",
+          "line": 66,
+          "column": 1
+        },
+        {
+          "title": "every internal link on every page resolves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/01-pages.spec.mjs",
+                    "line": 73,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3627,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:57.032Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/01-pages.spec.mjs",
+                        "line": 73,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-f87a1ff803dcf306e898",
+          "file": "01-pages.spec.mjs",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "nav marks the current section and reaches every other one",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 1623,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:57.116Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-1b56aa03a41b09e84e8d",
+          "file": "01-pages.spec.mjs",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "cookie consent gates Google Analytics",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 22674,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:57.158Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "08b1563b7069fab3fd67-6f65114353addf9bc502",
+          "file": "01-pages.spec.mjs",
+          "line": 100,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "02-data.spec.mjs",
+      "file": "02-data.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "data files",
+          "file": "02-data.spec.mjs",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "every data file is served and parses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 234,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:57.637Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-846598dde0df0cc8cb7e",
+              "file": "02-data.spec.mjs",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "no PnL, balance or liquidation field anywhere in the data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 220,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:57.890Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-f74351232ae14c1e8d95",
+              "file": "02-data.spec.mjs",
+              "line": 17,
+              "column": 3
+            },
+            {
+              "title": "tokens, owners, rarity and provenance cover all 4,600",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 92,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.168Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-a8973e6664b8ede23fb0",
+              "file": "02-data.spec.mjs",
+              "line": 27,
+              "column": 3
+            },
+            {
+              "title": "positions.json is well-formed and covers the holder set",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 20,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.271Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-141b2f4cece267b73b8d",
+              "file": "02-data.spec.mjs",
+              "line": 74,
+              "column": 3
+            },
+            {
+              "title": "index.json aggregates recompute exactly from positions.json",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 87,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.305Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-011ddbc0a0b6b6fd680a",
+              "file": "02-data.spec.mjs",
+              "line": 109,
+              "column": 3
+            },
+            {
+              "title": "cat_states.json matches each owner net stance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 19,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.406Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-4f41d85449d6d549ef94",
+              "file": "02-data.spec.mjs",
+              "line": 154,
+              "column": 3
+            },
+            {
+              "title": "desk.json rows agree with positions.json",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 51,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.435Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-194d226e5d34ad6720fa",
+              "file": "02-data.spec.mjs",
+              "line": 183,
+              "column": 3
+            },
+            {
+              "title": "og.json (The Pride) recomputes from provenance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 83,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.507Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-19a3be639cebef41982b",
+              "file": "02-data.spec.mjs",
+              "line": 221,
+              "column": 3
+            },
+            {
+              "title": "sales and scatter are consistent and plausible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 22,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.598Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-15b798b88fa361f215bf",
+              "file": "02-data.spec.mjs",
+              "line": 250,
+              "column": 3
+            },
+            {
+              "title": "history and HYPE price series are sane",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 37,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.636Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-93b49da19946d5f034af",
+              "file": "02-data.spec.mjs",
+              "line": 286,
+              "column": 3
+            },
+            {
+              "title": "leaderboards reference real, live wallets",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.686Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-4e48098952b50e3e5db9",
+              "file": "02-data.spec.mjs",
+              "line": 312,
+              "column": 3
+            },
+            {
+              "title": "globe ids are real tokens with cached art",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.702Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-ee037ac8816da2db18ab",
+              "file": "02-data.spec.mjs",
+              "line": 343,
+              "column": 3
+            },
+            {
+              "title": "every data timestamp comes from the same refresh cycle",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 35,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.725Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "64a7cb3c02d1ae05420b-db65daecaeaabb6a50a5",
+              "file": "02-data.spec.mjs",
+              "line": 354,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "03-live-truth.spec.mjs",
+      "file": "03-live-truth.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "live truth",
+          "file": "03-live-truth.spec.mjs",
+          "line": 28,
+          "column": 6,
+          "specs": [
+            {
+              "title": "shipped positions match Hyperliquid clearinghouseState",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 270000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                        "line": 29,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 5126,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "live truth: 11/12 wallets match exactly; drift: 0x023a3d058020fb76cca98f01b3c48c8938a22355 BTC: size 0.43275 vs live 5.84554 | 0x023a3d058020fb76cca98f01b3c48c8938a22355 BTC: notional 28223 vs live 381322\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.761Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                            "line": 29,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd94beb9725a112890f8-f924d93fa61692198613",
+              "file": "03-live-truth.spec.mjs",
+              "line": 31,
+              "column": 3
+            },
+            {
+              "title": "every traded coin exists on Hyperliquid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 270000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                        "line": 29,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 456,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:58.768Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                            "line": 29,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd94beb9725a112890f8-9329894c7b5e4bcd56ee",
+              "file": "03-live-truth.spec.mjs",
+              "line": 87,
+              "column": 3
+            },
+            {
+              "title": "HYPE price series tracks the live mid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 270000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                        "line": 29,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 509,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:59.229Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                            "line": 29,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd94beb9725a112890f8-f50b337f257856b57a93",
+              "file": "03-live-truth.spec.mjs",
+              "line": 97,
+              "column": 3
+            },
+            {
+              "title": "owners.json matches on-chain ownerOf",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 270000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                        "line": 29,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2562,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:59.482Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                            "line": 29,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd94beb9725a112890f8-9673b3c30d45c46ebb5b",
+              "file": "03-live-truth.spec.mjs",
+              "line": 109,
+              "column": 3
+            },
+            {
+              "title": "holder count matches the number of distinct on-chain owners",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 270000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                        "line": 29,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-27T14:17:59.746Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/03-live-truth.spec.mjs",
+                            "line": 29,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd94beb9725a112890f8-0f882703ff8f944b8e24",
+              "file": "03-live-truth.spec.mjs",
+              "line": 130,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "04-interactions.spec.mjs",
+      "file": "04-interactions.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Collection: search, sort, live filter and the detail sheet",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 3463,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:17:59.764Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-b67c73751f59c2560533",
+          "file": "04-interactions.spec.mjs",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "The Desk: rows render, filters and search work",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3869,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:00.678Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-675a1f5e64e87571a364",
+          "file": "04-interactions.spec.mjs",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "The Index: wallet lookup handles a real holder and junk input",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1281,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:02.071Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-079c9a4c8a8e123d5bd3",
+          "file": "04-interactions.spec.mjs",
+          "line": 97,
+          "column": 1
+        },
+        {
+          "title": "The Index: pulse chart and leaderboards render",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 884,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:03.240Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-5925d9a0e171cc8da9cd",
+          "file": "04-interactions.spec.mjs",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "The Pride: tiles, filter and detail sheet",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2869,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:03.373Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-63233b3a5f39d93b5154",
+          "file": "04-interactions.spec.mjs",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "Passport: card canvas composes and the copy action works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 811,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:04.030Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1b55cba05aba30cbe016-00b73805d3f4993d0bd4",
+          "file": "04-interactions.spec.mjs",
+          "line": 165,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "05-mobile.spec.mjs",
+      "file": "05-mobile.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "mobile Landing: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 5532,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:34.024Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-e9f68d88c2c94e1b629c",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile The Collection: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 3048,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:34.014Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-b315c9772c19836bab64",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile The Index: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3021,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:35.375Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-ee1cf6fb5e9365c181b5",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile The Desk: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 2889,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:37.252Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-262b37d69f84629a95ce",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile The Pride: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3162,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:38.521Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-4db74d39010163cbb915",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile Privacy: no horizontal overflow, no errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 2949,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:39.729Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-61674341041894dba486",
+          "file": "05-mobile.spec.mjs",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "mobile: hamburger opens the nav and links close it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 628,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:40.151Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-6982dd817c9229acd86a",
+          "file": "05-mobile.spec.mjs",
+          "line": 39,
+          "column": 1
+        },
+        {
+          "title": "mobile: tap targets are big enough",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/05-mobile.spec.mjs",
+                    "line": 54,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13520,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:41.107Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/05-mobile.spec.mjs",
+                        "line": 54,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-db17c06dce936b288d8a",
+          "file": "05-mobile.spec.mjs",
+          "line": 53,
+          "column": 1
+        },
+        {
+          "title": "mobile: the hero drag spins the field without hijacking scroll",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 6092,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:40.789Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-7d62e810539942e33c33",
+          "file": "05-mobile.spec.mjs",
+          "line": 83,
+          "column": 1
+        },
+        {
+          "title": "mobile: the small atlas is used, not the desktop one",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 6849,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:41.695Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-6167139d54f5bd4f8b59",
+          "file": "05-mobile.spec.mjs",
+          "line": 102,
+          "column": 1
+        },
+        {
+          "title": "mobile: a cat sheet closes on the back gesture",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 832,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:42.692Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "041fc2280c7e6e35f738-561ed616a253d00efd02",
+          "file": "05-mobile.spec.mjs",
+          "line": 111,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "06-a11y.spec.mjs",
+      "file": "06-a11y.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "a11y Landing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 7709,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:04.162Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-e80e1f6ff1eb1766a9f8",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y The Collection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4008,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:04.572Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-9e1ffc0a47c761ee9f51",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y The Index",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 3603,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:04.965Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-d6bde6b978fc5433b83c",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y The Desk",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4317,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:06.358Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-979411569c3f310351dd",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y The Pride",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 8393,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:08.587Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-b7144163199b874361d1",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y Privacy",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2997,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:08.592Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-bdd4b38db0e4baf9beac",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y Passport",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 31,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3264,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:10.686Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 31,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-ed341de2a8c73c266ee2",
+          "file": "06-a11y.spec.mjs",
+          "line": 30,
+          "column": 3
+        },
+        {
+          "title": "a11y: every page has one h1, a lang and a main landmark",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2429,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:11.600Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-3e1a68ede4ab3d459e07",
+          "file": "06-a11y.spec.mjs",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a11y: images carry alt text",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                    "line": 64,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 18380,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:11.898Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/06-a11y.spec.mjs",
+                        "line": 64,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-e381b8bdfed8feca0ee0",
+          "file": "06-a11y.spec.mjs",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "a11y: keyboard can reach and operate the collection grid",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1641,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:13.967Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-9d50a651002702acdc34",
+          "file": "06-a11y.spec.mjs",
+          "line": 78,
+          "column": 1
+        },
+        {
+          "title": "a11y: reduced motion is respected",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 8555,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:14.050Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2ca49673aa5ee85003e5-9d100e6a89f0b058b1b8",
+          "file": "06-a11y.spec.mjs",
+          "line": 104,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "07-perf.spec.mjs",
+      "file": "07-perf.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "perf Landing: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5315,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/: FCP 76ms, LCP 76ms, 3225KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:15.635Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-fe3dd981b4ed6e5136e1",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf The Collection: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 3978,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/collection: FCP 112ms, LCP 112ms, 3073KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:17.014Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-04cb6d278e2abf456cf0",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf The Index: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3824,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/positioning: FCP 204ms, LCP 204ms, 324KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:19.857Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-bc1a4fa332f6618754a9",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf The Desk: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3822,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/desk: FCP 220ms, LCP 220ms, 745KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:20.966Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-de0b5adbb4c219240a9a",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf The Pride: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 4112,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/pride: FCP 72ms, LCP 72ms, 2039KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:21.010Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-6433bc7a3db8658c942d",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf Privacy: LCP and paint budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3699,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "/privacy: FCP 68ms, LCP 68ms, 23KB\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:22.624Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-b4453d68593466ec9982",
+          "file": "07-perf.spec.mjs",
+          "line": 50,
+          "column": 3
+        },
+        {
+          "title": "perf landing: critical path stays under budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 6166,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "landing bytes: {\"document\":35944,\"stylesheet\":6608,\"script\":612806,\"image\":2598896,\"fetch\":48427}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:23.689Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-f38783189e676b496a71",
+          "file": "07-perf.spec.mjs",
+          "line": 59,
+          "column": 1
+        },
+        {
+          "title": "perf: a slow Google Fonts must not hold up first paint",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3329,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:24.798Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-739a96a035f927214af9",
+          "file": "07-perf.spec.mjs",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "perf landing: the hero holds frame rate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "software rasterizer (ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)) — frame rate here is meaningless",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/07-perf.spec.mjs",
+                    "line": 97,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "skipped",
+                  "duration": 3339,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:25.133Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "software rasterizer (ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)) — frame rate here is meaningless",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/07-perf.spec.mjs",
+                        "line": 97,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-ff963068d398c081d2a0",
+          "file": "07-perf.spec.mjs",
+          "line": 87,
+          "column": 1
+        },
+        {
+          "title": "perf: art is lazy-loaded, not 4,600 requests at once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 5986,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "collection requested 65 thumbnails before scrolling\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:26.333Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-bf96eef23bf982fb7f5a",
+          "file": "07-perf.spec.mjs",
+          "line": 109,
+          "column": 1
+        },
+        {
+          "title": "perf: no-WebGL degrades gracefully",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5188,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:28.141Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-501bd6da631081b2d208",
+          "file": "07-perf.spec.mjs",
+          "line": 121,
+          "column": 1
+        },
+        {
+          "title": "perf: assets are served compressed and cacheable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "edge headers only exist in production",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/07-perf.spec.mjs",
+                    "line": 145,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "skipped",
+                  "duration": 27,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:28.492Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "edge headers only exist in production",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/07-perf.spec.mjs",
+                        "line": 145,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "6f5837c72528b17ca00b-c80e9e80106d728cca72",
+          "file": "07-perf.spec.mjs",
+          "line": 144,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "08-seo.spec.mjs",
+      "file": "08-seo.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "seo Landing: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 4836,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:28.549Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-4a8f088e0030bd567ff7",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo The Collection: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 339,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:29.873Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-284c54bfc30fc99e030d",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo The Index: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 820,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:30.223Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-2ac713a674256102e493",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo The Desk: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 1076,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:30.333Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-7d0b1139d583869757fe",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo The Pride: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 1358,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:31.058Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-fb1aa138dc3286163375",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo Privacy: metadata is complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 714,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:31.584Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-5e1f377071dd0bfeb2a9",
+          "file": "08-seo.spec.mjs",
+          "line": 33,
+          "column": 3
+        },
+        {
+          "title": "seo passport /cat/1: unfurl metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 402,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:32.325Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-0e45e340165ecb8ca7f9",
+          "file": "08-seo.spec.mjs",
+          "line": 58,
+          "column": 3
+        },
+        {
+          "title": "seo passport /cat/8: unfurl metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 427,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:32.337Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-1c5318524808ef0bb103",
+          "file": "08-seo.spec.mjs",
+          "line": 58,
+          "column": 3
+        },
+        {
+          "title": "seo passport /cat/2300: unfurl metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 677,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:32.442Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-50fd761829d086f96d71",
+          "file": "08-seo.spec.mjs",
+          "line": 58,
+          "column": 3
+        },
+        {
+          "title": "seo passport /cat/4203: unfurl metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 640,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:32.753Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-b731f3b6fb7e41f901cf",
+          "file": "08-seo.spec.mjs",
+          "line": 58,
+          "column": 3
+        },
+        {
+          "title": "seo passport /cat/4600: unfurl metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 658,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:32.780Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-07c33390998527bb63fb",
+          "file": "08-seo.spec.mjs",
+          "line": 58,
+          "column": 3
+        },
+        {
+          "title": "seo: og images exist and are the right size",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 52,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.197Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-dccf8d0932123dd37195",
+          "file": "08-seo.spec.mjs",
+          "line": 75,
+          "column": 1
+        },
+        {
+          "title": "seo: robots and sitemaps are valid and complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 86,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.277Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-720bffd0c5dcb4cbf5fa",
+          "file": "08-seo.spec.mjs",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "seo: retired routes are noindexed and redirect",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.345Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-78d9bcddb07046caa547",
+          "file": "08-seo.spec.mjs",
+          "line": 128,
+          "column": 1
+        },
+        {
+          "title": "seo: the disclaimer that keeps this unofficial is on every page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/08-seo.spec.mjs",
+                    "line": 139,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7391,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.375Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/08-seo.spec.mjs",
+                        "line": 139,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-7442bb6852763e2f93dc",
+          "file": "08-seo.spec.mjs",
+          "line": 138,
+          "column": 1
+        },
+        {
+          "title": "seo: no PnL language leaks into the rendered pages",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 270000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/08-seo.spec.mjs",
+                    "line": 152,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 18776,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.378Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/08-seo.spec.mjs",
+                        "line": 152,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe937694839d5880f41f-085d77677258f314ab77",
+          "file": "08-seo.spec.mjs",
+          "line": 151,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "09-pipeline.spec.mjs",
+      "file": "09-pipeline.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "workflow file is present and sane",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 6,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.411Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-4ab12b69e0aa42c33594",
+          "file": "09-pipeline.spec.mjs",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "the refresh script still refuses to publish PnL or a degraded snapshot",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 3,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.410Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-8daefaba95b5f7e3e277",
+          "file": "09-pipeline.spec.mjs",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "published data is fresh relative to the cron cadence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 26,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.426Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-9072d6bb1063bef7518c",
+          "file": "09-pipeline.spec.mjs",
+          "line": 31,
+          "column": 1
+        },
+        {
+          "title": "history shows a healthy cadence with no long blackouts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 12,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "refresh cadence — median 94min, worst 287min, worst of last 20 287min, 84 points\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.432Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-c80925b52fb88778be81",
+          "file": "09-pipeline.spec.mjs",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "recent GitHub Actions runs are succeeding",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1338,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "last 20 refresh runs: 20 ok, 0 failed\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.451Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-f517f3095052296d6e89",
+          "file": "09-pipeline.spec.mjs",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "live data matches what the repo last committed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "deploy-freshness check only makes sense against production",
+                  "location": {
+                    "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/09-pipeline.spec.mjs",
+                    "line": 75,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "skipped",
+                  "duration": 9,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-27T14:18:33.467Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "deploy-freshness check only makes sense against production",
+                      "location": {
+                        "file": "/Users/janhetfleis/Documents/Claude/Projects/Perps trading/Hypurr/hypurrterminal/tests/specs/09-pipeline.spec.mjs",
+                        "line": 75,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "2a33b7f71362ce81f5b6-236faa814ab3ff69c490",
+          "file": "09-pipeline.spec.mjs",
+          "line": 74,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-07-27T14:17:50.672Z",
+    "duration": 64074.58500000001,
+    "expected": 93,
+    "skipped": 3,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

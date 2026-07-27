@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:local",
+    "test:local": "TARGET=local playwright test -c tests/playwright.config.mjs",
+    "test:live": "TARGET=live playwright test -c tests/playwright.config.mjs",
+    "test:data": "TARGET=live playwright test -c tests/playwright.config.mjs 02-data 03-live-truth",
+    "test:report": "playwright show-report test-results/local-html",
+    "serve": "node tests/helpers/serve.mjs"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +18,9 @@
     "ethers": "^6.17.0",
     "playwright": "^1.61.1",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "axe-core": "^4.11.2"
   }
 }

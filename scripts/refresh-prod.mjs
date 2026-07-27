@@ -152,8 +152,18 @@ try {
     p.currentOwner = x.to;
     if (kind === "trade") p.trades = (p.trades || 0) + 1;
   }
-  // reconcile currentOwner with the applied ownership map
-  for (const id in prov) { if (owners[id]) prov[id].currentOwner = owners[id]; }
+  // Reconcile currentOwner with the applied ownership map. This used to be silent,
+  // which is how six chains ended up finishing on a wallet that no longer held the
+  // Hypurr: the owner was corrected here while the chain kept its stale tail. Count
+  // the drift instead — the self-heal pass after this block rescans those token ids.
+  let tailDrift = 0;
+  for (const id in prov) {
+    if (!owners[id]) continue;
+    const c = prov[id].chain || [];
+    if (c.length && c[c.length - 1].owner !== owners[id]) tailDrift++;
+    prov[id].currentOwner = owners[id];
+  }
+  if (tailDrift) console.warn(`chain: ${tailDrift} provenance chain(s) do not end on the current owner — a scan window was missed`);
 
   // ---- sales: price the new trade txs (native HYPE, else WHYPE from receipt) ----
   const salesBase = readOut("sales.json") || { byToken: {} };
@@ -217,6 +227,27 @@ try {
   console.log(`chain: scanned ${fromB}->${effHead}, ${xfers.length} transfers applied, ${txHashes.length} trade txs`);
 } catch (e) {
   console.error(`chain refresh failed (keeping last-known ownership @${ownersBlock}):`, e.message);
+}
+
+// ---- self-heal: repair any chain that does not end on its current owner ----
+// Cheap when everything agrees (three file reads and it returns), so it runs every
+// cycle. When it does find drift it rescans only those token ids against an RPC that
+// allows 100k-block windows, then the two views derived from provenance are rebuilt.
+if (!process.env.REPAIR_DISABLE) {
+  try {
+    const { repairProvenance } = await import("./repair-provenance.mjs");
+    const res = await repairProvenance({ root: ROOT });
+    if (res.repaired.length) {
+      const stamp = new Date().toISOString();
+      const provNow = readOut("provenance.json").prov;
+      const salesNow = (readOut("sales.json") || {}).byToken || {};
+      writeScatter(salesNow, stamp);
+      rebuildPride(provNow, stamp);
+      console.log(`chain: rebuilt scatter + pride after repairing ${res.repaired.length} chain(s)`);
+    }
+  } catch (e) {
+    console.error("provenance repair:", e.message);
+  }
 }
 
 // Rarity-vs-price scatter for /positioning: one point per token that has ever sold,
