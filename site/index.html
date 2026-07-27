@@ -128,7 +128,7 @@
     <div class="beat" data-b="3">
       <div class="eyebrow">Right now, on the tape</div>
       <div class="h disp"><span class="live" id="awake2">–</span> awake.<br>The rest are dreaming.</div>
-      <p class="sub">Direction and size only, never PnL. Keep scrolling to explore the terminal.</p>
+      <p class="sub">Direction and size only, never PnL. Many of these books are hedged or delta neutral, so what you see is one leg and not a call. Keep scrolling to explore the terminal.</p>
       <div class="row"><a class="btn" href="/desk">See the live desk →</a></div>
     </div>
 
@@ -152,7 +152,7 @@
 </nav>
 
 <footer class="site"><div class="foot">
-  Direction and size only, never PnL. Unofficial community tool.
+  Direction and size only, never PnL. Many of these books are hedged or delta neutral, so a single leg is not a directional call and nothing here is a signal or advice. Unofficial community tool.
   <div class="lg"><a href="/privacy">Privacy</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a></div>
 </div></footer>
 
@@ -170,9 +170,15 @@
   ]);
   const bw = IX.byWallet;
   const leanPct = Math.round(bw.netLong / Math.max(1, bw.netLong + bw.netShort) * 100);
-  document.getElementById('awake').textContent = IX.holdersWithPosition;
-  document.getElementById('leanpct').textContent = leanPct + '%';
   const states = CS.states || '';
+  // Every particle on this page is one Hypurr, so the number beside them has to count
+  // Hypurrs. It used to show holdersWithPosition, a count of WALLETS, which reads as
+  // roughly a third of the truth because one wallet often holds several Hypurrs.
+  // cat_states carries one byte per token: 1 net long, 2 net short.
+  const fromStates = states ? (states.match(/[12]/g) || []).length : 0;
+  const awakeTokens = fromStates || (IX.awakeTokens != null ? IX.awakeTokens : IX.holdersWithPosition);
+  document.getElementById('awake').textContent = awakeTokens.toLocaleString();
+  document.getElementById('leanpct').textContent = leanPct + '%';
 
   // weather: warm when long, cool when short
   const warm = Math.max(0, Math.min(1, (leanPct - 40) / 30));
@@ -181,14 +187,18 @@
   else { root.setProperty('--wA','var(--cool1)'); root.setProperty('--wB','var(--cool2)'); }
   const wpill = document.getElementById('wpill');
   wpill.classList.toggle('warm', warm > 0.5);
+  // The lean is one vote per holder wallet, not size weighted, and the pill says so.
+  // Without that, a pill reading "leaning long" looks like a claim about exposure.
   const wLabel = warm > 0.66 ? 'ember · leaning long' : warm > 0.4 ? 'dusk · balanced' : 'moonlit · leaning short';
-  document.getElementById('wtxt').textContent = (innerWidth < 620 ? '' : 'den weather: ') + wLabel;
+  document.getElementById('wtxt').textContent = (innerWidth < 620 ? '' : 'den weather: ') + wLabel + (innerWidth < 620 ? '' : ' by wallet');
 
   // ---------- particle selection ----------
   const N_ALL = META.n, COLS = META.cols;
   const ids = [];                                  // token indices (0-based)
   const awakeIdx = [], flatIdx = [];
-  for (let i = 0; i < N_ALL; i++) (states[i] && states[i] !== '0' ? awakeIdx : flatIdx).push(i);
+  // Only 1 and 2 are awake. State 3 means the owner's wallet could not be read this
+  // cycle, which is not the same as a live book and must not glow like one.
+  for (let i = 0; i < N_ALL; i++) (states[i] === '1' || states[i] === '2' ? awakeIdx : flatIdx).push(i);
   const BUDGET = mobile ? 2400 : N_ALL;
   const need = Math.max(0, BUDGET - awakeIdx.length);
   const step = flatIdx.length / Math.max(1, need);
@@ -454,8 +464,8 @@
   const beats=[...document.querySelectorAll('.beat')];
   const dots=[...document.querySelectorAll('#prog i')];
   const cue=document.getElementById('cue');
-  document.getElementById('awake2').textContent=IX.holdersWithPosition;
-  document.getElementById('leansub').textContent=`${bw.netLong} holders lean long, ${bw.netShort} lean short. The columns you're watching are the Hypurrs themselves.`;
+  document.getElementById('awake2').textContent=awakeTokens.toLocaleString();
+  document.getElementById('leansub').textContent=`${bw.netLong.toLocaleString()} holder wallets lean long, ${bw.netShort.toLocaleString()} lean short, counted one vote per wallet rather than by size. Plenty of those books are hedged or delta neutral, so a lean is a snapshot and not a signal.`;
   function onScroll(){
     const r=story.getBoundingClientRect();
     const total=r.height-innerHeight;

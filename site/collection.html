@@ -55,6 +55,7 @@
   .side.long{background:var(--long-soft);color:var(--long)}
   .side.short{background:var(--short-soft);color:var(--short)}
   .flat{margin-top:7px;font-weight:600;font-size:12px;color:var(--faint)}
+  .flat.unk{color:var(--gold);opacity:.75}
   #sentinel{height:1px}
   .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.66);backdrop-filter:blur(5px)}
   .modal.open{display:flex}
@@ -90,6 +91,10 @@
   .tl-line{position:absolute;top:13px;left:0;right:0;height:3px;border-radius:2px;background:var(--line2)}
   .tl-dot{position:absolute;top:6px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2.5px solid var(--panel);box-shadow:0 2px 6px rgba(0,0,0,.5);cursor:pointer}
   .tl-dot.mint{background:var(--faint)} .tl-dot.airdrop{background:var(--mint)} .tl-dot.trade{background:var(--coral)}
+  /* 14px is far under a thumb, so on touch each dot carries an invisible larger hit area.
+     Dots that sit close together will still overlap: the full list underneath is the
+     reliable way to read a busy chain, the dots are the quick glance. */
+  @media (pointer:coarse){ .tl-dot::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%} }
   .tl-axis{display:flex;justify-content:space-between;font-weight:700;font-size:11px;color:var(--faint);margin:2px 2px 0}
   .tl-leg{display:flex;gap:14px;margin:10px 2px 2px;font-weight:600;font-size:11.5px;color:var(--dim)}
   .tl-leg i{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
@@ -140,16 +145,16 @@
     <div class="stats">
       <div class="stat"><b id="s-supply">4,600</b><span>Hypurrs</span></div>
       <div class="stat"><b id="s-holders">–</b><span>unique holders</span></div>
-      <div class="stat live"><b id="s-live">–</b><span>holding a live position</span></div>
+      <div class="stat live"><b id="s-live">–</b><span id="s-live-lab">holding a live position</span></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
   <div class="controls">
-    <label class="field qfield">⌕ <input id="q" placeholder="# id or 0x wallet"></label>
+    <label class="field qfield">⌕ <input id="q" aria-label="Search by Hypurr id or wallet" placeholder="# id or 0x wallet"></label>
     <label class="field">Trait <select id="cat"><option value="">any</option></select></label>
-    <label class="field"><select id="val"><option value="">any value</option></select></label>
+    <label class="field"><select id="val" aria-label="Trait value"><option value="">any value</option></select></label>
     <button class="btn live" id="onlyLive">only trading</button>
     <label class="field">sort <select id="sortSel"><option value="rare">rarest first</option><option value="id">mint order</option></select></label>
     <button class="btn" id="dense">large view</button>
@@ -172,12 +177,20 @@
 
 <script>
 (async function(){
-  const [TOK, FREQ, OWN, POS, PROVRAW, SALES] = await Promise.all([
-    HT.json('/data/tokens.json'), HT.json('/data/rarity.json'), HT.json('/data/owners.json'),
-    HT.json('/data/positions.json',true), HT.json('/data/provenance.json'), HT.json('/data/sales.json')
+  // tokens.json and rarity.json are built once and never touched by the cron, so they
+  // ride the normal cache. Everything the cron rewrites is fetched with no-cache, or a
+  // visitor keeps seeing a stale snapshot for as long as the CDN holds the old copy.
+  // Only the grid's own data is on the critical path here; the 2.1 MB provenance file
+  // and the sales file are pulled later, on the first Hypurr you open.
+  const [TOK, FREQ, OWN, POS] = await Promise.all([
+    HT.json('/data/tokens.json'),
+    HT.json('/data/rarity.json').catch(()=>({freq:{},total:1,categories:[]})),
+    HT.json('/data/owners.json',true),
+    HT.json('/data/positions.json',true).catch(()=>null)
   ]);
-  const PROV = { nowTs: PROVRAW.nowTs, byId: PROVRAW.prov };
-  const positions = POS.wallets;
+  // A failed positions fetch is not a den full of flat wallets. Say so once, at the top.
+  const posOK = !!(POS && POS.wallets);
+  const positions = posOK ? POS.wallets : {};
   const esc=HT.esc, short=HT.short, money=HT.money, fmtD=HT.fmtD, img=HT.img;
   // join: build TOKENS with owner + mapped positions
   const TOKENS = TOK.tokens.map(t=>{
@@ -186,7 +199,10 @@
     const ps = (w && w.positions ? w.positions : []).slice()
       .sort((a,b)=>b.notionalUsd-a.notionalUsd)
       .map(p=>({coin:p.coin, dir:p.direction, lev:p.leverage&&p.leverage.value, notionalUsd:p.notionalUsd}));
-    return { id:t.id, name:"Hypurr #"+t.id, rarityRank:t.rr, traits:t.t, owner, positions:ps };
+    // A wallet the sweep could not read is not a flat wallet. It is marked so the card,
+    // the modal and the counters can say "not readable" instead of inventing a stance.
+    const unread = !posOK || !!(owner && (!w || w.error));
+    return { id:t.id, name:"Hypurr #"+t.id, rarityRank:t.rr, traits:t.t, owner, positions:ps, unread };
   });
   const rarityPct = (cat,val)=>{ const c=FREQ.freq&&FREQ.freq[cat]&&FREQ.freq[cat][val]; return c?((c/FREQ.total)*100):null; };
   document.getElementById('board').style.display='none';
@@ -194,8 +210,14 @@
   // stats
   const holders = new Set(Object.values(OWN)).size;
   const liveHolders = Object.values(positions).filter(w=>w.hasPosition).length;
+  // Wallets the sweep could not read this cycle are not evidence of a flat book, so they
+  // are named next to the count rather than folded silently into the remainder.
+  const unreadHolders = Object.values(positions).filter(w=>w.error).length;
   document.getElementById('s-holders').textContent = HT.num(holders);
-  document.getElementById('s-live').textContent = HT.num(liveHolders);
+  document.getElementById('s-live').textContent = posOK ? HT.num(liveHolders) : '–';
+  if(!posOK) document.getElementById('s-live-lab').textContent = 'live positions unavailable right now';
+  else if(unreadHolders) document.getElementById('s-live-lab').textContent =
+    'holding a live position · '+HT.num(unreadHolders)+' wallets unreadable';
 
   let state={ onlyLive:false, sortRare:true, cat:"", val:"" };
   const catSel=document.getElementById('cat'), valSel=document.getElementById('val');
@@ -217,7 +239,12 @@
     history.replaceState(null,'','/collection');
     render();
   };
-  const topPos=t=>t.positions&&t.positions.length?t.positions[0]:null;
+  // One dust threshold for the whole page. The modal filtered at $10 and the card did
+  // not, so a wallet whose only leg was $4 got a green "trading" badge and a coin line on
+  // the card, then a modal headed "Sitting flat". Same rule everywhere now.
+  const DUST=10;
+  const livePos=t=>(t.positions||[]).filter(p=>p.notionalUsd>=DUST);
+  const topPos=t=>livePos(t)[0]||null;
   // digits = id prefix ("40" → #40, #400–409…), anything else = wallet match
   function matchQ(q,id,owner){ if(/^\d+$/.test(q)) return String(id).startsWith(q);
     return (owner||'').toLowerCase().includes(q.toLowerCase()); }
@@ -225,7 +252,7 @@
     const q=document.getElementById('q').value.trim();
     let list=TOKENS.slice();
     if(q) list=list.filter(t=>matchQ(q,t.id,t.owner));
-    if(state.onlyLive) list=list.filter(t=>t.positions&&t.positions.length);
+    if(state.onlyLive) list=list.filter(t=>livePos(t).length);
     if(state.cat&&state.val) list=list.filter(t=>t.traits[state.cat]===state.val);
     list.sort((a,b)=> state.sortRare ? a.rarityRank-b.rarityRank : a.id-b.id);
     if(/^\d+$/.test(q)){ const ix=list.findIndex(t=>t.id===+q); if(ix>0){ const t=list.splice(ix,1)[0]; list.unshift(t); } }
@@ -235,9 +262,13 @@
   function cardHTML(t){
     const p=topPos(t);
     const trading=p?`<div class="trading"><span class="dot pulse"></span>trading</div>`:"";
-    const posline=p?`<div class="pos-mini"><span class="side ${p.dir}">${p.lev?p.lev+"x ":""}${p.dir}</span> ${esc(p.coin)}</div>`:`<div class="flat">sitting flat</div>`;
-    return `<div class="cat" onclick="openCat(${t.id})">
-      <div class="thumb"><span class="rank">#${t.rarityRank}</span>${trading}
+    const posline=p?`<div class="pos-mini"><span class="side ${p.dir}">${p.lev?p.lev+"x ":""}${p.dir}</span> ${esc(p.coin)}</div>`
+      :t.unread?`<div class="flat unk">wallet not readable</div>`:`<div class="flat">sitting flat</div>`;
+    // A div with an onclick is unreachable without a mouse, and the modal is the only
+    // route to a Hypurr's detail from this page. role + tabindex put it in the tab order;
+    // the Enter/Space handler is delegated on the grid.
+    return `<div class="cat" role="button" tabindex="0" aria-label="${esc(t.name)}, rank ${t.rarityRank}" onclick="openCat(${t.id})">
+      <div class="thumb"><span class="rank">rank #${t.rarityRank}</span>${trading}
         <img loading="lazy" src="${img(t.id)}" alt="${esc(t.name)}"></div>
       <div class="meta"><div class="nm">${esc(t.name)}</div>${posline}</div></div>`;
   }
@@ -257,23 +288,46 @@
   }
   const io=new IntersectionObserver(es=>{ if(es[0].isIntersecting) more(); }, {rootMargin:"800px"});
   io.observe(document.getElementById('sentinel'));
+  HT.keyActivate(grid,'.cat');
 
+  // ---- history + sales: fetched on demand ----
+  // provenance.json is 2.1 MB and sales.json another 240 KB, and the grid uses neither.
+  // They load once, the first time somebody reaches for a Hypurr, and the fetch is warmed
+  // by the first hover or touch on the grid so the modal is usually filled before it opens.
+  let PROV=null, SALES=null, detailP=null;
+  function loadDetail(){
+    if(!detailP) detailP=Promise.all([
+      HT.json('/data/provenance.json',true).catch(()=>null),
+      HT.json('/data/sales.json',true).catch(()=>null)
+    ]).then(function(r){
+      PROV = r[0] ? { nowTs:r[0].nowTs, byId:r[0].prov } : null;
+      SALES = r[1];
+    });
+    return detailP;
+  }
+  const warm=()=>{ loadDetail(); grid.removeEventListener('pointerover',warm); grid.removeEventListener('touchstart',warm); };
+  grid.addEventListener('pointerover',warm,{once:true});
+  grid.addEventListener('touchstart',warm,{once:true,passive:true});
+
+  let openId=0;
   window.openCat=function(id){
     const t=TOKENS.find(x=>x.id===id); if(!t)return;
-    const ps=(t.positions||[]).filter(p=>p.notionalUsd>=10);   // dust legs render as "$0", hide them
+    const ps=livePos(t);   // dust legs render as "$0", hide them (same rule as the card)
     const panel=ps.length?`
       <div class="panel"><h3>What ${esc(t.name)}'s human is trading</h3>
         ${ps.map(p=>`<div class="prow"><span class="coin">${esc(p.coin)}</span>
           <span class="side ${p.dir}">${p.dir}</span><span class="lev">${p.lev?p.lev+"x":""}</span>
           <span class="ntl">${money(p.notionalUsd)}</span></div>`).join("")}
         <div class="pnote">Could be one leg of a hedge or delta-neutral book, not a directional call or a copy-trade signal.</div>
-      </div>`:`<div class="panel"><h3>Sitting flat</h3>
+      </div>`:t.unread?`<div class="panel"><h3>Wallet not readable</h3>
+        <div style="font-weight:500;color:var(--dim)">The owner's wallet did not answer on the last sweep, so there is nothing to report either way. It should be back on the next cycle.</div></div>`
+      :`<div class="panel"><h3>Sitting flat</h3>
         <div style="font-weight:500;color:var(--dim)">This Hypurr's human has no open positions right now.</div></div>`;
     const traits=Object.entries(t.traits).map(([k,v])=>{ const pct=rarityPct(k,v);
       return `<div class="trait"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>
         ${pct!=null?`<div class="rr">${pct<1?pct.toFixed(1):Math.round(pct)}% have this</div>`:""}</div>`; }).join("");
     document.getElementById('sheet').innerHTML=`
-      <button class="x" onclick="closeM()">×</button>
+      <button class="x" onclick="closeM()" aria-label="Close">×</button>
       <div class="top">
         <div class="art"><img src="${img(t.id)}" alt="${esc(t.name)}"></div>
         <div class="side-pad">
@@ -283,18 +337,28 @@
         </div>
       </div>
       <div class="traits"><h3>traits</h3><div class="tgrid">${traits}</div></div>
-      <h3 class="tl-head">ownership history</h3>
-      ${timelineHTML(t.id)}
-      ${valueChartHTML(t.id)}`;
+      <div id="detail"><h3 class="tl-head">ownership history</h3>
+        <div class="tl-stat" style="padding:0 24px">loading history…</div></div>`;
+    openId=id;
+    loadDetail().then(function(){
+      if(openId!==id) return;               // they already moved on to another Hypurr
+      const d=document.getElementById('detail'); if(!d) return;
+      d.innerHTML='<h3 class="tl-head">ownership history</h3>'+timelineHTML(t.id)+valueChartHTML(t.id);
+      spreadDots(d);
+    });
     document.getElementById('modal').classList.add('open');
+    sheetEl.setAttribute('aria-label',t.name);
     back.onOpen();
+    fm.onOpen();
   };
-  const modalEl=document.getElementById('modal');
-  const back=HT.backClose(modalEl, function(){ modalEl.classList.remove('open'); });
+  const modalEl=document.getElementById('modal'), sheetEl=document.getElementById('sheet');
+  const fm=HT.focusModal(modalEl, sheetEl, 'Hypurr detail');
+  const back=HT.backClose(modalEl, function(){ modalEl.classList.remove('open'); fm.onClose(); });
   window.closeM=function(){ back.close(); };
   modalEl.onclick=e=>{ if(e.target.id==='modal') back.close(); };
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') back.close(); });
   function timelineHTML(id){
+    if(!PROV) return '<div class="tl-stat" style="padding:0 24px">Transfer history could not be loaded right now.</div>';
     const P=PROV.byId?PROV.byId[id]:null;
     if(!P) return '<div class="tl-stat" style="padding:0 24px">No transfer history for this Hypurr.</div>';
     const now=PROV.nowTs, start=P.chain[0].ts, span=Math.max(1, now-start);
@@ -303,8 +367,36 @@
     return `<div class="tl"><div class="tl-stat">traded <b>${P.trades}</b> ${P.trades===1?'time':'times'} · airdropped ${fmtD(P.airdropTs||start)} · now <code>${short(P.currentOwner)}</code></div>
       <div class="tl-track"><span class="tl-line"></span>${dots}</div>
       <div class="tl-axis"><span>${fmtD(start)}</span><span>today</span></div>
-      <div class="tl-leg"><span><i style="background:var(--mint)"></i>airdrop</span><span><i style="background:var(--coral)"></i>trade</span></div>
+      <div class="tl-leg"><span><i style="background:var(--faint)"></i>mint</span><span><i style="background:var(--mint)"></i>airdrop</span><span><i style="background:var(--coral)"></i>trade</span></div>
       <div class="tl-list">${list}</div></div>`;
+  }
+  // Every Hypurr was minted and airdropped within about two hours of each other, and the
+  // track runs from the mint to today, so those two dots land on the same pixel and the
+  // mint one vanishes completely underneath the airdrop one. Nothing about the dates is
+  // changed here: the dots keep their true position and are only nudged apart in pixels
+  // when they would otherwise cover each other, so every event stays visible and tappable.
+  // The list under the track remains the exact record.
+  function spreadDots(root){
+    const track=root.querySelector('.tl-track'); if(!track) return;
+    const w=track.getBoundingClientRect().width; if(!w) return;
+    const dots=[].slice.call(track.querySelectorAll('.tl-dot'));
+    // On a touch screen each dot carries a 34px invisible hit area, so 34px is the gap
+    // that actually makes a dot tappable; with a mouse the 15px dot itself is the target.
+    // A chain with dozens of trades cannot give every dot a thumb-sized gap without
+    // running off the end of the track, so those fall back to keeping the dots merely
+    // visible and the list underneath stays the reliable way to read a busy chain.
+    const coarse=!!(window.matchMedia && matchMedia('(pointer:coarse)').matches);
+    const HIT=coarse?34:15;
+    const MIN=(dots.length-1)*HIT<=w ? HIT : 15;
+    let prev=-1e9;
+    dots.forEach(function(d){
+      const x=Math.max(parseFloat(d.style.left)/100*w, prev+MIN);
+      prev=x; d.style.left=x+'px';
+    });
+    // A long run of same-day trades can push the last dot past the end of the track;
+    // slide the whole run back so it stays inside, clamped so nothing goes negative.
+    const over=prev-w;
+    if(over>0) dots.forEach(function(d){ d.style.left=Math.max(0,parseFloat(d.style.left)-over)+'px'; });
   }
   function valueChartHTML(id){
     const s=SALES&&SALES.byToken?SALES.byToken[id]:null;
@@ -313,15 +405,38 @@
     const W=300,H=120,pad=10, t0=s[0].ts, t1=Math.max(s[s.length-1].ts,t0+1), tspan=t1-t0, pmin=lo, pspan=Math.max(1,hi-lo);
     const pts=s.map(x=>[pad+((x.ts-t0)/tspan)*(W-2*pad), H-pad-((x.price-pmin)/pspan)*(H-2*pad), x]);
     const poly=pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
-    const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="var(--grape)" stroke="var(--panel)" stroke-width="1.5" data-t="${p[2].price} HYPE · ${fmtD(p[2].ts)}"/>`).join("");
+    const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="var(--grape)" stroke="var(--panel)" stroke-width="1.5"/>`).join("");
+    // A 4px point is nowhere near a thumb-sized target, so the label lives on an
+    // invisible circle drawn over each one. fill="transparent" still takes the tap;
+    // fill="none" would not.
+    const hits=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="11" fill="transparent" data-t="${p[2].price} HYPE · ${fmtD(p[2].ts)}"/>`).join("");
     return `<h3 class="tl-head">sale price (HYPE)</h3>
       <div class="vc"><div class="vc-stat">last sale <b>${last.price} HYPE</b> · ${s.length} sale${s.length>1?'s':''} · high ${hi} · avg ${avg}</div>
-      <svg viewBox="0 0 ${W} ${H}" class="vc-svg" preserveAspectRatio="none"><polyline points="${poly}" fill="none" stroke="var(--grape)" stroke-width="2.5"/>${dots}</svg>
+      <svg viewBox="0 0 ${W} ${H}" class="vc-svg" preserveAspectRatio="none"><polyline points="${poly}" fill="none" stroke="var(--grape)" stroke-width="2.5"/>${dots}${hits}</svg>
       <div class="vc-axis"><span>${fmtD(t0)}</span><span>${fmtD(s[s.length-1].ts)}</span></div></div>`;
   }
+  // Tooltips for mouse and for touch. Hovering does not exist on a phone, so every date,
+  // owner and sale price behind a [data-t] used to be unreachable there. A tap now shows
+  // the label and it clears on the next tap elsewhere or after a few seconds.
   const tt=document.getElementById('tt');
-  document.addEventListener('mousemove',e=>{const el=e.target.closest('[data-t]');if(el){tt.textContent=el.getAttribute('data-t');tt.style.opacity=1;tt.style.left=Math.min(e.clientX+12,innerWidth-220)+'px';tt.style.top=(e.clientY+14)+'px';}else tt.style.opacity=0;});
-  document.getElementById('note').textContent="Live: all 4,600 Hypurrs with their owners' current Hyperliquid positions, refreshed on a rolling ~15 minute cycle. No PnL shown anywhere by design. Positions can be delta-neutral or hedged legs, not signals or financial advice.";
+  let ttT=0;
+  function showTT(el,x,y){
+    clearTimeout(ttT);
+    tt.textContent=el.getAttribute('data-t');
+    tt.style.opacity=1;
+    tt.style.left=Math.min(Math.max(8,x+12),innerWidth-220)+'px';
+    tt.style.top=(y+14)+'px';
+  }
+  function hideTT(){ clearTimeout(ttT); tt.style.opacity=0; }
+  document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-t]');
+    if(el) showTT(el,e.clientX,e.clientY); else hideTT();});
+  document.addEventListener('touchstart',e=>{
+    const t=e.touches[0]; if(!t) return;
+    const el=e.target.closest&&e.target.closest('[data-t]');
+    if(el){ showTT(el,t.clientX,t.clientY); ttT=setTimeout(function(){tt.style.opacity=0;},2800); }
+    else hideTT();
+  },{passive:true});
+  document.getElementById('note').textContent="Live: all 4,600 Hypurrs with their owners' current Hyperliquid positions, refreshed on a rolling cycle through the day. No PnL shown anywhere by design. Positions can be delta-neutral or hedged legs, not signals or financial advice.";
   render();
 })().catch(e=>{document.getElementById('board').textContent='could not load data';console.error(e);});
 </script>

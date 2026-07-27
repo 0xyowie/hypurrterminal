@@ -32,7 +32,9 @@
   .rows{margin:14px 0 20px;display:flex;flex-direction:column;gap:10px}
   .row{display:grid;grid-template-columns:56px 156px 1fr 120px;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:11px 15px;transition:border-color .2s var(--ease)}
   .row:hover{border-color:var(--line2)}
-  .row .th{width:56px;height:56px;border-radius:11px;overflow:hidden;background:var(--panel2)}
+  /* Sized by the grid column, not by a fixed 56px, so the thumbnail cannot overhang
+     the 48px column the mobile layout gives it. */
+  .row .th{width:100%;aspect-ratio:1/1;border-radius:11px;overflow:hidden;background:var(--panel2)}
   .row .th img{width:100%;height:100%;object-fit:cover;display:block}
   .who .nm{font-family:'Bricolage Grotesque';font-weight:600;font-size:15px}
   .who .rk{font-weight:700;font-size:11px;color:var(--mint);margin-top:1px}
@@ -49,7 +51,10 @@
   .count{font-weight:600;font-size:12.5px;color:var(--faint);margin:0 2px 8px}
   .qnote{background:var(--panel);border:1px dashed var(--line2);border-radius:13px;padding:11px 15px;font-weight:600;font-size:13px;color:var(--dim)}
   .qnote a{color:var(--mint);font-weight:700}
-  @media(max-width:720px){.row{grid-template-columns:48px 1fr;gap:10px}.row .tot,.row .who .ow{grid-column:2}.ppills{grid-column:1/-1}}
+  /* .ow was listed here too, but it is a child of .who and not a grid item, so the rule
+     never did anything. Only .tot actually needs placing on the narrow layout, and there
+     it reads better left aligned under the name than pushed to the far edge. */
+  @media(max-width:720px){.row{grid-template-columns:48px 1fr;gap:10px}.row .tot{grid-column:2;text-align:left}.ppills{grid-column:1/-1}}
 </style></head>
 <body data-page="desk">
 <header class="site"><div class="bar">
@@ -67,9 +72,9 @@
   <div class="lead"><span class="dot"></span><span id="lead">loading…</span></div>
   <div class="deskcaveat">Heads up: many of these holders run delta-neutral, hedged or market-making books. What you see is one leg, not a directional call and not a copy-trade signal. Nothing here is financial advice.</div>
   <div class="controls">
-    <label class="field">⌕ <input id="q" placeholder="# id or 0x wallet" style="width:140px"></label>
+    <label class="field">⌕ <input id="q" aria-label="Search by Hypurr id or wallet" placeholder="# id or 0x wallet" style="width:140px"></label>
     <label class="field">coin <select id="coin"><option value="">any</option></select></label>
-    <label class="field">stance <select id="stance"><option value="">any</option><option value="long">net long</option><option value="short">net short</option></select></label>
+    <label class="field">stance <select id="stance"><option value="">any</option><option value="long">net long</option><option value="short">net short</option><option value="flat">balanced book</option></select></label>
     <label class="field">sort <select id="sortSel"><option value="big">biggest book</option><option value="markets">most markets</option><option value="cats">most Hypurrs held</option></select></label>
     <span class="legend"><span class="swatch" style="background:var(--long)"></span>long<span class="swatch" style="background:var(--short)"></span>short</span>
   </div>
@@ -85,7 +90,10 @@
   const D = await HT.json('/data/desk.json',true);
   const esc=HT.esc, short=HT.short, money=HT.money;
   let sortBy="big", coin="", stance="";
-  const coins=[...new Set(D.rows.flatMap(r=>r.positions.map(p=>p.coin)))].sort();
+  // r.positions is truncated to the twelve biggest for payload weight, so it is not a
+  // reliable list of what a wallet trades. r.coins carries every market on the book.
+  const coinsOf=r=> r.coins && r.coins.length ? r.coins : r.positions.map(p=>p.coin);
+  const coins=[...new Set(D.rows.flatMap(coinsOf))].sort();
   const cs=document.getElementById('coin'); coins.forEach(c=>cs.insertAdjacentHTML('beforeend',`<option>${esc(c)}</option>`));
   cs.onchange=()=>{coin=cs.value;render()};
   document.getElementById('stance').onchange=e=>{stance=e.target.value;render()};
@@ -93,14 +101,22 @@
   document.getElementById('q').oninput=render;
   const netOf=r=> r.netNotional!==undefined ? r.netNotional
     : r.positions.reduce((s,p)=>s+(p.direction==="long"?1:-1)*p.notionalUsd,0);
+  // Within 2% of flat counts as balanced. An exact zero is rare; a book that is 99.8%
+  // hedged is not meaningfully "net long" because of the rounding on one leg.
+  const isFlat=r=> Math.abs(netOf(r)) <= 0.02*Math.max(1,r.totalNotional||0);
   function matchQ(q,id,owner){ if(/^\d+$/.test(q)) return String(id).startsWith(q);
     return (owner||'').toLowerCase().includes(q.toLowerCase()); }
-  document.getElementById('lead').textContent=D.holdersWithPosition.toLocaleString()+" Hypurr holders have an open position. Here are the biggest.";
+  document.getElementById('lead').textContent=D.holdersWithPosition.toLocaleString()+" Hypurr holders have an open position"+(D.holdersTotal?" out of "+D.holdersTotal.toLocaleString()+" holder wallets":"")+". Here are the biggest.";
   function render(){
     const q=document.getElementById('q').value.trim();
     let rows=D.rows.slice();
-    if(coin) rows=rows.filter(r=>r.positions.some(p=>p.coin===coin));
-    if(stance) rows=rows.filter(r=> stance==="long" ? netOf(r)>0 : netOf(r)<0);
+    if(coin) rows=rows.filter(r=>coinsOf(r).includes(coin));
+    // A hedged book nets to roughly zero. Under a strict >0 / <0 test it fell out of
+    // both filters and was reachable only through "any", which is the wrong answer for
+    // a page whose own caveat says most of these wallets run delta neutral.
+    if(stance==="long") rows=rows.filter(r=>!isFlat(r)&&netOf(r)>0);
+    else if(stance==="short") rows=rows.filter(r=>!isFlat(r)&&netOf(r)<0);
+    else if(stance==="flat") rows=rows.filter(isFlat);
     if(q) rows=rows.filter(r=>matchQ(q,r.id,r.owner));
     rows.sort(sortBy==="markets" ? (a,b)=>(b.posCount||b.positions.length)-(a.posCount||a.positions.length)||b.totalNotional-a.totalNotional
             : sortBy==="cats"    ? (a,b)=>(b.heldCount||0)-(a.heldCount||0)||b.totalNotional-a.totalNotional
@@ -113,7 +129,10 @@
     }
     document.getElementById('count').textContent=rows.length+" holders";
     document.getElementById('rows').innerHTML=qn+rows.map(r=>{
-      const pills=r.positions.slice(0,5).map(p=>`<span class="pp"><span class="cn">${esc(p.coin)}</span>
+      // With a coin selected, show that market first. Otherwise a wallet can match the
+      // filter and display five pills that do not mention the coin you filtered on.
+      const shown=coin ? r.positions.slice().sort((a,b)=>(b.coin===coin)-(a.coin===coin)) : r.positions;
+      const pills=shown.slice(0,5).map(p=>`<span class="pp"><span class="cn">${esc(p.coin)}</span>
         <span class="sd ${p.direction}">${p.leverage?p.leverage.value+"x ":""}${p.direction}</span>
         <span class="nt">${money(p.notionalUsd)}</span></span>`).join("");
       const more=(r.posCount||r.positions.length)-5;
@@ -128,7 +147,10 @@
       </div>`;
     }).join("");
   }
-  document.getElementById('note').textContent="The biggest trading holders from a full sweep of all 3,423 wallets, refreshed on a rolling cycle through the day. Each row is a holder's Hypurr and the positions on that wallet. Direction and size only, never PnL.";
+  // Wallet count comes from the sweep itself. It was hardcoded at 3,423 and drifted
+  // every time a Hypurr moved to a new wallet.
+  const swept=D.holdersTotal ? D.holdersTotal.toLocaleString()+" holder wallets" : "every holder wallet";
+  document.getElementById('note').textContent=`The biggest trading holders from a full sweep of ${swept}, refreshed on a rolling cycle through the day. Each row is a holder's Hypurr and the positions on that wallet. Direction and size only, never PnL.`;
   render();
 })().catch(e=>{document.getElementById('lead').textContent='could not load data';console.error(e);});
 </script>

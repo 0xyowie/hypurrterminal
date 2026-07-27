@@ -16,6 +16,11 @@
 <style>
   .wrap{max-width:760px}
   a.link{color:var(--mint)} a.link:hover{text-decoration:underline}
+  /* The consent control is an action, not a destination, so it is a real button. As an
+     <a> with no href it took no keyboard focus and showed a text cursor, which is a poor
+     look for the one control that withdraws analytics consent. */
+  button.link{background:none;border:0;padding:0;font:inherit;color:var(--mint);cursor:pointer}
+  button.link:hover{text-decoration:underline}
   .kicker{color:var(--mint)}
   h1{font-family:'Bricolage Grotesque';font-size:clamp(34px,5vw,52px);line-height:1;font-weight:700;letter-spacing:-.03em;margin:10px 0 0}
   .updated{color:var(--faint);font-size:13px;margin:14px 0 0;font-weight:500}
@@ -51,7 +56,7 @@
 
   <h2>Cookies &amp; local storage</h2>
   <p>By default, the only thing stored in your browser is a <b>single preference</b> recording your choice on the cookie notice, so it does not reappear every visit. It lives in local storage, never leaves your device, and is not a tracking cookie.</p>
-  <p>If you press <b>Accept</b> on the cookie notice, we additionally load <b>Google Analytics 4</b> (measurement ID G-N4VNS4KXWH). It sets first-party cookies (typically <code>_ga</code> and <code>_ga_&lt;id&gt;</code>) and reports pseudonymous data to Google: pages viewed, approximate region, and device/browser type, so we can see how the terminal is used. Analytics load only after consent (we use Google Consent Mode, defaulting analytics storage to <i>denied</i>); if you press <b>Decline</b>, Google Analytics is never loaded and no analytics cookies are set. Our lawful basis for analytics is your <b>consent</b>, which you can withdraw at any time by <a class="link" onclick="HTConsent.manage()">reopening the cookie choice</a>, by clearing this site's storage, or by installing Google's <a class="link" href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Analytics opt-out add-on</a>. Google's own handling of this data is governed by the <a class="link" href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+  <p>If you press <b>Accept</b> on the cookie notice, we additionally load <b>Google Analytics 4</b> (measurement ID G-N4VNS4KXWH). It sets first-party cookies (typically <code>_ga</code> and <code>_ga_&lt;id&gt;</code>) and reports pseudonymous data to Google: pages viewed, approximate region, and device/browser type, so we can see how the terminal is used. Analytics load only after consent (we use Google Consent Mode, defaulting analytics storage to <i>denied</i>); if you press <b>Decline</b>, Google Analytics is never loaded and no analytics cookies are set. Our lawful basis for analytics is your <b>consent</b>, which you can withdraw at any time by <button type="button" class="link" onclick="HTConsent.manage()">reopening the cookie choice</button>, by clearing this site's storage, or by installing Google's <a class="link" href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Analytics opt-out add-on</a>. Google's own handling of this data is governed by the <a class="link" href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
 
   <h2>Not financial advice</h2>
   <div class="card"><p style="margin:0">Positions shown here can be <b>one leg of a hedge, a delta-neutral book, or a market-making inventory</b>, not a directional bet and not a copy-trade signal. Nothing on Hypurr Terminal is financial, investment, legal, or tax advice. Do your own research.</p></div>
@@ -61,6 +66,6 @@
 </div>
 <footer class="site"><div class="foot">
   Hypurr Terminal · unofficial community tool. Public on-chain &amp; Hyperliquid data only.
-  <div class="lg"><a href="/">Home</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a><a href="/collection">The Collection</a><a href="/positioning">The Index</a><a class="link" onclick="HTConsent.manage()">Cookie choice</a></div>
+  <div class="lg"><a href="/">Home</a><a href="https://x.com/intent/user?screen_name=0xYowie" target="_blank" rel="noopener">made by @0xyowie ↗</a><a href="/collection">The Collection</a><a href="/positioning">The Index</a><button type="button" class="link" onclick="HTConsent.manage()">Cookie choice</button></div>
 </div></footer>
 </body></html>

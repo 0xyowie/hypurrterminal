@@ -1,24 +1,35 @@
-// Generate /cat/<id> passport pages (per-cat OG unfurls + embedded data), scatter.json, sitemap-cats.xml
+// Generate /cat/<id> passport pages (per-cat OG unfurls + embedded data) and sitemap-cats.xml
+//
+// Two rules this script has to respect:
+//
+//  1. Read live state from site/data/, never from data/. data/ is the frozen July
+//     snapshot used to bootstrap the site; building 4,600 pages from it bakes in
+//     months-old owners and sale prices.
+//  2. The OG description must be STABLE. These pages are regenerated rarely, so any
+//     volatile fact baked into <meta> (last sale price, trade count) is stale on a
+//     crawler's next visit and there is no JavaScript to repair it. Volatile facts
+//     belong in the visible page, where passport.js refreshes them on load.
 import fs from "node:fs"; import path from "node:path";
 const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
 const D = p => path.join(ROOT, "data", p), S = p => path.join(ROOT, "site", p);
-const traits = JSON.parse(fs.readFileSync(D("traits.json"))).tokens;
-const owners = JSON.parse(fs.readFileSync(D("owners.json"))).owners;
-const prov = JSON.parse(fs.readFileSync(D("provenance_all.json"))).prov;
-const sales = JSON.parse(fs.readFileSync(D("sales.json"))).byToken;
+const traits = JSON.parse(fs.readFileSync(D("traits.json"))).tokens;   // static metadata
+const owners = JSON.parse(fs.readFileSync(S("data/owners.json")));      // {id: owner}
+const prov = JSON.parse(fs.readFileSync(S("data/provenance.json"))).prov;
+const sales = JSON.parse(fs.readFileSync(S("data/sales.json"))).byToken;
 fs.mkdirSync(S("cat"), { recursive: true });
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
-let scatter = [];
 const tpl = (t) => {
   const id = t.id, rr = t.rarityRank;
   const p = prov[id] || { trades: 0, currentOwner: owners[id] };
   const sl = (sales[id] || []).map(x => ({ t: x.ts, p: x.price }));
   const last = sl.length ? sl[sl.length-1].p : 0;
-  if (last) scatter.push({ id, rr, p: last });
   const flips = p.trades || 0;
   const diamond = flips === 0;
   const ownerShort = (p.currentOwner||"").slice(0,6)+"…"+(p.currentOwner||"").slice(-4);
-  const desc = `Rarity rank #${rr} of 4,600 · ${diamond ? "diamond hands, never traded" : `traded ${flips}×`}${last ? ` · last sale ${last} HYPE` : ""} · live on Hyperliquid.`;
+  // Stable by construction: rarity rank and trait count never change. No price, no
+  // trade count, nothing that goes stale between regenerations of these 4,600 pages.
+  const traitCount = Object.keys(t.traits || {}).length;
+  const desc = `Hypurr #${id}, rarity rank #${rr} of 4,600, ${traitCount} traits. Owner wallet, full sale history and live Hyperliquid positioning, updated every cycle.`;
   const DATA = JSON.stringify({ id, rr, traits: t.traits, flips, diamond, owner: p.currentOwner, sales: sl });
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hypurr #${id} · rank #${rr} · Hypurr Terminal</title>
@@ -74,8 +85,10 @@ const tpl = (t) => {
 };
 let n = 0;
 for (const t of traits) { fs.writeFileSync(S(`cat/${t.id}.html`), tpl(t)); n++; }
-fs.writeFileSync(S("data/scatter.json"), JSON.stringify({ pts: scatter }));
+// scatter.json is NOT written here. It is derived from sale prices, so it belongs to
+// the cron (refresh-prod.mjs), which rebuilds it on every scan that finds a sale.
+// Writing it from this script froze the chart at whenever the pages were last built.
 const sm = ['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   ...traits.map(t=>`<url><loc>https://hypurrterminal.xyz/cat/${t.id}</loc></url>`),'</urlset>'].join("\n");
 fs.writeFileSync(S("sitemap-cats.xml"), sm);
-console.log(`cat pages: ${n} · scatter pts: ${scatter.length} · sitemap-cats ${(fs.statSync(S("sitemap-cats.xml")).size/1024).toFixed(0)}KB`);
+console.log(`cat pages: ${n} · sitemap-cats ${(fs.statSync(S("sitemap-cats.xml")).size/1024).toFixed(0)}KB`);

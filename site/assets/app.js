@@ -87,6 +87,62 @@
     };
   }
 
+  // --- modal focus handling ---
+  // A sheet that never takes focus does not exist for a keyboard or a screen reader:
+  // Tab keeps walking the grid behind it and closing drops focus back onto <body>, which
+  // means the reader starts over from the top of the page. This marks the sheet as a
+  // dialog, moves focus into it, keeps Tab inside it, and hands focus back to whatever
+  // opened it. Usage: var fm=HT.focusModal(modalEl, sheetEl, label); call fm.onOpen()
+  // after showing and fm.onClose() from the same place that hides it.
+  var FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function focusModal(modalEl, sheetEl, label){
+    var last=null;
+    sheetEl.setAttribute('role','dialog');
+    sheetEl.setAttribute('aria-modal','true');
+    if(label) sheetEl.setAttribute('aria-label',label);
+    sheetEl.setAttribute('tabindex','-1');
+    modalEl.setAttribute('aria-hidden','true');
+    function items(){
+      return Array.prototype.filter.call(sheetEl.querySelectorAll(FOCUSABLE), function(el){
+        return el.offsetWidth || el.offsetHeight || el.getClientRects().length;
+      });
+    }
+    modalEl.addEventListener('keydown', function(e){
+      if(e.key!=='Tab') return;
+      var f=items();
+      if(!f.length){ e.preventDefault(); sheetEl.focus(); return; }
+      var first=f[0], end=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); end.focus(); }
+      else if(!e.shiftKey && document.activeElement===end){ e.preventDefault(); first.focus(); }
+    });
+    return {
+      onOpen:function(){
+        last=document.activeElement;
+        modalEl.setAttribute('aria-hidden','false');
+        var f=items()[0];
+        try{ (f||sheetEl).focus(); }catch(e){}
+      },
+      onClose:function(){
+        modalEl.setAttribute('aria-hidden','true');
+        if(last && last.focus) try{ last.focus(); }catch(e){}
+        last=null;
+      }
+    };
+  }
+
+  // --- keyboard route into onclick cards ---
+  // Cards are divs, so Enter and Space do nothing to them by default. One delegated
+  // handler on the container covers every card, including the ones re-rendered later.
+  function keyActivate(container, sel){
+    container.addEventListener('keydown', function(e){
+      if(e.key!=='Enter' && e.key!==' ' && e.key!=='Spacebar') return;
+      var el=e.target.closest && e.target.closest(sel);
+      if(!el || !container.contains(el)) return;
+      e.preventDefault();
+      el.click();
+    });
+  }
+
   function ready(fn){ if(document.readyState!=='loading')fn(); else document.addEventListener('DOMContentLoaded',fn); }
   ready(function(){
     markNav();
@@ -107,6 +163,8 @@
     pct:function(x){ return Math.round(x*100); },
     fmtD:function(ts){ return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); },
     json:function(p,fresh){ return fetch(p, fresh?{cache:'no-cache'}:undefined).then(function(r){ if(!r.ok) throw new Error(p+' '+r.status); return r.json(); }); },
-    backClose:backClose
+    backClose:backClose,
+    focusModal:focusModal,
+    keyActivate:keyActivate
   };
 })();

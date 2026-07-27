@@ -94,6 +94,7 @@
   .wsum{display:none;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
   .wsum .tile b{font-size:26px}
   .wsum .long b{color:var(--mint)} .wsum .short b{color:var(--coral)}
+  .wsum .unk b{color:var(--gold);font-size:20px} .wsum .unk{border-style:dashed}
   .wcats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:18px}
   .wcat{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .15s var(--ease)}
   .wcat:hover{transform:translateY(-3px)}
@@ -189,7 +190,7 @@
   <h2 class="sech disp" id="wallet">Wallet lookup</h2>
   <p class="secsub">Paste any wallet address to see its Hypurrs and the live stance of its Hyperliquid book, read straight from public data. No connect, ever.</p>
   <div class="lookup">
-    <input id="addr" placeholder="0x… wallet address" spellcheck="false" autocomplete="off">
+    <input id="addr" aria-label="Wallet address" placeholder="0x… wallet address" spellcheck="false" autocomplete="off">
     <button id="go">Look up</button>
   </div>
   <div class="status" id="status"></div>
@@ -222,9 +223,16 @@
   const nlong = IX.byNotional.longPct;
   document.getElementById('n-long').textContent = pct(nlong)+"% long";
   document.getElementById('n-bar').innerHTML = `<div class="seg long" style="flex:${Math.round(nlong*1000)}"></div><div class="seg short" style="flex:${Math.round((1-nlong)*1000)}"></div>`;
-  document.getElementById('read').textContent = pct(netLongPct) >= 55 && nlong < 50
-    ? `Most holders are long, but the biggest positions lean short. The crowd is bullish; the whales are hedged or fading them.`
-    : `Holders and dollars are pointing the same way right now.`;
+  // nlong is a 0..1 fraction; pct() returns it on a 0..100 scale. Comparing the raw
+  // fraction against 50 was always true, so the divergence copy showed even when the
+  // dollars agreed with the wallets.
+  const nlongPct = pct(nlong), wlongPct = pct(netLongPct);
+  document.getElementById('read').textContent =
+    wlongPct >= 55 && nlongPct < 50
+      ? `Most holders are long, but the biggest positions lean short. The crowd is bullish; the whales are hedged or fading them.`
+    : wlongPct <= 45 && nlongPct > 50
+      ? `Most holders are short, but the biggest positions lean long. The crowd is bearish; the whales are on the other side.`
+      : `Holders and dollars are pointing the same way right now.`;
   document.getElementById('t-holders').textContent = num(IX.holdersTotal);
   document.getElementById('t-live').textContent = num(IX.holdersWithPosition);
   document.getElementById('t-part').textContent = pct(IX.participationRate)+"%";
@@ -238,7 +246,12 @@
       <div class="hold"><b>${c.holders}</b><br>holders</div></div>`;
   }).join("");
   const tt=document.getElementById('tt');
-  document.addEventListener('mousemove',e=>{const el=e.target.closest('[data-t]');
+  document.addEventListener('mousemove',e=>{
+    // The charts further down own the tooltip while the pointer is over them. Without
+    // this guard, this handler fires on the same movement and blanks the tooltip the
+    // chart just wrote, so chart hovers never appeared.
+    if(e.target && e.target.closest && e.target.closest('canvas.chart')) return;
+    const el=e.target.closest('[data-t]');
     if(el){tt.innerHTML=el.getAttribute('data-t');tt.style.opacity=1;tt.style.left=Math.min(e.clientX+12,innerWidth-250)+"px";tt.style.top=(e.clientY+14)+"px";}else tt.style.opacity=0;});
   document.getElementById('note').textContent="Live read across all "+num(IX.holdersTotal)+" holders' Hyperliquid positions, refreshed on a rolling cycle through the day. Direction and size only, never PnL. Many holders run delta-neutral or hedged books, so this is a read on the pride, not a signal or financial advice.";
 })().catch(e=>{document.getElementById('h-ts').textContent='could not load data';console.error(e);});
@@ -249,7 +262,7 @@
     HT.json('/data/history.json', true).catch(()=>({points:[]})),
     HT.json('/data/hype_price.json', true).catch(()=>({px:[]})),
     HT.json('/data/leaders.json', true).catch(()=>null),
-    HT.json('/data/scatter.json').catch(()=>({pts:[]}))
+    HT.json('/data/scatter.json', true).catch(()=>({pts:[]}))   // rebuilt by the cron now, so no-cache
   ]);
   const css = getComputedStyle(document.documentElement);
   const COL = { mint: css.getPropertyValue('--mint').trim()||'#54E0CB', gold: css.getPropertyValue('--gold').trim()||'#EDBE72',
@@ -258,11 +271,34 @@
   function showTT(html,x,y){ tt.innerHTML=html; tt.style.opacity=1; tt.style.left=Math.min(x+12,innerWidth-190)+'px'; tt.style.top=(y+14)+'px'; }
   function hideTT(){ tt.style.opacity=0; }
   function prep(cv){ const dpr=Math.min(2,devicePixelRatio||1); const r=cv.getBoundingClientRect();
-    cv.width=r.width*dpr; cv.height=r.height*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr); return [ctx,r.width,r.height]; }
+    cv.width=r.width*dpr; cv.height=r.height*dpr; const ctx=cv.getContext('2d');
+    ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height); ctx.scale(dpr,dpr);
+    return [ctx,r.width,r.height]; }
+
+  // Canvas backing stores are sized from the element's box, so a rotate or a window
+  // resize leaves the old bitmap stretched and every hit-test off by the scale factor.
+  // Each chart registers its draw here and re-runs on resize.
+  const redraws=[];
+  let rzT=null;
+  addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ for(const f of redraws) { try{ f(); }catch(e){} } },180); });
+
+  // One hit-test path for mouse and touch. touch-action:pan-y on the canvas keeps the
+  // page scrollable, so a drag across the chart reads values without trapping the page.
+  function bindProbe(cv,probe){
+    const at=e=>{ const t=e.touches&&e.touches[0]; return t?{x:t.clientX,y:t.clientY}:{x:e.clientX,y:e.clientY}; };
+    cv.addEventListener('mousemove',e=>probe(at(e)));
+    cv.addEventListener('mouseleave',()=>{ hideTT(); });
+    cv.addEventListener('touchstart',e=>probe(at(e)),{passive:true});
+    cv.addEventListener('touchmove',e=>probe(at(e)),{passive:true});
+    cv.addEventListener('touchend',()=>setTimeout(hideTT,1600),{passive:true});
+  }
 
   const pts=H.points||[];
   (function(){
-    const cv=document.getElementById('sentchart'); const [ctx,W,Ht]=prep(cv);
+    const cv=document.getElementById('sentchart');
+    let X=null;
+    function draw(){
+    const [ctx,W,Ht]=prep(cv);
     const pad={l:44,r:52,t:14,b:22};
     // window = the terminal's lifetime (sentiment range), not HYPE's 120 days;
     // otherwise a young history squashes into a blob at the right edge
@@ -274,7 +310,7 @@
     let px=(span<=13*86400 && (P.pxh||[]).length ? P.pxh : (P.px||[])).filter(p=>p.t>=t0-3600&&p.t<=t1);
     if(px.length<2) px=(P.px||[]).filter(p=>p.t>=t0-86400&&p.t<=t1);
     if(px.length<2) px=(P.px||[]).slice(-3);
-    const X=t=>pad.l+(t-t0)/(t1-t0)*(W-pad.l-pad.r);
+    X=t=>pad.l+(t-t0)/(t1-t0)*(W-pad.l-pad.r);
     ctx.strokeStyle=COL.line; ctx.lineWidth=1;
     for(let i=0;i<=4;i++){ const y=pad.t+i*(Ht-pad.t-pad.b)/4; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); }
     if(px.length>1){
@@ -297,15 +333,17 @@
     } else document.getElementById('sentnote').textContent='First snapshots land within the hour. Check back.';
     document.getElementById('ax0').textContent=new Date(t0*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     document.getElementById('ax1').textContent='today';
-    cv.addEventListener('mousemove',e=>{
-      if(!pts.length) return hideTT();
-      const r=cv.getBoundingClientRect(); const mx=e.clientX-r.left;
+    }
+    draw();
+    redraws.push(draw);
+    bindProbe(cv,({x,y})=>{
+      if(!pts.length||!X) return hideTT();
+      const r=cv.getBoundingClientRect(); const mx=x-r.left;
       let best=null,bd=1e9; pts.forEach(p=>{ const d=Math.abs(X(p.t)-mx); if(d<bd){bd=d;best=p;} });
       if(best&&bd<40){ const v=Math.round(best.nl/(best.nl+best.ns)*100);
-        showTT(new Date(best.t*1000).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'<br>'+v+'% long · '+best.live+' live', e.clientX, e.clientY); }
+        showTT(new Date(best.t*1000).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'<br>'+v+'% long · '+best.live+' live', x, y); }
       else hideTT();
     });
-    cv.addEventListener('mouseleave',hideTT);
   })();
 
   if(L){
@@ -320,24 +358,30 @@
   }
 
   (function(){
-    const cv=document.getElementById('scatchart'); const [ctx,W,Ht]=prep(cv);
+    const cv=document.getElementById('scatchart');
     const pts=SC.pts||[]; if(!pts.length) return;
-    const pad={l:56,r:14,t:12,b:22};
-    const pmax=Math.max(...pts.map(p=>p.p));
-    const Y=v=>pad.t+(1-Math.log(1+v)/Math.log(1+pmax))*(Ht-pad.t-pad.b);
-    const X=rr=>pad.l+(rr/4600)*(W-pad.l-pad.r);
-    ctx.strokeStyle=COL.line; [200,500,1000,2000,5000,10000].filter(v=>v<=pmax*1.1).forEach(v=>{
-      ctx.beginPath(); ctx.moveTo(pad.l,Y(v)); ctx.lineTo(W-pad.r,Y(v)); ctx.stroke();
-      ctx.fillStyle=COL.faint; ctx.font='600 10.5px Inter'; ctx.textAlign='left'; ctx.fillText(v.toLocaleString(),6,Y(v)+4);
-    });
-    pts.forEach(p=>{ ctx.fillStyle='rgba(84,224,203,.45)'; ctx.beginPath(); ctx.arc(X(p.rr),Y(p.p),2.6,0,7); ctx.fill(); });
-    cv.addEventListener('mousemove',e=>{
-      const r=cv.getBoundingClientRect(); const mx=e.clientX-r.left,my=e.clientY-r.top;
+    let X=null, Y=null;
+    function draw(){
+      const [ctx,W,Ht]=prep(cv);
+      const pad={l:56,r:14,t:12,b:22};
+      const pmax=Math.max(...pts.map(p=>p.p));
+      Y=v=>pad.t+(1-Math.log(1+v)/Math.log(1+pmax))*(Ht-pad.t-pad.b);
+      X=rr=>pad.l+(rr/4600)*(W-pad.l-pad.r);
+      ctx.strokeStyle=COL.line; [200,500,1000,2000,5000,10000].filter(v=>v<=pmax*1.1).forEach(v=>{
+        ctx.beginPath(); ctx.moveTo(pad.l,Y(v)); ctx.lineTo(W-pad.r,Y(v)); ctx.stroke();
+        ctx.fillStyle=COL.faint; ctx.font='600 10.5px Inter'; ctx.textAlign='left'; ctx.fillText(v.toLocaleString(),6,Y(v)+4);
+      });
+      pts.forEach(p=>{ ctx.fillStyle='rgba(84,224,203,.45)'; ctx.beginPath(); ctx.arc(X(p.rr),Y(p.p),2.6,0,7); ctx.fill(); });
+    }
+    draw();
+    redraws.push(draw);
+    bindProbe(cv,({x,y})=>{
+      if(!X) return;
+      const r=cv.getBoundingClientRect(); const mx=x-r.left,my=y-r.top;
       let best=null,bd=1e9; pts.forEach(p=>{ const dx=X(p.rr)-mx,dy=Y(p.p)-my,d=dx*dx+dy*dy; if(d<bd){bd=d;best=p;} });
-      if(best&&bd<300){ showTT('Hypurr #'+best.id+'<br>rank #'+best.rr+' · last '+best.p.toLocaleString()+' HYPE',e.clientX,e.clientY); cv.style.cursor='pointer'; cv.dataset.hot=best.id; }
+      if(best&&bd<300){ showTT('Hypurr #'+best.id+'<br>rank #'+best.rr+' · last '+best.p.toLocaleString()+' HYPE',x,y); cv.style.cursor='pointer'; cv.dataset.hot=best.id; }
       else { hideTT(); cv.style.cursor='default'; cv.dataset.hot=''; }
     });
-    cv.addEventListener('mouseleave',hideTT);
     cv.addEventListener('click',()=>{ if(cv.dataset.hot) location.href='/cat/'+cv.dataset.hot; });
   })();
 })().catch(e=>console.error('pulse:',e));
@@ -347,27 +391,42 @@
   const $=id=>document.getElementById(id);
   const money=HT.money;
   let OWN=null, POSD=null;
+  // A failed fetch used to reject out of the lookup and leave "loading data…" on screen
+  // forever. Each file is caught on its own so the box can say what is actually wrong.
   async function load(){ if(!OWN){ $('status').textContent='loading data…';
-    [OWN,POSD]=await Promise.all([HT.json('/data/owners.json'),HT.json('/data/positions.json',true)]);
-    $('status').textContent=''; } }
+    const r=await Promise.all([
+      HT.json('/data/owners.json',true).catch(()=>null),
+      HT.json('/data/positions.json',true).catch(()=>null)]);
+    OWN=r[0]; POSD=r[1]; $('status').textContent=''; } }
   const held={},heldReady=()=>Object.keys(held).length;
   function index(){ for(const id in OWN){ (held[OWN[id]] ||= []).push(+id); } }
   async function lookup(a){
     a=(a||'').trim().toLowerCase();
     if(!/^0x[a-f0-9]{40}$/.test(a)){ $('status').textContent='That doesn’t look like a wallet address (0x + 40 hex).'; return; }
-    await load(); if(!heldReady()) index();
+    await load();
+    if(!OWN){ $('status').textContent='Could not load the ownership data right now. Try again in a moment.'; return; }
+    if(!heldReady()) index();
     history.replaceState(null,'','/positioning?a='+a+'#wallet');
     const ids=held[a]||[];
-    const w=POSD.wallets[a];
+    const w=POSD&&POSD.wallets?POSD.wallets[a]:null;
     const ps=(w&&w.positions||[]).filter(p=>p.notionalUsd>=10).sort((x,y)=>y.notionalUsd-x.notionalUsd);
     let net=0,tot=0; ps.forEach(p=>{const s=(p.direction==='long'?1:-1)*p.notionalUsd; net+=s; tot+=p.notionalUsd;});
-    $('status').textContent=ids.length?'':'This wallet holds no Hypurrs. Showing its book anyway.';
+    // The sweep only reads wallets that hold a Hypurr, and a wallet can also fail to
+    // answer during a cycle. In both cases the honest answer is "not checked", not
+    // "flat": nothing was read, so nothing is known about the book either way.
+    const unread = !w || w.error;
+    $('status').textContent = ids.length
+      ? (unread ? 'This wallet did not answer on the last sweep, so its book is unknown right now. It should be back on the next cycle.' : '')
+      : (unread ? 'This wallet holds no Hypurrs, so it is outside the sweep and its book was never read.'
+                : 'This wallet holds no Hypurrs. Showing its book anyway.');
     const sum=$('wsum'); sum.style.display='grid';
+    const stance = unread ? 'not checked' : ps.length ? (net>=0?'net long':'net short') : 'flat';
+    const stanceCls = unread ? 'unk' : net>0 ? 'long' : net<0 ? 'short' : '';
     sum.innerHTML=`<div class="tile"><b>${ids.length}</b><span>HYPURRS HELD</span></div>`+
-      `<div class="tile ${net>0?'long':net<0?'short':''}"><b>${ps.length?(net>=0?'net long':'net short'):'flat'}</b><span>LIVE STANCE</span></div>`+
-      `<div class="tile"><b>${tot?money(tot):'–'}</b><span>TOTAL AT RISK</span></div>`;
+      `<div class="tile ${stanceCls}"><b>${stance}</b><span>LIVE STANCE</span></div>`+
+      `<div class="tile"><b>${unread?'–':tot?money(tot):'–'}</b><span>TOTAL AT RISK</span></div>`;
     const pos=$('pos');
-    if(ps.length){ pos.style.display='block';
+    if(ps.length && !unread){ pos.style.display='block';
       pos.innerHTML='<h3>Open positions</h3>'+ps.slice(0,14).map(p=>`<span class="pp"><b>${HT.esc(p.coin)}</b>`+
         `<span class="sd ${p.direction}">${p.leverage?p.leverage.value+'x ':''}${p.direction}</span><span class="nt">${money(p.notionalUsd)}</span></span>`).join('')+
         (ps.length>14?`<span class="pp">+${ps.length-14} more</span>`:'');
