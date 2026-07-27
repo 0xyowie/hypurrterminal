@@ -11,7 +11,11 @@
 // the cron, and only to the cron.
 import fs from "node:fs";
 import path from "node:path";
-const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
+import { fileURLToPath } from "node:url";
+// fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
+// checkout under a folder with a space in it resolves to "Perps%20trading" and every
+// read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
+const ROOT = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const D = path.join(ROOT, "data");
 const OUT = path.join(ROOT, "site/data");
 fs.mkdirSync(OUT, { recursive: true });

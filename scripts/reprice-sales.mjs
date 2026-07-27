@@ -18,6 +18,7 @@
 // do not cover, so a re-run is cheap.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { priceForLeg, isAttributed, DUST } from "./sale-price.mjs";
 import { makePool, pmap } from "./rpc-pool.mjs";
 
@@ -27,7 +28,10 @@ const XFER  = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3e
 const ZERO  = "0x0000000000000000000000000000000000000000";
 const DIST  = "0xdc97b8a7023c5e29b1ca17ed9e850b8ba457d610";
 
-const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
+// fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
+// checkout under a folder with a space in it resolves to "Perps%20trading" and every
+// read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
+const ROOT = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const D   = path.join(ROOT, "data");
 const OUT = path.join(ROOT, "site/data");
 const DRY = process.argv.includes("--dry-run");

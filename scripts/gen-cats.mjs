@@ -10,7 +10,11 @@
 //     crawler's next visit and there is no JavaScript to repair it. Volatile facts
 //     belong in the visible page, where passport.js refreshes them on load.
 import fs from "node:fs"; import path from "node:path";
-const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
+import { fileURLToPath } from "node:url";
+// fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
+// checkout under a folder with a space in it resolves to "Perps%20trading" and every
+// read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
+const ROOT = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const D = p => path.join(ROOT, "data", p), S = p => path.join(ROOT, "site", p);
 const traits = JSON.parse(fs.readFileSync(D("traits.json"))).tokens;   // static metadata
 const owners = JSON.parse(fs.readFileSync(S("data/owners.json")));      // {id: owner}

@@ -4,6 +4,7 @@
 // Phase 2 (positions): live Hyperliquid perp positioning for the CURRENT holders.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { priceForLeg as priceLeg, DUST as DUST_HYPE } from "./sale-price.mjs";
 import { makePool, pmap } from "./rpc-pool.mjs";
 
@@ -21,7 +22,10 @@ const SUPPLY = 4600;
 const CHAIN_ID = 999;
 const GENESIS_BLOCK = 40876211; // first ownership snapshot block (fallback scan floor)
 
-const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
+// fileURLToPath, not url.pathname: a pathname keeps its percent-encoding, so a
+// checkout under a folder with a space in it resolves to "Perps%20trading" and every
+// read fails with ENOENT. The CI runner has no spaces in its path and never saw this.
+const ROOT = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const D = path.join(ROOT, "data");        // static inputs (traits)
 const OUT = path.join(ROOT, "site/data"); // outputs + prior state
 fs.mkdirSync(OUT, { recursive: true });
