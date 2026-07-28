@@ -3,8 +3,14 @@
 import { test, expect } from '@playwright/test';
 import { PAGES, seedConsent, isThirdParty } from '../helpers/util.mjs';
 
-const LCP_BUDGET_MS = Number(process.env.LCP_BUDGET_MS || 2500);
-const CRITICAL_KB = Number(process.env.CRITICAL_KB || 150);
+// These budgets describe what a person on real hardware should get. A shared 2-core
+// CI runner cannot measure that — it measures the runner. Rather than delete the
+// check there (a 10x regression should still fail a PR) the budgets are scaled, and
+// the multiplier is printed so nobody mistakes a CI number for a real one.
+const CI_MULT = Number(process.env.PERF_CI_MULTIPLIER || (process.env.CI ? 3 : 1));
+const LCP_BUDGET_MS = Number(process.env.LCP_BUDGET_MS || 2500) * CI_MULT;
+const FCP_BUDGET_MS = Number(process.env.FCP_BUDGET_MS || 2000) * CI_MULT;
+const CRITICAL_KB = Number(process.env.CRITICAL_KB || 150);   // bytes don't care how fast the box is
 const FPS_FLOOR = Number(process.env.FPS_FLOOR || 45);
 
 test.beforeEach(async ({ context }) => { await seedConsent(context); });
@@ -50,8 +56,8 @@ for (const p of PAGES) {
   test(`perf ${p.name}: LCP and paint budgets`, async ({ page }) => {
     await blockFonts(page);
     const m = await measure(page, p.path);
-    console.log(`${p.path}: FCP ${Math.round(m.nav.fcp)}ms, LCP ${Math.round(m.lcp)}ms, ${Math.round(m.bytes.total / 1024)}KB`);
-    expect(m.nav.fcp, `${p.path} first contentful paint (ms)`).toBeLessThan(2000);
+    console.log(`${p.path}: FCP ${Math.round(m.nav.fcp)}ms, LCP ${Math.round(m.lcp)}ms, ${Math.round(m.bytes.total / 1024)}KB${CI_MULT > 1 ? ` (budgets x${CI_MULT} for CI)` : ''}`);
+    expect(m.nav.fcp, `${p.path} first contentful paint (ms) — budget ${FCP_BUDGET_MS}`).toBeLessThan(FCP_BUDGET_MS);
     expect(m.lcp, `${p.path} LCP (ms) — budget ${LCP_BUDGET_MS}`).toBeLessThan(LCP_BUDGET_MS);
   });
 }
@@ -71,17 +77,18 @@ test('perf: a slow Google Fonts must not hold up first paint', async ({ page }) 
     await new Promise((res) => setTimeout(res, 10_000));
     await r.abort();
   });
+  const window = 8000 * CI_MULT;
   await page.goto('/', { waitUntil: 'commit' });
-  const fcp = await page.evaluate(() => new Promise((res) => {
+  const fcp = await page.evaluate((w) => new Promise((res) => {
     const done = () => {
       const e = performance.getEntriesByName('first-contentful-paint')[0];
       if (e) res(e.startTime); else setTimeout(done, 100);
     };
-    setTimeout(() => res(null), 8000);
+    setTimeout(() => res(null), w);
     done();
-  }));
-  expect(fcp, 'page did not paint within 8s while the font CDN hung').not.toBeNull();
-  expect(fcp, `first paint waited ${Math.round(fcp)}ms on the font CDN`).toBeLessThan(2500);
+  }), window);
+  expect(fcp, `page did not paint within ${window / 1000}s while the font CDN hung`).not.toBeNull();
+  expect(fcp, `first paint waited ${Math.round(fcp)}ms on the font CDN (budget ${2500 * CI_MULT})`).toBeLessThan(2500 * CI_MULT);
 });
 
 test('perf landing: the hero holds frame rate', async ({ page }) => {

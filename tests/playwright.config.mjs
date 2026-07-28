@@ -14,7 +14,9 @@ export default defineConfig({
   timeout: 90_000,
   expect: { timeout: 15_000 },
   fullyParallel: true,
-  workers: TARGET === 'live' ? 3 : 5,
+  // GitHub runners have 2 cores. Five parallel Chromium instances there means every
+  // page load competes for CPU, which shows up as "slow site" in the perf specs.
+  workers: process.env.CI ? 2 : (TARGET === 'live' ? 3 : 5),
   retries: TARGET === 'live' ? 1 : 0,
   forbidOnly: true,
   reporter: [
