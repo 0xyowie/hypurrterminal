@@ -178,6 +178,16 @@ test.describe('data files', () => {
     expect(states.awakeTokens).toBe(awake);
     expect(states.unreadTokens).toBe(unread);
     expect(idx.awakeTokens, 'index.json awakeTokens').toBe(awake);
+
+    // The landing counts HYPURRS awake; The Desk counts WALLETS with an open book.
+    // Both are correct and they are never equal, because a holder often keeps several
+    // Hypurrs. What must hold is the relationship between them: every awake Hypurr is
+    // owned by a wallet with a position, and every such wallet holds at least one.
+    const liveWallets = new Set(Object.entries(pos.wallets).filter(([, w]) => w.hasPosition).map(([a]) => a));
+    const heldByLiveWallets = Object.values(owners).filter((a) => liveWallets.has(a)).length;
+    expect(states.awakeTokens, 'awake Hypurrs must be exactly those held by trading wallets').toBe(heldByLiveWallets);
+    expect(states.awakeTokens, 'awake Hypurrs cannot be fewer than the wallets holding them')
+      .toBeGreaterThanOrEqual(idx.holdersWithPosition);
   });
 
   test('desk.json rows agree with positions.json', async ({ request, baseURL }) => {

@@ -57,6 +57,22 @@ test('Collection: search, sort, live filter and the detail sheet', async ({ page
   expect(diag.consoleErrors).toEqual([]);
 });
 
+test('Landing: the awake count names its unit and reconciles with the wallet count', async ({ page, request, baseURL }) => {
+  const [idx, states] = await Promise.all([
+    getJSON(request, baseURL, 'index.json'), getJSON(request, baseURL, 'cat_states.json'),
+  ]);
+  await page.goto('/');
+  const pill = page.locator('.awake');
+  await expect(pill).toContainText(states.awakeTokens.toLocaleString('en-US'));
+  // "778 awake" alone reads as wallets and contradicts The Desk's 562. Name the unit.
+  await expect(pill, 'the hero count must say what it is counting').toContainText(/Hypurrs/);
+
+  const sub = page.locator('#awakesub');
+  await expect(sub).toContainText(states.awakeTokens.toLocaleString('en-US'));
+  await expect(sub, 'the landing must also carry the wallet count that The Desk shows')
+    .toContainText(idx.holdersWithPosition.toLocaleString('en-US'));
+});
+
 test('The Desk: rows render, filters and search work', async ({ page }) => {
   const diag = attachDiagnostics(page);
   await page.goto('/desk');

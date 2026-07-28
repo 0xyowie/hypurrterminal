@@ -108,7 +108,7 @@
       <p class="sub">Every particle you see is a real Hypurr. Behind each one is a Hyperliquid wallet, and hundreds are live on the tape right now.</p>
       <div class="row">
         <a class="btn" href="/collection">Enter the den →</a>
-        <span class="awake"><span class="p"></span><b id="awake">–</b>&nbsp;awake right now</span>
+        <span class="awake"><span class="p"></span><b id="awake">–</b>&nbsp;Hypurrs awake right now</span>
       </div>
     </div>
 
@@ -129,7 +129,7 @@
     <div class="beat" data-b="3">
       <div class="eyebrow">Right now, on the tape</div>
       <div class="h disp"><span class="live" id="awake2">–</span> awake.<br>The rest are dreaming.</div>
-      <p class="sub">Direction and size only, never PnL. Many of these books are hedged or delta neutral, so what you see is one leg and not a call. Keep scrolling to explore the terminal.</p>
+      <p class="sub" id="awakesub">Direction and size only, never PnL. Many of these books are hedged or delta neutral, so what you see is one leg and not a call. Keep scrolling to explore the terminal.</p>
       <div class="row"><a class="btn" href="/desk">See the live desk →</a></div>
     </div>
 
@@ -467,6 +467,10 @@
   const dots=[...document.querySelectorAll('#prog i')];
   const cue=document.getElementById('cue');
   document.getElementById('awake2').textContent=awakeTokens.toLocaleString();
+  // The Desk counts WALLETS with an open book; this page counts HYPURRS, because one
+  // particle is one Hypurr. Those are different numbers (a holder often keeps several),
+  // so say both here rather than leaving a reader to wonder which one is wrong.
+  document.getElementById('awakesub').textContent=`${awakeTokens.toLocaleString()} Hypurrs, held by ${IX.holdersWithPosition.toLocaleString()} wallets — one holder often keeps several. Direction and size only, never PnL. Many of these books are hedged or delta neutral, so what you see is one leg and not a call.`;
   document.getElementById('leansub').textContent=`${bw.netLong.toLocaleString()} holder wallets lean long, ${bw.netShort.toLocaleString()} lean short, counted one vote per wallet rather than by size. Plenty of those books are hedged or delta neutral, so a lean is a snapshot and not a signal.`;
   function onScroll(){
     const r=story.getBoundingClientRect();
