@@ -1,7 +1,7 @@
 // The shipped JSON must be well-formed, internally consistent and fresh —
 // and must never contain a PnL field.
 import { test, expect } from '@playwright/test';
-import { SUPPLY, DATA_FILES, FORBIDDEN_PNL, getJSON, ageMinutes, isAddress, near } from '../helpers/util.mjs';
+import { SUPPLY, DATA_FILES, FORBIDDEN_PNL, IS_LIVE, getJSON, ageMinutes, isAddress, near } from '../helpers/util.mjs';
 
 const MAX_AGE_MIN = Number(process.env.MAX_DATA_AGE_MIN || 180);
 
@@ -78,7 +78,7 @@ test.describe('data files', () => {
     const holders = new Set(Object.values(owners));
 
     expect(pos.source).toBe('clearinghouseState');
-    expect(ageMinutes(pos.generatedAt), 'positions.json age (minutes)').toBeLessThan(MAX_AGE_MIN);
+    if (IS_LIVE) expect(ageMinutes(pos.generatedAt), 'positions.json age (minutes)').toBeLessThan(MAX_AGE_MIN);
 
     const walletAddrs = Object.keys(pos.wallets);
     expect(walletAddrs.length).toBe(holders.size);
@@ -306,7 +306,7 @@ test.describe('data files', () => {
       expect(s.filter((c, i) => i && c.t < s[i - 1].t).length, `${series} out of order`).toBe(0);
       expect(s.every((c) => c.c > 0 && c.c < 10_000), `${series} implausible price`).toBeTruthy();
     }
-    expect(ageMinutes(hype.updated), 'hype_price.json age').toBeLessThan(MAX_AGE_MIN);
+    if (IS_LIVE) expect(ageMinutes(hype.updated), 'hype_price.json age').toBeLessThan(MAX_AGE_MIN);
   });
 
   test('leaderboards reference real, live wallets', async ({ request, baseURL }) => {
@@ -359,8 +359,10 @@ test.describe('data files', () => {
       stamps[f] = d.generatedAt || d.updated;
     }
     const ages = Object.entries(stamps).map(([f, t]) => [f, Math.round(ageMinutes(t))]);
-    const stale = ages.filter(([, a]) => a > MAX_AGE_MIN);
-    expect(stale, `stale data (minutes old, limit ${MAX_AGE_MIN}): ${JSON.stringify(ages)}`).toEqual([]);
+    if (IS_LIVE) {
+      const stale = ages.filter(([, a]) => a > MAX_AGE_MIN);
+      expect(stale, `stale data (minutes old, limit ${MAX_AGE_MIN}): ${JSON.stringify(ages)}`).toEqual([]);
+    }
     expect(new Set(Object.values(stamps)).size, `cycle stamps disagree: ${JSON.stringify(stamps)}`).toBe(1);
   });
 });

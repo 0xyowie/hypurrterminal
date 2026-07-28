@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getJSON, ageMinutes } from '../helpers/util.mjs';
+import { getJSON, ageMinutes, IS_LIVE } from '../helpers/util.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const REPO = process.env.GH_REPO || '0xyowie/hypurrterminal';
@@ -29,6 +29,7 @@ test('the refresh script still refuses to publish PnL or a degraded snapshot', a
 });
 
 test('published data is fresh relative to the cron cadence', async ({ request, baseURL }) => {
+  test.skip(!IS_LIVE, 'freshness is a property of production, not of a checkout');
   const idx = await getJSON(request, baseURL, 'index.json');
   const age = ageMinutes(idx.generatedAt);
   // the cron asks for every 15 minutes; GitHub delays it, so 3 hours is the alarm line

@@ -106,7 +106,12 @@ test('cookie consent gates Google Analytics', async ({ browser, baseURL }) => {
 
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   const banner = page.locator('#cookie');
+  // The banner is injected on DOMContentLoaded and slides in on a CSS transition.
+  // Clicking mid-transition makes Playwright wait for the element to stop moving,
+  // which on a slow CI runner burns the whole action timeout. Wait for the class
+  // that ends the transition first.
   await expect(banner).toBeVisible();
+  await expect(banner).toHaveClass(/show/);
   await page.waitForTimeout(2500);
   expect(gaHits, 'GA loaded before consent').toEqual([]);
 
@@ -122,6 +127,9 @@ test('cookie consent gates Google Analytics', async ({ browser, baseURL }) => {
   const gaHits2 = [];
   page2.on('request', (r) => { if (/googletagmanager|google-analytics/.test(r.url())) gaHits2.push(r.url()); });
   await page2.goto(baseURL, { waitUntil: 'domcontentloaded' });
+  const banner2 = page2.locator('#cookie');
+  await expect(banner2).toBeVisible();
+  await expect(banner2).toHaveClass(/show/);
   await page2.click('#cc-yes');
   await expect.poll(() => gaHits2.length, { timeout: 15_000, message: 'GA never loaded after accepting' }).toBeGreaterThan(0);
 

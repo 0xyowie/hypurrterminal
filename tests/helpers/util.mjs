@@ -1,6 +1,11 @@
 // Shared constants + helpers for the Hypurr Terminal test suite.
 export const SUPPLY = 4600;
 
+// Data age is a property of production, not of a checkout. A commit made during a
+// quiet stretch would otherwise fail its own CI for being "stale", which says nothing
+// about the code being pushed.
+export const IS_LIVE = (process.env.TARGET || 'local') === 'live';
+
 // Every page the site actually serves, with the selector that only fills in
 // once that page's live data has arrived.
 export const PAGES = [
