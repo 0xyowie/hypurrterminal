@@ -17,7 +17,12 @@ test('workflow file is present and sane', async () => {
   expect(y, 'workflow needs write permission to commit data').toMatch(/permissions:[\s\S]*contents:\s*write/);
   expect(y, 'runs should not stack on top of each other').toMatch(/concurrency:/);
   expect(y).toContain('refresh-prod.mjs');
-  expect(y, 'a rebase before push avoids losing a cycle to a race').toMatch(/git pull --rebase/);
+  // Generated data must never be rebased: there is nothing to merge, and a conflict
+  // leaves markers in the checkout that the next JSON read chokes on.
+  expect(y, 'the refresh must not rebase site/data').not.toMatch(/git pull --rebase/);
+  expect(y, 'fresh data should be replayed on top of origin/main').toMatch(/git reset --hard --quiet origin\/main/);
+  expect(y, 'and pushed explicitly to main, with retries').toMatch(/git push --quiet origin HEAD:main/);
+  expect(y, 'diagnostics must not be able to fail the run').toMatch(/continue-on-error: true/);
 });
 
 test('the refresh script still refuses to publish PnL or a degraded snapshot', async () => {

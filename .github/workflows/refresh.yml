@@ -48,22 +48,43 @@ jobs:
           set -u
           git config user.name  "hypurr-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
+
+          # site/data is regenerated in full every sweep, so there is nothing in it to
+          # merge with whatever landed upstream meanwhile. Rebasing it invites a
+          # conflict, and a conflict leaves markers in the checkout that the next read
+          # chokes on (seen 2026-07-28: "Unexpected token '<', \"<<<<<<< HE\""). So:
+          # keep the fresh data aside, take origin/main as the base, put the data back.
+          publish() {
+            out="${RUNNER_TEMP}/data-out"
+            for attempt in 1 2 3; do
+              rm -rf "$out"
+              cp -R site/data "$out"
+              if ! git fetch --quiet origin main; then sleep 5; continue; fi
+              git reset --hard --quiet origin/main
+              rm -rf site/data
+              cp -R "$out" site/data
+              git add site/data
+              if git diff --cached --quiet; then
+                echo "No change in positions this cycle."
+                return 0
+              fi
+              git commit --quiet -m "data: refresh positions $(date -u +%FT%TZ)"
+              if git push --quiet origin HEAD:main; then
+                echo "published $(git rev-parse --short HEAD)"
+                return 0
+              fi
+              echo "push attempt $attempt lost a race, retrying"
+              sleep $((attempt * 5))
+            done
+            echo "could not publish this cycle"
+            return 1
+          }
+
           fail=0
           for i in $(seq 1 "$SWEEPS"); do
             echo "::group::sweep $i/$SWEEPS"
             if node scripts/refresh-prod.mjs; then
-              git add site/data
-              if git diff --cached --quiet; then
-                echo "No change in positions this cycle."
-              else
-                git commit -m "data: refresh positions $(date -u +%FT%TZ)"
-                # Rebase onto whatever landed while we were sweeping, then push.
-                for attempt in 1 2 3; do
-                  git pull --rebase origin main && git push && break
-                  echo "push attempt $attempt failed, retrying"
-                  sleep 10
-                done
-              fi
+              publish || fail=$((fail+1))
             else
               echo "sweep $i failed"
               fail=$((fail+1))
@@ -79,10 +100,12 @@ jobs:
 
       - name: Report freshness
         if: always()
+        continue-on-error: true
         run: |
+          # Diagnostics only. This must never be the thing that turns a run red.
           node -e "
             const d = require('./site/data/index.json');
             const age = Math.round((Date.now() - new Date(d.generatedAt)) / 60000);
             console.log('published cycle ' + d.generatedAt + ' (' + age + ' min old)');
             console.log('holders ' + d.holdersTotal + ', live ' + d.holdersWithPosition + ', unread ' + (d.holdersUnread ?? 'n/a'));
-          "
+          " || echo "could not read site/data/index.json"
