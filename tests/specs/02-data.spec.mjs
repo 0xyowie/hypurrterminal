@@ -352,17 +352,32 @@ test.describe('data files', () => {
   });
 
   test('every data timestamp comes from the same refresh cycle', async ({ request, baseURL }) => {
-    const stamped = ['index.json', 'positions.json', 'desk.json', 'cat_states.json', 'leaders.json', 'history.json', 'hype_price.json'];
+    // These are all written from one in-memory snapshot, so they must agree exactly.
+    const core = ['index.json', 'positions.json', 'desk.json', 'cat_states.json', 'leaders.json', 'history.json'];
+    // hype_price is different: it comes from an external candle API, and the cron
+    // deliberately keeps the last good copy rather than failing the whole cycle over
+    // a refused request. So it may trail — but not by so much that the price overlay
+    // is telling a different story than the sentiment line drawn next to it.
+    const lagging = { 'hype_price.json': Number(process.env.MAX_PRICE_LAG_MIN || 240) };
+
     const stamps = {};
-    for (const f of stamped) {
+    for (const f of [...core, ...Object.keys(lagging)]) {
       const d = await getJSON(request, baseURL, f);
       stamps[f] = d.generatedAt || d.updated;
     }
     const ages = Object.entries(stamps).map(([f, t]) => [f, Math.round(ageMinutes(t))]);
     if (IS_LIVE) {
-      const stale = ages.filter(([, a]) => a > MAX_AGE_MIN);
+      const stale = core.filter((f) => ageMinutes(stamps[f]) > MAX_AGE_MIN);
       expect(stale, `stale data (minutes old, limit ${MAX_AGE_MIN}): ${JSON.stringify(ages)}`).toEqual([]);
     }
-    expect(new Set(Object.values(stamps)).size, `cycle stamps disagree: ${JSON.stringify(stamps)}`).toBe(1);
+
+    const coreStamps = new Set(core.map((f) => stamps[f]));
+    expect(coreStamps.size, `cycle stamps disagree: ${JSON.stringify(stamps)}`).toBe(1);
+
+    const cycle = new Date([...coreStamps][0]).getTime();
+    for (const [f, limit] of Object.entries(lagging)) {
+      const lag = (cycle - new Date(stamps[f]).getTime()) / 60000;
+      expect(lag, `${f} is ${Math.round(lag)} min behind the cycle (limit ${limit}) — the candle fetch has been failing`).toBeLessThan(limit);
+    }
   });
 });

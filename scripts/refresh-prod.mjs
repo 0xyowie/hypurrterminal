@@ -409,17 +409,31 @@ try {
 // daily for the long arc, hourly for the young-terminal window (the chart picks by span)
 try {
   const now = Date.now();
-  async function candles(interval, days){
-    const r = await fetch(INFO, { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "candleSnapshot", req: { coin: "HYPE", interval, startTime: now - days*86400e3, endTime: now } }),
-      signal: AbortSignal.timeout(15000) });
-    if (!r.ok) return null;
-    const j = await r.json();
-    return Array.isArray(j) ? j.map(c => ({ t: Math.floor(c.t/1000), c: +c.c })) : null;
+  // One refused request used to freeze the price overlay for a whole cycle without a
+  // word in the log: the file simply was not rewritten, so the chart kept yesterday's
+  // candles while everything around it moved. Retry, then say so if it still fails.
+  async function candles(interval, days, tries = 3){
+    for (let i = 0; i < tries; i++) {
+      try {
+        const r = await fetch(INFO, { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "candleSnapshot", req: { coin: "HYPE", interval, startTime: now - days*86400e3, endTime: now } }),
+          signal: AbortSignal.timeout(15000) });
+        if (r.ok) {
+          const j = await r.json();
+          if (Array.isArray(j)) return j.map(c => ({ t: Math.floor(c.t/1000), c: +c.c }));
+        }
+      } catch { /* fall through to the retry */ }
+      if (i < tries - 1) await new Promise(res => setTimeout(res, 800 * (i + 1)));
+    }
+    return null;
   }
   const px = await candles("1d", 120);
   const pxh = await candles("1h", 14);
   if (px) fs.writeFileSync(path.join(OUT, "hype_price.json"), JSON.stringify({ updated: generatedAt, px, pxh: pxh||[] }));
+  else {
+    const prev = readOut("hype_price.json");
+    console.warn(`hype price: candle fetch failed after retries — keeping the copy from ${prev?.updated || "an earlier cycle"}`);
+  }
 } catch (e) { console.error("hype price:", e.message); }
 
 // ---- leaders.json : leaderboards for The Pulse ----
