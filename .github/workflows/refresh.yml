@@ -21,7 +21,7 @@ on:
       sweeps:
         description: 'How many sweeps this run should perform'
         required: false
-        default: '3'
+        default: '8'
 
 concurrency:
   group: refresh
@@ -33,9 +33,13 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    # Eight sweeps 15 minutes apart covers ~2 hours per run. GitHub delivers the cron
+    # late and unevenly — measured gaps between triggers ran to 2.5 hours overnight —
+    # so a run that keeps working through that window is what actually closes the
+    # holes. The runner mostly sleeps; on a public repo that costs nothing.
+    timeout-minutes: 150
     env:
-      SWEEPS: ${{ github.event.inputs.sweeps || (github.event_name == 'push' && '1' || '3') }}
+      SWEEPS: ${{ github.event.inputs.sweeps || (github.event_name == 'push' && '1' || '8') }}
       GAP_SECONDS: '900'
     steps:
       - uses: actions/checkout@v4
